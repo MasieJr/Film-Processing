@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import branchRoutes from './routes/branchRoutes.js'
+import branchRoutes from './routes/branchRoutes.js';
+import serviceRoutes from './routes/serviceRoutes.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors()); // Allow the Flutter app to talk to us
 app.use(express.json()); // Allow us to read JSON data
 
 app.use('/branches', branchRoutes);
+app.use('/services',serviceRoutes);
 
 // A Simple Test Route
 app.get('/', (req, res) => {
