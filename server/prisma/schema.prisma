@@ -1,60 +1,59 @@
-// This is your Database Configuration File
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // --------------------------------------
-// 1. The Branch (Hub & Spoke Logic)
+// 1. The Branch
 // --------------------------------------
 model Branch {
   id          Int      @id @default(autoincrement())
-  name        String   // e.g. "Sandton", "Cresta Hub"
+  name        String
   isHub       Boolean  @default(false)
-  transitDays Int      // 0 for Hub, 21 for outlying branches
+  transitDays Int
   orders      Order[]
 }
 
 // --------------------------------------
-// 2. The Customer (Privacy First)
+// 2. The Customer
 // --------------------------------------
 model Customer {
   id          Int      @id @default(autoincrement())
   firstName   String
   lastName    String?
-  phone       String   @unique // The primary identifier (No passwords)
+  phone       String   @unique
   email       String?
   orders      Order[]
 }
 
 // --------------------------------------
-// 3. The Services Menu (Prices)
+// 3. The Services Menu
 // --------------------------------------
 model Service {
   id          Int      @id @default(autoincrement())
-  name        String   // e.g. "Dev + Scan (High Res)"
-  price       Decimal  @db.Decimal(10, 2) // Current price
-  category    Category @default(35mm)
+  name        String
+  price       Decimal  
+  category    String   @default("COLOR") // Changed from Enum to String
   orders      Order[]
 }
 
 // --------------------------------------
-// 4. The Order (The Core)
+// 4. The Order
 // --------------------------------------
 model Order {
   id              Int         @id @default(autoincrement())
   createdAt       DateTime    @default(now())
   
-  // Status Tracking
-  status          OrderStatus @default(RECEIVED)
-  expectedDate    DateTime    // Auto-calculated by your Node.js logic
+  // Changed from Enum to String for SQLite compatibility
+  status          String      @default("RECEIVED") 
+  expectedDate    DateTime
   
-  // Connections
   customer        Customer    @relation(fields: [customerId], references: [id])
   customerId      Int
   
@@ -63,28 +62,11 @@ model Order {
 
   service         Service     @relation(fields: [serviceId], references: [id])
   serviceId       Int
-  priceAtOrder    Decimal     @db.Decimal(10, 2) // Saved in case prices change later
+  priceAtOrder    Decimal     
 
-  // Deliverables
-  smashLink       String?     // The Zip file download
-  previewImages   Json?       // Array of S3 URLs ["url1", "url2"]
+  smashLink       String?
+  previewImages   String?     
 }
 
-// --------------------------------------
-// Enums (Strict choices)
-// --------------------------------------
-enum OrderStatus {
-  RECEIVED
-  IN_TRANSIT_TO_HUB
-  DEVELOPING
-  SCANNING
-  READY_FOR_COLLECTION
-  COMPLETED
-}
-
-enum Category {
-  120mm
-  35mm
-  110mm
-  SLIDE
-}
+// Enums removed because SQLite doesn't support them.
+// We will handle the strict logic in TypeScript instead!

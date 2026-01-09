@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import branchRoutes from './routes/branchRoutes.js'
 
 dotenv.config();
 
@@ -10,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors()); // Allow the Flutter app to talk to us
 app.use(express.json()); // Allow us to read JSON data
+
+app.use('/branches', branchRoutes);
 
 // A Simple Test Route
 app.get('/', (req, res) => {
