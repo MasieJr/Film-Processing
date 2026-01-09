@@ -1,0 +1,90 @@
+// This is your Database Configuration File
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------
+// 1. The Branch (Hub & Spoke Logic)
+// --------------------------------------
+model Branch {
+  id          Int      @id @default(autoincrement())
+  name        String   // e.g. "Sandton", "Cresta Hub"
+  isHub       Boolean  @default(false)
+  transitDays Int      // 0 for Hub, 21 for outlying branches
+  orders      Order[]
+}
+
+// --------------------------------------
+// 2. The Customer (Privacy First)
+// --------------------------------------
+model Customer {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String?
+  phone       String   @unique // The primary identifier (No passwords)
+  email       String?
+  orders      Order[]
+}
+
+// --------------------------------------
+// 3. The Services Menu (Prices)
+// --------------------------------------
+model Service {
+  id          Int      @id @default(autoincrement())
+  name        String   // e.g. "Dev + Scan (High Res)"
+  price       Decimal  @db.Decimal(10, 2) // Current price
+  category    Category @default(35mm)
+  orders      Order[]
+}
+
+// --------------------------------------
+// 4. The Order (The Core)
+// --------------------------------------
+model Order {
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  
+  // Status Tracking
+  status          OrderStatus @default(RECEIVED)
+  expectedDate    DateTime    // Auto-calculated by your Node.js logic
+  
+  // Connections
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  customerId      Int
+  
+  branch          Branch      @relation(fields: [branchId], references: [id])
+  branchId        Int
+
+  service         Service     @relation(fields: [serviceId], references: [id])
+  serviceId       Int
+  priceAtOrder    Decimal     @db.Decimal(10, 2) // Saved in case prices change later
+
+  // Deliverables
+  smashLink       String?     // The Zip file download
+  previewImages   Json?       // Array of S3 URLs ["url1", "url2"]
+}
+
+// --------------------------------------
+// Enums (Strict choices)
+// --------------------------------------
+enum OrderStatus {
+  RECEIVED
+  IN_TRANSIT_TO_HUB
+  DEVELOPING
+  SCANNING
+  READY_FOR_COLLECTION
+  COMPLETED
+}
+
+enum Category {
+  120mm
+  35mm
+  110mm
+  SLIDE
+}
