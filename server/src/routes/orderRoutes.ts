@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 router.post('/', async (req, res) => {
   try {
     // 1. Get data from the App/Frontend
-    const { firstName, lastName, phone, email, branchId, serviceId } = req.body;
+    const { firstName, lastName, phone, email, branchId, serviceId, salesPersonId } = req.body;
 
     // 2. Validation (Make sure we have the basics)
     if (!phone || !branchId || !serviceId) {
@@ -50,6 +50,7 @@ router.post('/', async (req, res) => {
           serviceId: serviceId,
           priceAtOrder: service.price, // Locking in the price!
           expectedDate: completionDate,
+          salesPersonId: salesPersonId,
           status: 'RECEIVED'
         },
       });
