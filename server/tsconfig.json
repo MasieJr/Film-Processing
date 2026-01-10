@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    // ------------------------------------
+    // 1. File Locations (CRITICAL: Uncommented these)
+    // ------------------------------------
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "types": ["node"],
+    // ------------------------------------
+    // 2. Environment Settings (ESM Setup)
+    // ------------------------------------
+    "module": "nodenext",
+    "moduleResolution": "nodenext",  // Added this explicitly
+    "target": "es2022",              // Changed to ES2022 (stable/fast for Node)
+    
+    // ------------------------------------
+    // 3. Interop Settings
+    // ------------------------------------
+    "esModuleInterop": true,         // Allows importing CommonJS modules cleanly
+    "skipLibCheck": true,            // Speeds up compilation
+    "forceConsistentCasingInFileNames": true,
+
+    // ------------------------------------
+    // 4. Strict Typechecking
+    // ------------------------------------
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    
+    // ------------------------------------
+    // 5. Cleanups
+    // ------------------------------------
+    // "jsx": "react-jsx",          // Removed (You don't need React for the Backend)
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
