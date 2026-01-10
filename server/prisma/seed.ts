@@ -55,6 +55,20 @@ async function main() {
   console.log(`Created 3 Branches and ${services.length} Services.`);
 }
 
+// 3. Create Sales Staff
+  const staffMembers = [
+    { name: 'Masie Seremu', branchId: 1 },
+    { name: 'Nithian Chetty', branchId: 1 },
+    { name: 'Prudence Ndlovu', branchId: 1 },
+    { name: 'Yanga Bululu', branchId: 1 },
+    { name: 'Luisa Gravito', branchId: 1 },
+    { name: 'Hloni Smith', branchId: 1 },
+  ];
+
+  for (const staff of staffMembers) {
+    // await prisma.salesPerson.create({ data: staff });
+  }
+
 main()
   .catch((e) => {
     console.error(e);

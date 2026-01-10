@@ -18,6 +18,7 @@ model Branch {
   isHub       Boolean  @default(false)
   transitDays Int
   orders      Order[]
+  salesPerson SalesPerson[]
 }
 
 // --------------------------------------
@@ -64,9 +65,20 @@ model Order {
   serviceId       Int
   priceAtOrder    Decimal     
 
+  salesPerson     SalesPerson? @relation(fields: [salesPersonId], references: [id])
+  salesPersonId   Int?
+
   smashLink       String?
   previewImages   String?     
 }
 
-// Enums removed because SQLite doesn't support them.
-// We will handle the strict logic in TypeScript instead!
+model SalesPerson{
+  id              Int         @id @default(autoincrement())
+  name            String
+  
+  branch          Branch      @relation(fields: [branchId], references: [id])
+  branchId        Int 
+
+  isActive        Boolean  @default(true) // To hide staff who left the company
+  orders          Order[]
+}
