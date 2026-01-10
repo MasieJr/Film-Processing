@@ -54,6 +54,8 @@ model Order {
   // Changed from Enum to String for SQLite compatibility
   status          String      @default("RECEIVED") 
   expectedDate    DateTime
+
+  quantiy         Int
   
   customer        Customer    @relation(fields: [customerId], references: [id])
   customerId      Int
@@ -67,6 +69,8 @@ model Order {
 
   salesPerson     SalesPerson? @relation(fields: [salesPersonId], references: [id])
   salesPersonId   Int?
+
+  negatives       Boolean      @default(false)
 
   smashLink       String?
   previewImages   String?     
