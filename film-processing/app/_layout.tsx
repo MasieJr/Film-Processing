@@ -1,24 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import "react-native-reanimated";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Image } from "react-native";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
+  function LogoTitle() {
+    return (
+      <Image
+        style={{ width: 200, height: 150 }}
+        source={require("../assets/images/logo.png")} // Update path!
+        resizeMode="contain"
+      />
+    );
+  }
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: "",
+        },
+        headerTitle: () => <LogoTitle />,
+      }}
+    >
+      <Stack.Screen name="index" options={{ title: "Home" }} />
+    </Stack>
   );
 }
