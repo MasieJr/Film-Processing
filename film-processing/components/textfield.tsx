@@ -7,7 +7,7 @@ type ItemProps = {
   placeholder: string;
 };
 
-export default function fieldItem({ label, placeholder }: ItemProps) {
+export default function Textfield({ label, placeholder }: ItemProps) {
   return (
     <>
       <ThemedText>{label}</ThemedText>
