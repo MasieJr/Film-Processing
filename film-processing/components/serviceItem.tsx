@@ -9,7 +9,7 @@ type ItemProps = {
 
 export function ServiceItem({ service, price }: ItemProps) {
   return (
-    <ThemedView darkColor="#565656" style={styles.gridItem}>
+    <ThemedView darkColor="#2c2c2c" style={styles.gridItem}>
       <ThemedText style={styles.text}>{service}</ThemedText>
       <ThemedText style={styles.text} darkColor="#41B544">
         {price}
