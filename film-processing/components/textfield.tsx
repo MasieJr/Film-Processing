@@ -5,9 +5,16 @@ import { ThemedTextInput } from "./themed-textinput";
 type ItemProps = {
   label: string;
   placeholder: string;
+  autocomplete?: "name" | "email" | "tel" | "off";
+  type?: "name" | "emailAddress" | "telephoneNumber" | "none";
 };
 
-export default function FieldItem({ label, placeholder }: ItemProps) {
+export default function FieldItem({
+  label,
+  placeholder,
+  autocomplete,
+  type,
+}: ItemProps) {
   return (
     <>
       <ThemedText style={styles.label}>{label}</ThemedText>
@@ -16,6 +23,9 @@ export default function FieldItem({ label, placeholder }: ItemProps) {
         lightColor="#2c2c2c"
         placeholder={placeholder}
         style={styles.textInput}
+        autoComplete={autocomplete}
+        textContentType={type}
+        keyboardType={type === "emailAddress" ? "email-address" : "default"}
       />
     </>
   );
