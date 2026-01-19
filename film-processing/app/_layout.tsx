@@ -20,13 +20,16 @@ export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
+        headerShadowVisible: false,
+        headerBackButtonDisplayMode: "minimal",
         headerStyle: {
-          backgroundColor: "#2c2c2c",
+          backgroundColor: "#121212",
         },
         headerTitle: () => <LogoTitle />,
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Home" }} />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="order_form" />
     </Stack>
   );
 }
