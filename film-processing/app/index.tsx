@@ -1,8 +1,8 @@
-import { Pressable, StyleSheet } from "react-native";
-
 import { ServiceItem } from "@/components/serviceItem";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { router } from "expo-router";
+import { Pressable, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -14,7 +14,7 @@ export default function HomeScreen() {
         <ThemedText style={styles.title}>
           Welcome to our Film Developing App!
         </ThemedText>
-        <ThemedView darkColor="#565656" style={styles.accent}>
+        <ThemedView darkColor="#2c2c2c" style={styles.accent}>
           <ThemedText
             style={{
               textAlign: "center",
@@ -26,7 +26,7 @@ export default function HomeScreen() {
           </ThemedText>
           <Pressable
             style={{ margin: 10 }}
-            onPress={() => alert("Order Placed!")}
+            onPress={() => router.push("/order_form")}
           >
             <ThemedView
               darkColor="#41B544"

@@ -7,12 +7,13 @@ type ItemProps = {
   placeholder: string;
 };
 
-export default function Textfield({ label, placeholder }: ItemProps) {
+export default function FieldItem({ label, placeholder }: ItemProps) {
   return (
     <>
-      <ThemedText>{label}</ThemedText>
+      <ThemedText style={styles.label}>{label}</ThemedText>
       <ThemedTextInput
-        darkColor="#FFFFFF"
+        darkColor="#fff9f9"
+        lightColor="#2c2c2c"
         placeholder={placeholder}
         style={styles.textInput}
       />
@@ -22,10 +23,15 @@ export default function Textfield({ label, placeholder }: ItemProps) {
 
 const styles = StyleSheet.create({
   textInput: {
-    height: 40,
+    fontSize: 18,
+    height: 45,
     padding: 5,
     borderWidth: 1,
     borderColor: "#41B544",
-    backgroundColor: "#2c2c2c",
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 20,
   },
 });
