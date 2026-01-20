@@ -14,7 +14,7 @@ export default function HomeScreen() {
         <ThemedText style={styles.title}>
           Welcome to our Film Developing App!
         </ThemedText>
-        <ThemedView darkColor="#2c2c2c" style={styles.accent}>
+        <ThemedView darkColor="#2c2c2c" lightColor="#F3F4F6" style={styles.accent}>
           <ThemedText
             style={{
               textAlign: "center",

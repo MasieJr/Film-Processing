@@ -3,10 +3,13 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Image } from "react-native";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const bg = useThemeColor({ light: '#fff', dark: '#121212' }, 'background');
 
+  console.log(colorScheme);
   function LogoTitle() {
     return (
       <Image
@@ -23,7 +26,7 @@ export default function RootLayout() {
         headerShadowVisible: false,
         headerBackButtonDisplayMode: "minimal",
         headerStyle: {
-          backgroundColor: "#121212",
+          backgroundColor: bg,
         },
         headerTitle: () => <LogoTitle />,
       }}

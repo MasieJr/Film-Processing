@@ -5,18 +5,19 @@ import { ThemedView } from "@/components/themed-view";
 import { useEffect, useState } from "react";
 import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { SalesPersonModal } from "@/components/salesPersonList";
 
 export default function OrderFormScreen() {
   const [count, setCount] = useState(1);
-  const [salesPerson , setSalesPerson] = useState("Please Select Sales Person")
+  const [salesPerson, setSalesPerson] = useState("Please Select Sales Person");
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
     quantity: 1,
+    salesPerson:""
   });
 
   useEffect(() => {}, [count]);
@@ -24,21 +25,21 @@ export default function OrderFormScreen() {
     setCount((prev) => Math.max(1, prev - 1));
     setForm({
       ...form,
-      quantity: count
-    })
+      quantity: count,
+    });
   };
   const increment = () => {
     setCount((prev) => prev + 1);
     setForm({
       ...form,
-      quantity: count
-    })
+      quantity: count,
+    });
   };
 
   const handleInputChange = (key: string, value: string) => {
     setForm({
-      ...form,       
-      [key]: value   
+      ...form,
+      [key]: value,
     });
   };
 
@@ -46,12 +47,14 @@ export default function OrderFormScreen() {
     console.log("Submitting Order:", form);
   };
 
-  const openModal = () =>{
-
-  }
+  const openModal = () => {};
 
   const handleModalSubmit = (selectedPerson: string) => {
     setSalesPerson(selectedPerson);
+    setForm({
+      ...form,
+      salesPerson:selectedPerson,
+    })
     console.log("Modal returned:", selectedPerson);
   };
 
@@ -62,51 +65,75 @@ export default function OrderFormScreen() {
           label="Name & Surname"
           placeholder="Enter your name and surname"
           autoComplete="name"
-          onChangeText={(text) => handleInputChange('name', text)}
+          onChangeText={(text) => handleInputChange("name", text)}
         />
         <Textfield
           label="Email Address"
           placeholder="Enter your email address"
           autoComplete="email"
-           onChangeText={(text) => handleInputChange('email', text)}
+          onChangeText={(text) => handleInputChange("email", text)}
         />
         <Textfield
           label="Phone Number"
           placeholder="Enter your phone number"
           autoComplete="tel"
-           onChangeText={(text) => handleInputChange('phone', text)}
+          onChangeText={(text) => handleInputChange("phone", text)}
         />
         <View style={styles.stepper}>
           <ThemedText style={styles.label}>Quantity</ThemedText>
-          <View style={{ flexDirection: "row", marginBottom:10}}>
+          <View style={{ flexDirection: "row", marginBottom: 10 }}>
             <TouchableOpacity style={styles.stepperbtn} onPress={decrement}>
-              <ThemedText>-</ThemedText>
+              <ThemedView
+                lightColor="#F3F4F6"
+                darkColor="#2c2c2c"
+                style={styles.stepperbtn}
+              >
+                <ThemedText>-</ThemedText>
+              </ThemedView>
             </TouchableOpacity>
-            <ThemedTextInput style={{ marginHorizontal: 10, fontSize: 20 }}
-            onChangeText={(text) => {handleInputChange('quantity', text)}}>
+            <ThemedTextInput
+              style={{ marginHorizontal: 10, fontSize: 20 }}
+              onChangeText={(text) => {
+                handleInputChange("quantity", text);
+              }}
+            >
               {count}
             </ThemedTextInput>
-            <TouchableOpacity style={styles.stepperbtn} onPress={increment}>
-              <ThemedText>+</ThemedText>
+            <TouchableOpacity onPress={increment}>
+              <ThemedView
+                lightColor="#F3F4F6"
+                darkColor="#2c2c2c"
+                style={styles.stepperbtn}
+              >
+                <ThemedText lightColor="">+</ThemedText>
+              </ThemedView>
             </TouchableOpacity>
           </View>
         </View>
         <ThemedText style={styles.label}>Sales Person</ThemedText>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <ThemedView darkColor="#2C2C2E" lightColor="#F3F4F6" style={styles.dropDown}>
-          <ThemedText style={styles.label}>{salesPerson}</ThemedText>
-          <FontAwesome style={{color:"#9CA3AF"}}name="chevron-down" size={24} color="black" />
+          <ThemedView
+            darkColor="#2C2C2E"
+            lightColor="#F3F4F6"
+            style={styles.dropDown}
+          >
+            <ThemedText style={styles.label}>{salesPerson}</ThemedText>
+            <FontAwesome
+              style={{ color: "#9CA3AF" }}
+              name="chevron-down"
+              size={24}
+              color="black"
+            />
           </ThemedView>
         </TouchableOpacity>
-        <SalesPersonModal 
-        visible={modalVisible} 
-        onClose={() => setModalVisible(false)}
-        onSubmit={handleModalSubmit} // Pass the function down
-      />
+        <SalesPersonModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onSubmit={handleModalSubmit} // Pass the function down
+        />
         <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
           <ThemedText style={styles.btnText}>SUBMIT ORDER</ThemedText>
         </TouchableOpacity>
-      
       </ThemedView>
     </SafeAreaProvider>
   );
@@ -117,11 +144,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  stepperText:{
+
+  },
   stepperbtn: {
     width: 25,
     height: 25,
     justifyContent: "center",
-    backgroundColor: "#2c2c2c",
     alignItems: "center",
     borderRadius: 5,
   },
@@ -133,24 +162,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#41B544",
     borderRadius: 15,
   },
-    btnText:{
-    textAlign: "center", 
-    fontSize:30,
-    fontWeight:"bold",
-    lineHeight:40
+  btnText: {
+    textAlign: "center",
+    fontSize: 30,
+    fontWeight: "bold",
+    lineHeight: 40,
   },
-  label:{
-    fontSize:20
+  label: {
+    fontSize: 20,
   },
-  dropDown:{
+  dropDown: {
     flexDirection: "row",
     justifyContent: "space-between",
-    height:45,
-    alignItems:"center",
+    height: 45,
+    alignItems: "center",
     padding: 5,
     borderRadius: 10,
     borderColor: "#41B544",
-    borderWidth:1,
-    marginBottom: 10
-  }
+    borderWidth: 1,
+    marginBottom: 10,
+  },
 });
