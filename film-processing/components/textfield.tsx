@@ -1,31 +1,28 @@
 import { StyleSheet } from "react-native";
 import { ThemedText } from "./themed-text";
-import { ThemedTextInput } from "./themed-textinput";
+import { ThemedTextInput , type ThemedTextInputProps} from "./themed-textinput";
 
-type ItemProps = {
+// type ItemProps = {
+//   label: string;
+//   placeholder: string;
+// };
+type ItemProps = ThemedTextInputProps & {
   label: string;
-  placeholder: string;
-  autocomplete?: "name" | "email" | "tel" | "off";
-  type?: "name" | "emailAddress" | "telephoneNumber" | "none";
+  
 };
 
 export default function FieldItem({
   label,
-  placeholder,
-  autocomplete,
-  type,
+  ...otherProps
 }: ItemProps) {
   return (
     <>
       <ThemedText style={styles.label}>{label}</ThemedText>
-      <ThemedTextInput
+      <ThemedTextInput style={styles.textInput}
         darkColor="#fff9f9"
         lightColor="#2c2c2c"
-        placeholder={placeholder}
-        style={styles.textInput}
-        autoComplete={autocomplete}
-        textContentType={type}
-        keyboardType={type === "emailAddress" ? "email-address" : "default"}
+        {...otherProps}
+        
       />
     </>
   );
