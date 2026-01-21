@@ -3,10 +3,12 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedTextInput } from "@/components/themed-textinput";
 import { ThemedView } from "@/components/themed-view";
 import { useEffect, useState } from "react";
-import { Button, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Button, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { SalesPersonModal } from "@/components/salesPersonList";
+import { Radiobutton } from "@/components/radiobutton";
+import { Radiogroup } from "@/components/radiogroup";
 
 export default function OrderFormScreen() {
   const [count, setCount] = useState(1);
@@ -61,6 +63,7 @@ export default function OrderFormScreen() {
   return (
     <SafeAreaProvider style={{ flex: 1, justifyContent: "center" }}>
       <ThemedView style={{ flex: 1, padding: 20 }}>
+      <ScrollView>
         <Textfield
           label="Name & Surname"
           placeholder="Enter your name and surname"
@@ -131,9 +134,12 @@ export default function OrderFormScreen() {
           onClose={() => setModalVisible(false)}
           onSubmit={handleModalSubmit} // Pass the function down
         />
+        <ThemedText style={styles.label}>Service</ThemedText>
+        <Radiogroup />
         <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
           <ThemedText style={styles.btnText}>SUBMIT ORDER</ThemedText>
         </TouchableOpacity>
+      </ScrollView>
       </ThemedView>
     </SafeAreaProvider>
   );

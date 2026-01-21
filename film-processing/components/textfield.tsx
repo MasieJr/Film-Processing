@@ -2,10 +2,6 @@ import { StyleSheet } from "react-native";
 import { ThemedText } from "./themed-text";
 import { ThemedTextInput , type ThemedTextInputProps} from "./themed-textinput";
 
-// type ItemProps = {
-//   label: string;
-//   placeholder: string;
-// };
 type ItemProps = ThemedTextInputProps & {
   label: string;
   

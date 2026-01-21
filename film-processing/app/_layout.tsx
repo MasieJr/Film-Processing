@@ -8,8 +8,6 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const bg = useThemeColor({ light: '#fff', dark: '#121212' }, 'background');
-
-  console.log(colorScheme);
   function LogoTitle() {
     return (
       <Image
