@@ -1,20 +1,13 @@
+import { Radiobutton } from "@/components/radiobutton";
+import { SalesPersonModal } from "@/components/salesPersonList";
 import Textfield from "@/components/textfield";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedTextInput } from "@/components/themed-textinput";
 import { ThemedView } from "@/components/themed-view";
-import { useEffect, useState } from "react";
-import {
-  Button,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { SalesPersonModal } from "@/components/salesPersonList";
-import { Radiobutton } from "@/components/radiobutton";
-import { Radiogroup } from "@/components/radiogroup";
+import { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function OrderFormScreen() {
   const [selectedPrice, setSelectedPrice] = useState(238);
@@ -38,6 +31,14 @@ export default function OrderFormScreen() {
     }));
     setSelectedPrice(prices[index]);
   }
+
+  function negative() {
+    setForm((prev) => ({
+      ...prev,
+      keepNegatives: !prev.keepNegatives,
+    }));
+  }
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -46,6 +47,7 @@ export default function OrderFormScreen() {
     salesPerson: "",
     selectedService: "",
     price: 238,
+    keepNegatives: false,
   });
 
   useEffect(() => {}, [form]);
@@ -63,13 +65,13 @@ export default function OrderFormScreen() {
   };
 
   const increment = () => {
-   setForm((prev) => {
+    setForm((prev) => {
       const newQuantity = prev.quantity + 1;
 
       return {
-        ...prev, 
+        ...prev,
         quantity: newQuantity,
-        price: newQuantity * selectedPrice, 
+        price: newQuantity * selectedPrice,
       };
     });
   };
@@ -97,7 +99,7 @@ export default function OrderFormScreen() {
 
   return (
     <SafeAreaProvider style={{ flex: 1, justifyContent: "center" }}>
-      <ThemedView style={{ flex: 1, padding: 20 }}>
+      <ThemedView style={{ flex: 1, padding: 15 }}>
         <ScrollView keyboardDismissMode="on-drag">
           <Textfield
             label="Name & Surname"
@@ -185,11 +187,34 @@ export default function OrderFormScreen() {
               />
             </TouchableOpacity>
           ))}
+          <View>
+            <ThemedText style={styles.label}>Keep Negatives</ThemedText>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity onPress={negative}>
+                <Radiobutton
+                  darkColor="#fff"
+                  lightColor="#2c2c2c"
+                  value="Yes"
+                  isSelected={form.keepNegatives}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={negative}>
+                <Radiobutton
+                  darkColor="#fff"
+                  lightColor="#2c2c2c"
+                  value="No"
+                  isSelected={!form.keepNegatives}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </ScrollView>
         <ThemedView style={styles.bottomRow}>
-          <View style={{flexDirection:"row"}}>
-          <ThemedText style={styles.price}>Total: </ThemedText>
-          <ThemedText style={[styles.price, {color:"red"}]}>R{form.price}</ThemedText>
+          <View style={{ flexDirection: "row" }}>
+            <ThemedText style={styles.price}>Total: </ThemedText>
+            <ThemedText style={[styles.price, { color: "red" }]}>
+              R{form.price}
+            </ThemedText>
           </View>
           <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
             <ThemedText style={styles.btnText}>SUBMIT ORDER</ThemedText>
@@ -201,16 +226,15 @@ export default function OrderFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  price:{
-    textAlign:"center",
-    fontSize:25,
-    fontWeight:"bold"
+  price: {
+    textAlign: "center",
+    fontSize: 25,
+    fontWeight: "bold",
   },
-  bottomRow:{
+  bottomRow: {
     flexDirection: "row",
-    justifyContent:"space-between",
-    alignItems: "center"
-    
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   stepper: {
     flexDirection: "row",
@@ -231,7 +255,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     backgroundColor: "#41B544",
     borderRadius: 15,
-    padding:5
+    padding: 5,
   },
   btnText: {
     textAlign: "center",
