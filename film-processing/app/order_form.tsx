@@ -14,6 +14,7 @@ export default function OrderFormScreen() {
   const [salesPerson, setSalesPerson] = useState("Please Select Sales Person");
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState(0);
+  const [showPrint, setShowPrints] = useState(false);
   const services = [
     "Email in High Resolution",
     "Email in low Resolution",
@@ -188,6 +189,7 @@ export default function OrderFormScreen() {
             </TouchableOpacity>
           ))}
           <View>
+            {form.selectedService === "Print Only"}
             <ThemedText style={styles.label}>Keep Negatives</ThemedText>
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity onPress={negative}>

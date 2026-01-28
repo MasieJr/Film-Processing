@@ -18,7 +18,7 @@ export function Radiobutton({ lightColor, darkColor, value, isSelected }: Button
   return (
     <ThemedView style={styles.container}>
         <ThemedView style={[styles.outerRing, {borderColor:innerColor}]}>
-            <ThemedView style={[styles.innerRing, isSelected && { backgroundColor: innerColor }]}/>
+            <ThemedView style={[styles.innerRing, isSelected && { backgroundColor: "#41B544" }]}/>
         </ThemedView>
       <ThemedText>{value}</ThemedText>
     </ThemedView>
@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     innerRing:{
         width: "100%",
         height: "100%",
-        borderRadius:50
+        borderRadius:50,
     }
 })
