@@ -42,6 +42,7 @@ export default function OrderFormPage() {
 
   const selectService = (index: number) => {
     setSelectedServiceIndex(index);
+    setSelectedSizeIndex(1);
     setSelectedPrice(prices[index]);
     setForm((prev) => ({
       ...prev,
@@ -191,7 +192,7 @@ export default function OrderFormPage() {
         {/* Prints Sizes */}
         {(form.selectedService === "Print Only" || form.selectedService === "Print and email") && (
         <div className="flex flex-col">
-          <label>Print Sizes</label>
+          <label className="text-xl mb-3 font-medium">Print Sizes</label>
            <div className="flex flex-col space-y-3">
             {printsSizes.map((size, index) => {
               const isSelected = selectedSizeIndex === index;
