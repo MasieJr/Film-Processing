@@ -1,7 +1,8 @@
 "use client"; // Required in Next.js because we are using useState
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RadioGroup from "@/components/RadioGroup";
+import Image from "next/image";
 
 export default function OrderFormPage() {
   const services = [
@@ -109,6 +110,15 @@ export default function OrderFormPage() {
     <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
+        <div className="sticky top-0 bg-white dark:bg-black m-y-4 p-4 rounded-lg shadow-md flex justify-center">
+          <Image
+            src="/logo.png"
+            alt="Company Logo"
+            width={632}
+            height={127}
+            className="rounded-full min-w-full"
+          />
+        </div>
         {/* --- Text Inputs --- */}
         <div className="flex flex-col">
           <label className="text-lg mb-1 font-medium">Name & Surname</label>
@@ -158,7 +168,7 @@ export default function OrderFormPage() {
             </span>
             <button
               onClick={increment}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#2c2c2c] rounded-lg flex items-center justify-center text-2xl active:scale-95"
+              className="w-10 h-10 bg-gray-100 dark:bg-[#2c2c2c] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
             >
               +
             </button>
