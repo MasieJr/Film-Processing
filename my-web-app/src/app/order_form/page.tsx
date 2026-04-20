@@ -46,8 +46,26 @@ export default function OrderFormPage() {
     keepNegatives: false,
   });
 
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    email: false,
+    phone: false,
+    salesPerson: false,
+  });
+
   const handleInputChange = (key: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (value === "") {
+      setFormErrors((prev) => ({ ...prev, [key]: true }));
+    } else {
+      setFormErrors((prev) => ({ ...prev, [key]: false }));
+    }
+  };
+
+  const checkError = (key: string) => {
+    if (form[key as keyof typeof form] === "") {
+      setFormErrors((prev) => ({ ...prev, [key]: true }));
+    }
   };
 
   const selectService = (index: number) => {
@@ -114,6 +132,7 @@ export default function OrderFormPage() {
           <Image
             src="/logo.png"
             alt="Company Logo"
+            loading="eager"
             width={632}
             height={127}
             className="rounded-full min-w-full"
@@ -126,8 +145,9 @@ export default function OrderFormPage() {
             type="text"
             placeholder="Enter your name and surname"
             autoComplete="name"
-            className="border border-[#41B544] rounded-lg h-12 px-3 bg-transparent text-lg"
+            className={`border ${formErrors.name ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
             onChange={(e) => handleInputChange("name", e.target.value)}
+            onBlur={() => checkError("name")}
           />
         </div>
 
@@ -137,8 +157,9 @@ export default function OrderFormPage() {
             type="email"
             placeholder="Enter your email address"
             autoComplete="email"
-            className="border border-[#41B544] rounded-lg h-12 px-3 bg-transparent text-lg"
+            className={`border ${formErrors.email ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
             onChange={(e) => handleInputChange("email", e.target.value)}
+            onBlur={() => checkError("email")}
           />
         </div>
 
@@ -148,8 +169,9 @@ export default function OrderFormPage() {
             type="tel"
             placeholder="Enter your phone number"
             autoComplete="tel"
-            className="border border-[#41B544] rounded-lg h-12 px-3 bg-transparent text-lg"
+            className={`border ${formErrors.phone ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
             onChange={(e) => handleInputChange("phone", e.target.value)}
+            onBlur={() => checkError("phone")}
           />
         </div>
 
@@ -179,9 +201,10 @@ export default function OrderFormPage() {
         <div className="flex flex-col">
           <label className="text-xl mb-1 font-medium">Sales Person</label>
           <select
-            className="border border-[#41B544] rounded-lg h-12 px-3 bg-transparent text-lg appearance-none"
+            className={`border ${formErrors.salesPerson ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg appearance-none`}
             value={form.salesPerson}
             onChange={(e) => handleInputChange("salesPerson", e.target.value)}
+            onBlur={() => checkError("salePerson")}
           >
             <option value="" disabled>
               Please Select Sales Person
