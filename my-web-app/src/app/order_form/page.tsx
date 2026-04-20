@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import RadioGroup from "@/components/RadioGroup";
+import TextInput from "@/components/TextInput";
 import Image from "next/image";
 
 export default function OrderFormPage() {
@@ -138,42 +139,33 @@ export default function OrderFormPage() {
             className="rounded-full min-w-full"
           />
         </div>
-        {/* --- Text Inputs --- */}
-        <div className="flex flex-col">
-          <label className="text-lg mb-1 font-medium">Name & Surname</label>
-          <input
-            type="text"
-            placeholder="Enter your name and surname"
-            autoComplete="name"
-            className={`border ${formErrors.name ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            onBlur={() => checkError("name")}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-lg mb-1 font-medium">Email Address</label>
-          <input
-            type="email"
-            placeholder="Enter your email address"
-            autoComplete="email"
-            className={`border ${formErrors.email ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            onBlur={() => checkError("email")}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-lg mb-1 font-medium">Phone Number</label>
-          <input
-            type="tel"
-            placeholder="Enter your phone number"
-            autoComplete="tel"
-            className={`border ${formErrors.phone ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
-            onChange={(e) => handleInputChange("phone", e.target.value)}
-            onBlur={() => checkError("phone")}
-          />
-        </div>
+        <TextInput
+          label="Name and Surname"
+          type="text"
+          value="name"
+          autoComplete="name"
+          valid={formErrors.name}
+          onChange={handleInputChange}
+          onBlur={checkError}
+        />
+        <TextInput
+          label="Email Address"
+          type="email"
+          value="email"
+          autoComplete="email"
+          valid={formErrors.email}
+          onChange={handleInputChange}
+          onBlur={checkError}
+        />
+        <TextInput
+          label="Phone number"
+          type="tel"
+          value="phone"
+          autoComplete="tel"
+          valid={formErrors.phone}
+          onChange={handleInputChange}
+          onBlur={checkError}
+        />
 
         {/* --- Quantity Stepper --- */}
         <div className="flex flex-row justify-between items-center">
