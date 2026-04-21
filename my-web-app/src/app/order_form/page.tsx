@@ -52,7 +52,28 @@ export default function OrderFormPage() {
     email: false,
     phone: false,
     salesPerson: false,
+    hasError: true,
   });
+
+  const removeError = () => {
+    if (
+      formErrors.name &&
+      formErrors.email &&
+      formErrors.phone &&
+      formErrors.salesPerson
+    ) {
+      setFormErrors((prev) => ({
+        ...prev,
+        hasError: true,
+      }));
+    }
+    else{
+       setFormErrors((prev) => ({
+        ...prev,
+        hasError: false,
+      }));
+    }
+  };
 
   const handleInputChange = (key: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -60,6 +81,7 @@ export default function OrderFormPage() {
       setFormErrors((prev) => ({ ...prev, [key]: true }));
     } else {
       setFormErrors((prev) => ({ ...prev, [key]: false }));
+      removeError();
     }
   };
 
@@ -122,7 +144,13 @@ export default function OrderFormPage() {
 
   const handleSubmit = () => {
     console.log("Submitting Order:", form);
-    alert("Order Placed Successfully!");
+    if (formErrors.hasError === true) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    } else {
+      alert("Order Placed succesful");
+    }
+    //todo
   };
 
   return (
@@ -144,7 +172,7 @@ export default function OrderFormPage() {
           type="text"
           value="name"
           autoComplete="name"
-          valid={formErrors.name}
+          hasError={formErrors.name}
           onChange={handleInputChange}
           onBlur={checkError}
         />
@@ -153,7 +181,7 @@ export default function OrderFormPage() {
           type="email"
           value="email"
           autoComplete="email"
-          valid={formErrors.email}
+          hasError={formErrors.email}
           onChange={handleInputChange}
           onBlur={checkError}
         />
@@ -162,7 +190,7 @@ export default function OrderFormPage() {
           type="tel"
           value="phone"
           autoComplete="tel"
-          valid={formErrors.phone}
+          hasError={formErrors.phone}
           onChange={handleInputChange}
           onBlur={checkError}
         />
