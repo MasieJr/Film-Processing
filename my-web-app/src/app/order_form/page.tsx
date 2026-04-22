@@ -52,7 +52,7 @@ export default function OrderFormPage() {
     email: false,
     phone: false,
     salesPerson: false,
-    hasError: true,
+    hasError: false,
   });
 
   const removeError = () => {
@@ -75,13 +75,36 @@ export default function OrderFormPage() {
     }
   };
 
+  const hasError = () => {
+    const isNameEmpty = form.name.trim() === "";
+    const isEmailEmpty = form.email.trim() === "";
+    const isPhoneEmpty = form.phone.trim() === "";
+    const isSalesPersonEmpty = form.salesPerson === "";
+
+    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
+      setFormErrors((prev) => ({
+        ...prev,
+        hasError:true
+      }))
+    }
+    else{
+       setFormErrors((prev) => ({
+        ...prev,
+        hasError:false
+      }))
+    }
+
+  }
+
   const handleInputChange = (key: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     if (value === "") {
       setFormErrors((prev) => ({ ...prev, [key]: true }));
+      hasError();
     } else {
       setFormErrors((prev) => ({ ...prev, [key]: false }));
-      removeError();
+      // removeError();
+      hasError();
     }
   };
 
@@ -144,13 +167,19 @@ export default function OrderFormPage() {
 
   const handleSubmit = () => {
     console.log("Submitting Order:", form);
-    if (formErrors.hasError === true) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+     const isNameEmpty = form.name.trim() === "";
+    const isEmailEmpty = form.email.trim() === "";
+    const isPhoneEmpty = form.phone.trim() === "";
+    const isSalesPersonEmpty = form.salesPerson === "";
+
+    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
+     window.scrollTo({ top: 0, behavior: "smooth" });
       return;
-    } else {
-      alert("Order Placed succesful");
     }
-    //todo
+    else{
+      alert("Order Placed succesful");
+
+    }
   };
 
   return (
@@ -167,6 +196,9 @@ export default function OrderFormPage() {
             className="rounded-full min-w-full"
           />
         </div>
+        {formErrors.hasError &&(
+          <div>Hello</div>
+        )}
         <TextInput
           label="Name and Surname"
           type="text"
