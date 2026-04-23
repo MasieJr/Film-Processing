@@ -8,6 +8,7 @@ import {
 type DropDownListProp = {
   name: string;
   onClick: (status: string) => void;
+  btnClick: (order: any) => void;
   open: boolean;
   orders: {
     id: string;
@@ -44,7 +45,7 @@ export default function DropDownList({
   return (
     <div>
       <button
-        className="w-full flex flex-row justify-between p-3 hover:bg-[#1e1e1e] hover:border border-[#41B544] cursor-pointer rounded-xl mb-2"
+        className="w-full flex flex-row justify-between p-3 hover:bg-white dark:hover:bg-[#1e1e1e] hover:border border-[#41B544] cursor-pointer rounded-xl mb-2"
         onClick={() => onClick(type)}
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -137,7 +138,10 @@ export default function DropDownList({
                         </button>
                       </td>
                       <td className="p-4">
-                        <button className="text-[#41B544] font-medium text-sm hover:underline">
+                        <button
+                          className="text-[#41B544] font-medium text-sm hover:underline"
+                          onClick={}
+                        >
                           View Details
                         </button>
                       </td>

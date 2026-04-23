@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  ArrowDownToLine,
-  ArrowUpToLine,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { X } from "lucide-react";
 import DropDownList from "@/components/DropDownList";
 
 const initialOrders = [
@@ -51,6 +46,7 @@ export default function AdminDashboard() {
   });
 
   const [orders, setOrders] = useState(initialOrders);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
