@@ -109,6 +109,7 @@ export default function OrderFormPage() {
   };
 
   const checkError = (key: string) => {
+    hasError();
     if (form[key as keyof typeof form] === "") {
       setFormErrors((prev) => ({ ...prev, [key]: true }));
     }
@@ -197,7 +198,13 @@ export default function OrderFormPage() {
           />
         </div>
         {formErrors.hasError &&(
-          <div>Hello</div>
+          <div className="bg-red-100 w-50 text-red-500 w-full">
+            {/* <p className="text-lg font-bold">Please Check the following:</p> */}
+            {formErrors.name && (<p className="text-sm font-light">Please enter Name & Surname</p>)}
+            {formErrors.email && (<p className="text-sm font-light">Please enter valid email Address</p>)}
+            {formErrors.phone && (<p className="text-sm font-light">Please enter valid Phone Number</p>)}
+            {formErrors.salesPerson && (<p className="text-xs font-light">Please Select Sales Person</p>)}
+          </div>
         )}
         <TextInput
           label="Name and Surname"
