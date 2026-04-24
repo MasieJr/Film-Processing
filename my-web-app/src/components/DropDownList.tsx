@@ -26,6 +26,7 @@ type DropDownListProp = {
 export default function DropDownList({
   name,
   onClick,
+  btnClick,
   open,
   orders,
   type,
@@ -140,7 +141,7 @@ export default function DropDownList({
                       <td className="p-4">
                         <button
                           className="text-[#41B544] font-medium text-sm hover:underline"
-                          onClick={}
+                          onClick={() => btnClick(order)}
                         >
                           View Details
                         </button>
