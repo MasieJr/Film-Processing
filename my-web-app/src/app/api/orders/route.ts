@@ -40,6 +40,7 @@ export async function POST(request: Request) {
         selectedSize: body.selectedSize || null,
         selectedFinish: body.selectedFinish || null,
         keepNegatives: body.keepNegatives || false,
+        totalPrice:parseFloat(body.totalPrice),
       }
     });
 

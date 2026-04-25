@@ -12,11 +12,11 @@ type DropDownListProp = {
   open: boolean;
   orders: {
     id: string;
-    name: string;
+    customerName: string;
     email: string;
-    service: string;
+    services: string;
     quantity: number;
-    price: number;
+    totalPrice: number;
     status: string;
     date: string;
   }[];
@@ -35,7 +35,7 @@ export default function DropDownList({
     switch (status) {
       case "Pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "Processing":
+      case "New":
         return "bg-blue-100 text-blue-800 border-blue-200";
       case "Completed":
         return "bg-green-100 text-green-800 border-green-200";
@@ -70,9 +70,6 @@ export default function DropDownList({
                 <thead>
                   <tr className="bg-gray-50 dark:bg-[#252525] border-b border-gray-100 dark:border-gray-800">
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
-                      Order ID
-                    </th>
-                    <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Customer
                     </th>
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
@@ -101,19 +98,20 @@ export default function DropDownList({
                       key={order.id}
                       className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors"
                     >
-                      <td className="p-4 font-medium text-sm">{order.id}</td>
                       <td className="p-4">
-                        <p className="font-medium text-sm">{order.name}</p>
+                        <p className="font-medium text-sm">
+                          {order.customerName}
+                        </p>
                         <p className="text-xs text-gray-500">{order.email}</p>
                       </td>
                       <td className="p-4">
-                        <p className="text-sm">{order.service}</p>
+                        <p className="text-sm">{order.services}</p>
                         <p className="text-xs text-gray-500">
                           Qty: {order.quantity}
                         </p>
                       </td>
                       <td className="p-4 font-medium text-sm">
-                        R{order.price}
+                        R{order.totalPrice}
                       </td>
                       <td className="p-4">
                         <span

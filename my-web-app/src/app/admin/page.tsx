@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, Printer } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import OrderPdfTemplate from "@/components/OrderPdfTemplate";
@@ -9,42 +9,65 @@ import DropDownList from "@/components/DropDownList";
 const initialOrders = [
   {
     id: "ORD-001",
-    name: "John Doe",
+    customerName: "John Doe",
     email: "john@example.com",
-    service: "Print and email",
+    services: "Print and email",
     quantity: 2,
-    price: 658,
+    totalPrice: 658,
     status: "Pending",
     date: "Oct 24, 2023",
   },
   {
     id: "ORD-002",
-    name: "Sarah Smith",
+    customerName: "Sarah Smith",
     email: "sarah.s@example.com",
-    service: "Develop only",
+    services: "Develop only",
     quantity: 1,
-    price: 95,
+    totalPrice: 95,
     status: "Processing",
     date: "Oct 24, 2023",
   },
   {
     id: "ORD-003",
-    name: "Mike Johnson",
+    customerName: "Mike Johnson",
     email: "mikej@example.com",
-    service: "Email in High Resolution",
+    services: "Email in High Resolution",
     quantity: 5,
-    price: 1300,
+    totalPrice: 1300,
     status: "Completed",
     date: "Oct 23, 2023",
   },
 ];
 
 export default function AdminDashboard() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState(initialOrders);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch("/api/orders");
+        const data = await res.json();
+        setOrders(data);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []); // The empty array means this only runs once when the page opens
+
+  if (isLoading)
+    return <div className="p-8 text-xl">Loading lab orders...</div>;
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "Processing":
+      case "New":
         return "bg-blue-100 text-blue-800 border-blue-200";
       case "Completed":
         return "bg-green-100 text-green-800 border-green-200";
@@ -59,9 +82,6 @@ export default function AdminDashboard() {
     completedOrder: false,
   });
   const pdfRef = useRef<HTMLDivElement>(null);
-
-  const [orders, setOrders] = useState(initialOrders);
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   const openDropdown = (status: string) => {
     setDropDowns((prev) => {
@@ -115,7 +135,7 @@ export default function AdminDashboard() {
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.newOrder}
-        orders={orders}
+        orders={orders.filter((order) => order.status === "New")}
         type="newOrder"
         name="New Orders"
         btnClick={setSelectedOrder}
@@ -123,7 +143,7 @@ export default function AdminDashboard() {
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.pendingOrder}
-        orders={orders}
+        orders={orders.filter((order) => order.status === "Pending")}
         type="pendingOrder"
         name="Pending orders"
         btnClick={setSelectedOrder}
@@ -131,7 +151,7 @@ export default function AdminDashboard() {
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.completedOrder}
-        orders={orders}
+        orders={orders.filter((order) => order.status === "Completed")}
         type="completedOrder"
         name="Completed Orders"
         btnClick={setSelectedOrder}
@@ -166,7 +186,7 @@ export default function AdminDashboard() {
                 <div className="bg-gray-50 dark:bg-[#252525] p-4 rounded-xl space-y-2">
                   <p>
                     <span className="font-medium">Name:</span>{" "}
-                    {selectedOrder.name}
+                    {selectedOrder.customerName}
                   </p>
                   <p>
                     <span className="font-medium">Email:</span>{" "}
@@ -174,7 +194,7 @@ export default function AdminDashboard() {
                   </p>
                   <p>
                     <span className="font-medium">Date:</span>{" "}
-                    {selectedOrder.date}
+                    {selectedOrder.createdAt}
                   </p>
                 </div>
               </div>
@@ -187,7 +207,7 @@ export default function AdminDashboard() {
                 <div className="bg-gray-50 dark:bg-[#252525] p-4 rounded-xl flex justify-between items-center">
                   <div>
                     <p className="font-medium text-lg">
-                      {selectedOrder.service}
+                      {selectedOrder.services}
                     </p>
                     <p className="text-gray-500">
                       Quantity: {selectedOrder.quantity}
@@ -195,7 +215,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-[#41B544]">
-                      R{selectedOrder.price}
+                      R{selectedOrder.totalPrice}
                     </p>
                   </div>
                 </div>
