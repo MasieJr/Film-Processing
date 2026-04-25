@@ -58,35 +58,9 @@ export default function AdminDashboard() {
     pendingOrder: false,
     completedOrder: false,
   });
-const [isGenerating, setIsGenerating] = useState(false);
-const handleGenerateDoc = async () => {
-    if (!selectedOrder) return;
-    
-    setIsGenerating(true); // Start the loading spinner
 
-    try {
-      const res = await fetch("/api/generate-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectedOrder)
-      });
-      
-      const data = await res.json();
-      
-      if (data.success) {
-        // Open the Google Doc in a new tab!
-        window.open(data.documentUrl, "_blank"); 
-      } else {
-        alert("Failed to generate document: " + data.error);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong connecting to the server.");
-    } finally {
-      setIsGenerating(false); // Stop the loading spinner
-    }
-  };
-  const [orders, setOrders] = useState(initialOrders);
+
+const [orders, setOrders] = useState(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
 
@@ -222,17 +196,8 @@ const handleGenerateDoc = async () => {
                 >
                   Contact Customer
                 </button>
-                <button 
-                  onClick={handleGenerateDoc}
-                  disabled={isGenerating}
-                  className="px-4 py-2 text-sm font-medium border border-[#41B544] text-[#41B544] rounded-lg hover:bg-[#41B544] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                >
-                  {isGenerating ? (
-                    <span>Generating...</span>
-                  ) : (
-                    <span>Create Work Order</span>
-                  )}
-                </button>
+                
+                
                 <button 
                   onClick={() => alert("Marking as complete...")}
                   className="px-4 py-2 text-sm font-medium bg-[#41B544] text-white rounded-lg hover:bg-[#359638]"

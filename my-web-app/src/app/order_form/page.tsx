@@ -29,54 +29,72 @@ export default function OrderFormPage() {
   const printPrices = [445, 329, 895, 931];
   const prices = [260, 240, 329, 329, 95];
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState(260);
-  const [selectedServiceIndex, setSelectedServiceIndex] = useState(0);
+  const [servicesIndex, setservicesIndex] = useState(0);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
 
   const [form, setForm] = useState({
-    name: "",
+    customerName: "",
     email: "",
     phone: "",
     quantity: 1,
     salesPerson: "",
-    selectedService: services[0],
+    services: services[0],
     selectedSize: printsSizes[1],
     selectedFinish: finishes[0],
-    price: 260,
+    totalPrice: 260,
     keepNegatives: false,
   });
 
   const [formErrors, setFormErrors] = useState({
-    name: false,
+    customerName: false,
     email: false,
     phone: false,
     salesPerson: false,
     hasError: false,
   });
 
-  const removeError = () => {
-    if (
-      formErrors.name &&
-      formErrors.email &&
-      formErrors.phone &&
-      formErrors.salesPerson
-    ) {
-      setFormErrors((prev) => ({
-        ...prev,
-        hasError: true,
-      }));
-    }
-    else{
-       setFormErrors((prev) => ({
-        ...prev,
-        hasError: false,
-      }));
+  const handleSubmit = async (e: React.FormEvent) => {
+    const isNameEmpty = form.customerName.trim() === "";
+    const isEmailEmpty = form.email.trim() === "";
+    const isPhoneEmpty = form.phone.trim() === "";
+    const isSalesPersonEmpty = form.salesPerson === "";
+
+    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    } else {
+      e.preventDefault(); // Stops the page from refreshing
+      setIsSubmitting(true);
+
+      try {
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert("Success! Your order ID is: " + data.order.id);
+          // Optional: Redirect them to a Thank You page here!
+        } else {
+          alert("Failed to submit order: " + data.error);
+        }
+      } catch (error) {
+        console.error("Error submitting order:", error);
+        alert("Something went wrong connecting to the server.");
+      } finally {
+        setIsSubmitting(false); // Stop the loading spinner
+      }
     }
   };
 
   const hasError = () => {
-    const isNameEmpty = form.name.trim() === "";
+    const isNameEmpty = form.customerName.trim() === "";
     const isEmailEmpty = form.email.trim() === "";
     const isPhoneEmpty = form.phone.trim() === "";
     const isSalesPersonEmpty = form.salesPerson === "";
@@ -84,17 +102,15 @@ export default function OrderFormPage() {
     if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
       setFormErrors((prev) => ({
         ...prev,
-        hasError:true
-      }))
-    }
-    else{
-       setFormErrors((prev) => ({
+        hasError: true,
+      }));
+    } else {
+      setFormErrors((prev) => ({
         ...prev,
-        hasError:false
-      }))
+        hasError: false,
+      }));
     }
-
-  }
+  };
 
   const handleInputChange = (key: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -116,13 +132,13 @@ export default function OrderFormPage() {
   };
 
   const selectService = (index: number) => {
-    setSelectedServiceIndex(index);
+    setservicesIndex(index);
     setSelectedSizeIndex(1);
     setSelectedPrice(prices[index]);
     setForm((prev) => ({
       ...prev,
-      selectedService: services[index],
-      price: prev.quantity * prices[index],
+      services: services[index],
+      totalPrice: prev.quantity * prices[index],
     }));
   };
 
@@ -132,7 +148,7 @@ export default function OrderFormPage() {
     setForm((prev) => ({
       ...prev,
       selectedSize: printsSizes[index],
-      price: prev.quantity * printPrices[index],
+      totalPrice: prev.quantity * printPrices[index],
     }));
   };
 
@@ -150,7 +166,7 @@ export default function OrderFormPage() {
       return {
         ...prev,
         quantity: newQuantity,
-        price: newQuantity * selectedPrice,
+        totalPrice: newQuantity * selectedPrice,
       };
     });
   };
@@ -161,26 +177,9 @@ export default function OrderFormPage() {
       return {
         ...prev,
         quantity: newQuantity,
-        price: newQuantity * selectedPrice,
+        totalPrice: newQuantity * selectedPrice,
       };
     });
-  };
-
-  const handleSubmit = () => {
-    console.log("Submitting Order:", form);
-     const isNameEmpty = form.name.trim() === "";
-    const isEmailEmpty = form.email.trim() === "";
-    const isPhoneEmpty = form.phone.trim() === "";
-    const isSalesPersonEmpty = form.salesPerson === "";
-
-    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
-     window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    else{
-      alert("Order Placed succesful");
-
-    }
   };
 
   return (
@@ -197,21 +196,33 @@ export default function OrderFormPage() {
             className="rounded-full min-w-full"
           />
         </div>
-        {formErrors.hasError &&(
+        {formErrors.hasError && (
           <div className="bg-red-100 w-50 text-red-500 w-full">
             {/* <p className="text-lg font-bold">Please Check the following:</p> */}
-            {formErrors.name && (<p className="text-sm font-light">Please enter Name & Surname</p>)}
-            {formErrors.email && (<p className="text-sm font-light">Please enter valid email Address</p>)}
-            {formErrors.phone && (<p className="text-sm font-light">Please enter valid Phone Number</p>)}
-            {formErrors.salesPerson && (<p className="text-xs font-light">Please Select Sales Person</p>)}
+            {formErrors.customerName && (
+              <p className="text-sm font-light">Please enter Name & Surname</p>
+            )}
+            {formErrors.email && (
+              <p className="text-sm font-light">
+                Please enter valid email Address
+              </p>
+            )}
+            {formErrors.phone && (
+              <p className="text-sm font-light">
+                Please enter valid Phone Number
+              </p>
+            )}
+            {formErrors.salesPerson && (
+              <p className="text-xs font-light">Please Select Sales Person</p>
+            )}
           </div>
         )}
         <TextInput
           label="Name and Surname"
           type="text"
-          value="name"
+          value="customerName"
           autoComplete="name"
-          hasError={formErrors.name}
+          hasError={formErrors.customerName}
           onChange={handleInputChange}
           onBlur={checkError}
         />
@@ -280,13 +291,13 @@ export default function OrderFormPage() {
         <RadioGroup
           label="Select Service"
           options={services}
-          selectedIndex={selectedServiceIndex}
+          selectedIndex={servicesIndex}
           onChange={(index) => selectService(index)}
         />
 
         {/* Prints Sizes */}
-        {(form.selectedService === "Print Only" ||
-          form.selectedService === "Print and email") && (
+        {(form.services === "Print Only" ||
+          form.services === "Print and email") && (
           <RadioGroup
             label="Print Size"
             options={printsSizes}
@@ -296,8 +307,8 @@ export default function OrderFormPage() {
         )}
 
         {/** --- Paper Finish --- **/}
-        {(form.selectedService === "Print Only" ||
-          form.selectedService === "Print and email") && (
+        {(form.services === "Print Only" ||
+          form.services === "Print and email") && (
           <RadioGroup
             label="Paper Finish"
             options={finishes}
@@ -347,15 +358,16 @@ export default function OrderFormPage() {
           <div className="flex items-baseline space-x-2">
             <span className="text-xl font-bold">Total:</span>
             <span className="text-2xl font-bold text-red-500">
-              R{form.price}
+              R{form.totalPrice}
             </span>
           </div>
 
           <button
             onClick={handleSubmit}
+            disabled={isSubmitting}
             className="w-[55%] h-[45px] bg-[#41B544] text-white rounded-[15px] font-bold text-xl active:scale-95 transition-transform"
           >
-            SUBMIT ORDER
+            {isSubmitting ? "Sending to Lab..." : "Submit Order"}
           </button>
         </div>
       </div>
