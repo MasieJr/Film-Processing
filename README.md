@@ -19,7 +19,7 @@ A high-performance, full-stack Next.js 15 application designed to streamline com
 * **Live Upload Tracking:** Custom `XMLHttpRequest` integration to display smooth, real-time progress bars for large file uploads.
 * **Automated Customer Delivery:** Automatically dispatches a beautifully formatted email with a secure download link the exact moment an order is marked as Completed.
 * **Printable Work Orders:** Generates formatted, printer-friendly PDF dockets for the lab technicians with a single click.
-* **Customer Intake & Routing:** Seamless customer form submission that automatically redirects to a dynamic "Thank You" confirmation page with next steps.
+* **Customer Intake & Routing:** Seamless customer form submission that automatically redirects to a "Thank You" confirmation page with next steps.
 
 ## 🛠️ Getting Started
 
@@ -32,5 +32,5 @@ Make sure you have Node.js installed, and active accounts for:
 ### 1. Clone & Install
 ```bash
 git clone [https://github.com/your-username/film-lab-app.git](https://github.com/your-username/film-lab-app.git)
-cd film-lab-app
+cd my-web-app
 npm install
