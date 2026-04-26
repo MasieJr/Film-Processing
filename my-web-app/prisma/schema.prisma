@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model Order {
+  id              String   @id @default(cuid()) // Generates a unique ID like "clm1x..."
+  
+  // Customer Info
+  customerName    String
+  email           String
+  phone           String
+  
+  // Film Details
+  quantity        Int
+  services        String   // "Scans Only", "Print and email", etc.
+  selectedSize    String?  // Optional (only if they chose prints)
+  selectedFinish  String?  // Optional (Matte/Gloss)
+  keepNegatives   Boolean  @default(false)
+  salesPerson     String   //Name of salesPerson
+  
+  // Admin & Financials
+  status          String   @default("New") // Pending, Processing, Ready, Completed
+  totalPrice      Float?
+  fileUrl         String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
