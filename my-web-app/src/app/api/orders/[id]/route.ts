@@ -20,26 +20,24 @@ export async function PATCH(
     const resolvedParams = await params;
     const orderId = resolvedParams.id;
 
-    // 1. Update the database (This also grabs the customer's email and name!)
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
         fileUrl: body.fileUrl,
-        status: "Completed", // Optional: Auto-move them to the Completed tab!
+        status: body.status, 
       },
     });
 
-    // 2. SEND THE AUTOMATED EMAIL
+    
     if (body.fileUrl) {
-      // Construct the download link using your Cloudflare Public URL
-      // Replace this URL with your actual r2.dev subdomain!
+      
       const downloadLink = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${body.fileUrl}`;
 
       await resend.emails.send({
-        // Use 'onboarding@resend.dev' for testing, update to your domain later
+        //'onboarding@resend.dev' for testing,
         from: "Film Lab <onboarding@resend.dev>", 
-        to: updatedOrder.email, // Sends directly to the customer
-        subject: `Your film scans are ready! 🎞️ (Order #${updatedOrder.id.slice(-4)})`,
+        to: updatedOrder.email, 
+        subject: `Your film ORDER is ready! 🎞️`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2>Hi ${updatedOrder.customerName},</h2>
@@ -52,7 +50,7 @@ export async function PATCH(
             </div>
             
             <p><strong>Note:</strong> This link will expire, so please download your files to a safe location as soon as possible.</p>
-            <p>Thanks for choosing our lab!</p>
+            <p>Thanks for choosing our Foto First Cresta!</p>
           </div>
         `,
       });

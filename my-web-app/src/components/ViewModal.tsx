@@ -16,7 +16,8 @@ type ViewModalProps = {
   setSelectedOrder: (order: any | null) => void;
   handleprint: () => void;
   setSelectedFile: (file: File | null) => void;
-  handleUpload:() => void;
+  handleUpload: () => void;
+  uploadProgress: number;
 };
 
 export default function ViewModal({
@@ -25,20 +26,9 @@ export default function ViewModal({
   handleprint,
   isUploading,
   setSelectedFile,
-  handleUpload
+  handleUpload,
+  uploadProgress,
 }: ViewModalProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "New":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "Completed":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       {/* Modal Content Box */}
@@ -94,51 +84,64 @@ export default function ViewModal({
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="mb-4">
-          <div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-neutral-800">
-            <h3 className="font-bold mb-2">Attach Scans (.zip)</h3>
+          <div className="mb-4">
+            <div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-neutral-800">
+              <h3 className="font-bold mb-2">Attach Scans (.zip)</h3>
+              {order.fileUrl ? (
+                <p className="text-green-600 font-medium">
+                  ✅ File attached: {order.fileUrl}
+                </p>
+              ) : (
+                // 1. Added a flex-col wrapper so the bar sits below the button
+                <div className="flex flex-col gap-4">
+                  {/* Input and Button Row */}
+                  <div>
+                    <input
+                      type="file"
+                      accept=".zip,.rar,.tar"
+                      name="Masie"
+                      onChange={(e) =>
+                        setSelectedFile(e.target.files?.[0] || null)
+                      }
+                      className="text-xl"
+                    />
+                  </div>
 
-            {order.fileUrl ? (
-              <p className="text-green-600 font-medium">
-                ✅ File attached: {order.fileUrl}
-              </p>
-            ) : (
-              <div className="flex items-center gap-4">
-                <input
-                  type="file"
-                  accept=".zip,.rar,.tar"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="text-sm"
-                />
-                <button
-                  onClick={handleUpload}
-                  // disabled={!selectedFile || isUploading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-                >
-                  {isUploading ? "Uploading..." : "Upload & Attach"}
-                </button>
-              </div>
-            )}
+                  {isUploading && (
+                    <div className="w-full mt-2">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                          Uploading Files
+                        </span>
+                        <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                          {uploadProgress}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                        <div
+                          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                          style={{ width: `${uploadProgress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Modal Footer (Actions) */}
         <div className="p-6 bg-gray-50 dark:bg-[#1a1a1a] border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-          {/* <span
-                className={`px-4 py-2 rounded-full text-sm font-bold border ${getStatusColor(order.status)}`}
-              >
-                {order.status}
-              </span> */}
-
           <div className="flex flex-row space-x-3 align-between ">
             <button
-              onClick={() => alert("Connecting to email system...")}
+              onClick={handleUpload}
+              disabled={isUploading}
               className="flex items-center space-x-2 px-4 py-2 text-xl font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
             >
               <Upload className="w-4 h-4" />
-              <span>Send Files</span>
+              <span>{isUploading ? "Uploading" : "Send Files"}</span>
             </button>
             <button
               onClick={handleprint}

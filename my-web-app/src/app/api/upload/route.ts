@@ -2,9 +2,8 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
 
-// Initialize the S3 client to point at Cloudflare R2
 const S3 = new S3Client({
-  region: "auto", // R2 always uses "auto"
+  region: "auto",
   endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   credentials: {
     accessKeyId: process.env.R2_ACCESS_KEY_ID as string,

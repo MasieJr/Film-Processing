@@ -4,8 +4,16 @@ import { useState, useEffect } from "react";
 import RadioGroup from "@/components/RadioGroup";
 import TextInput from "@/components/TextInput";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function OrderFormPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState(260);
+  const [servicesIndex, setservicesIndex] = useState(0);
+  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
+  const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
+  const router = useRouter();
+
   const services = [
     "Email in High Resolution",
     "Email in Low Resolution",
@@ -28,13 +36,6 @@ export default function OrderFormPage() {
 
   const printPrices = [445, 329, 895, 931];
   const prices = [260, 240, 329, 329, 95];
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(260);
-  const [servicesIndex, setservicesIndex] = useState(0);
-  const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
-  const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
-  
 
   const [form, setForm] = useState({
     customerName: "",
@@ -67,7 +68,7 @@ export default function OrderFormPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     } else {
-      e.preventDefault(); // Stops the page from refreshing
+      e.preventDefault();
       setIsSubmitting(true);
 
       try {
@@ -80,8 +81,7 @@ export default function OrderFormPage() {
         const data = await response.json();
 
         if (data.success) {
-          alert("Success! Your order ID is: " + data.order.id);
-          // Optional: Redirect them to a Thank You page here!
+          router.push("/thank-you");
         } else {
           alert("Failed to submit order: " + data.error);
         }
@@ -89,7 +89,7 @@ export default function OrderFormPage() {
         console.error("Error submitting order:", error);
         alert("Something went wrong connecting to the server.");
       } finally {
-        setIsSubmitting(false); // Stop the loading spinner
+        setIsSubmitting(false);
       }
     }
   };
@@ -184,10 +184,10 @@ export default function OrderFormPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white dark:bg-black text-black dark:text-white pt-6">
+    <main className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
-        <div className="sticky top-0 bg-white dark:bg-black m-y-4 p-4 rounded-lg shadow-md flex justify-center">
+        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] m-y-4 p-4 flex justify-center">
           <Image
             src="/logo.png"
             alt="Company Logo"
@@ -199,7 +199,6 @@ export default function OrderFormPage() {
         </div>
         {formErrors.hasError && (
           <div className="bg-red-100 w-50 text-red-500 w-full">
-            {/* <p className="text-lg font-bold">Please Check the following:</p> */}
             {formErrors.customerName && (
               <p className="text-sm font-light">Please enter Name & Surname</p>
             )}
@@ -252,7 +251,7 @@ export default function OrderFormPage() {
           <div className="flex flex-row items-center space-x-4">
             <button
               onClick={decrement}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#2c2c2c] rounded-lg flex items-center justify-center text-2xl active:scale-95"
+              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95"
             >
               -
             </button>
@@ -261,7 +260,7 @@ export default function OrderFormPage() {
             </span>
             <button
               onClick={increment}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#2c2c2c] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
+              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
             >
               +
             </button>
@@ -272,7 +271,7 @@ export default function OrderFormPage() {
         <div className="flex flex-col">
           <label className="text-xl mb-1 font-medium">Sales Person</label>
           <select
-            className={`border ${formErrors.salesPerson ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg appearance-none`}
+            className={`border ${formErrors.salesPerson ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg appearance-none`}
             value={form.salesPerson}
             onChange={(e) => handleInputChange("salesPerson", e.target.value)}
             onBlur={() => checkError("salePerson")}

@@ -29,7 +29,7 @@ export default function TextInput({
         type={type}
         placeholder={`Enter your ${label}`}
         autoComplete={autoComplete}
-        className={`border ${hasError ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 bg-transparent text-lg`}
+        className={`border ${hasError ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg`}
         onChange={(e) => onChange(value, e.target.value)}
         onBlur={() => onBlur(value)}
       />

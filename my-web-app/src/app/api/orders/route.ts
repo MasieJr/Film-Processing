@@ -14,7 +14,7 @@ const prisma = new PrismaClient({ adapter });
 export async function GET() {
   try {
     const orders = await prisma.order.findMany({
-      orderBy: { createdAt: 'desc' } // Newest orders at the top
+      orderBy: { createdAt: 'desc' } 
     });
     return NextResponse.json(orders);
   } catch (error) {
@@ -28,7 +28,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Save the new order directly to the database
     const newOrder = await prisma.order.create({
       data: {
         customerName: body.customerName,

@@ -76,17 +76,8 @@ export default function DropDownList({
                       Service
                     </th>
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
-                      Total
-                    </th>
-                    <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Status
                     </th>
-                    {/* <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
-                      Download PDF
-                    </th>
-                    <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
-                      Upload Files
-                    </th> */}
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Action
                     </th>
@@ -99,47 +90,28 @@ export default function DropDownList({
                       className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors"
                     >
                       <td className="p-4">
-                        <p className="font-medium text-sm">
+                        <p className="font-medium text-xl">
                           {order.customerName}
                         </p>
-                        <p className="text-xs text-gray-500">{order.email}</p>
+                        <p className="text-lg text-gray-500">{order.email}</p>
                       </td>
                       <td className="p-4">
-                        <p className="text-sm">{order.services}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xl">{order.services}</p>
+                        <p className="text-lg text-gray-500">
                           Qty: {order.quantity}
                         </p>
                       </td>
-                      <td className="p-4 font-medium text-sm">
-                        R{order.totalPrice}
-                      </td>
                       <td className="p-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}
+                          className={`px-3 py-1 rounded-full text-lg font-medium border ${getStatusColor(order.status)}`}
                         >
                           {order.status}
                         </span>
                       </td>
-                      {/* <td>
-                        <button className="align-center rounded-full border active:scale-95"
-                        onClick={() => btnClick(order)}>
-                          <div className="flex flex-row p-3">
-                            <ArrowDownToLine />
-                            <span>Download</span>
-                          </div>
-                        </button>
-                      </td>
-                      <td>
-                        <button className="align-center rounded-full border active:scale-95">
-                          <div className="flex flex-row p-3">
-                            <ArrowUpToLine />
-                            <span>Upload</span>
-                          </div>
-                        </button>
-                      </td> */}
+
                       <td className="p-4">
                         <button
-                          className="text-[#41B544] font-medium text-sm hover:underline"
+                          className=" bg-[#41B544] text-white px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-[#359638] transition-colors"
                           onClick={() => btnClick(order)}
                         >
                           View Details
