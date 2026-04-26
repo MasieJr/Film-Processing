@@ -18,27 +18,50 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
       checked?: boolean;
     }) => (
       <div className="flex items-center space-x-2 mr-6">
-        <div className="w-5 h-5 border-[1.5px] border-black flex items-center justify-center">
+        <div className="w-5 h-5 border-[1.5px] border-black flex items-center justify-center shrink-0">
           {checked && <div className="w-3 h-3 bg-black" />}
         </div>
-        <span className="text-black">{label}</span>
+        <span className="text-black whitespace-nowrap">{label}</span>
       </div>
     );
 
     return (
-      // The A4 paper container
-      <div className="flex justify-start bg-white w-[297mm] min-h-[210mm] ">
-        <div
-          ref={ref}
-          className="p-12 bg-white text-black w-[148mm] min-h-[210mm] font-sans"
-        >
+      // 1. REF MOVED TO THE OUTERMOST DIV
+      // 2. HEIGHT CHANGED TO 209mm (Magic number to prevent page spilling)
+      // 3. ADDED overflow-hidden
+      <div
+        ref={ref}
+        className="flex justify-start bg-white w-[297mm] h-[209mm] overflow-hidden box-border"
+      >
+        {/* The Print Styles MUST be inside the ref so the printer sees them */}
+        <style type="text/css" media="print">
+          {`
+            @page { 
+              size: landscape; 
+              margin: 0mm !important; 
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              height: 100% !important;
+              overflow: hidden !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          `}
+        </style>
+
+        {/* 4. Changed to flex-col and h-full to prevent vertical stretching */}
+        {/* 5. Slightly reduced padding (p-10 instead of p-12) to give content breathing room */}
+        <div className="p-10 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
+          
           {/* Title */}
-          <h1 className="text-[2.5rem] font-bold text-black tracking-tight mb-8 ">
+          <h1 className="text-[2rem] font-bold text-black tracking-tight mb-2">
             FILM DEVELOPMENT ORDER
           </h1>
 
           {/* Meta Info Row */}
-          <div className="flex justify-between items-end mb-6 text-lg">
+          <div className="flex justify-between items-end mb-1 text-lg shrink-0">
             <p>
               Date In:{" "}
               <span className="font-bold border-b border-black pb-1">
@@ -47,16 +70,16 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
             </p>
             <p className="flex items-end">
               Date Out:{" "}
-              <span className="inline-block border-b border-black w-48 ml-2"></span>
+              <span className="inline-block border-b border-black w-32 ml-2"></span>
             </p>
           </div>
 
           {/* Customer Info */}
-          <div className="space-y-4 mb-8 text-lg">
+          <div className=" mb-1 text-lg shrink-0">
             <p>
               Customer Name:{" "}
               <span className="font-bold border-b border-black pb-1">
-                {order.name}
+                {order.name || order.customerName}
               </span>
             </p>
             <p>
@@ -74,10 +97,10 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
           </div>
 
           {/* Film Details Section */}
-          <div className="mb-12">
-            <h2 className="text-xl font-bold text-black mb-6">Film Details:</h2>
+          <div className="mb-2 flex-grow">
+            <h2 className="text-xl font-bold text-black mb-2">Film Details:</h2>
 
-            <div className="space-y-6 text-lg ml-2">
+            <div className="space-y-2 text-lg ml-2">
               {/* Film Type Line */}
               <div className="flex items-center">
                 <span className="mr-4">- Film Type:</span>
@@ -86,7 +109,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
                   <Checkbox label="120" />
                   <div className="flex items-end">
                     <Checkbox label="Other:" />
-                    <span className="inline-block border-b border-black w-32 -ml-4"></span>
+                    <span className="inline-block border-b border-black w-24 -ml-4"></span>
                   </div>
                 </div>
               </div>
@@ -98,12 +121,14 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
 
               <p>
                 - Scans:{" "}
-                <span className="font-bold italic">{order.service}</span>
+                <span className="font-bold italic">{order.service || order.services}</span>
               </p>
 
               {/* Conditional rendering for Print sizing */}
-              {order.service === "Print Only" ||
-              order.service === "Print and email" ? (
+              {(order.service === "Print Only" ||
+              order.service === "Print and email" || 
+              order.services === "Print Only" || 
+              order.services === "Print and email") ? (
                 <p>
                   - Prints Size:{" "}
                   <span className="font-bold italic">
@@ -124,7 +149,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
                 </span>
               </p>
 
-              <p className="flex items-end">
+              <p className="flex items-end pt-1">
                 - Special Instructions:{" "}
                 <span className="inline-block border-b border-black flex-grow ml-2"></span>
               </p>
@@ -142,18 +167,16 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
             </div>
           </div>
 
-          {/* Footer Logo Area */}
-          <div className="mt-auto pt-8">
-            <div className="mb-2">
-              <Image
-                src="/banner.jpg"
-                alt="Company Logo"
-                loading="eager"
-                width={650}
-                height={205}
-                className="w-full h-auto object-contain"
-              />
-            </div>
+          {/* Footer Logo Area - mt-auto pushes this firmly to the bottom */}
+          <div className="mt-auto shrink-0">
+            <Image
+              src="/banner.jpg"
+              alt="Company Logo"
+              loading="eager"
+              width={650}
+              height={205}
+              className="w-full h-auto object-contain"
+            />
           </div>
         </div>
       </div>

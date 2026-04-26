@@ -32,6 +32,7 @@ model Order {
   // Admin & Financials
   status          String   @default("New") // Pending, Processing, Ready, Completed
   totalPrice      Float?
+  fileUrl         String?
   
   // Timestamps
   createdAt       DateTime @default(now())

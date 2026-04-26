@@ -44,9 +44,9 @@ export default function DropDownList({
     }
   };
   return (
-    <div>
+    <div className="bg-">
       <button
-        className="w-full flex flex-row justify-between p-3 hover:bg-white dark:hover:bg-[#1e1e1e] hover:border border-[#41B544] cursor-pointer rounded-xl mb-2"
+        className="sticky top-1 w-full flex flex-row justify-between p-3 hover:bg-white dark:hover:bg-[#1e1e1e] hover:border border-[#41B544] cursor-pointer rounded-xl mb-2"
         onClick={() => onClick(type)}
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -81,12 +81,12 @@ export default function DropDownList({
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Status
                     </th>
-                    <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
+                    {/* <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Download PDF
                     </th>
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Upload Files
-                    </th>
+                    </th> */}
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Action
                     </th>
@@ -120,8 +120,9 @@ export default function DropDownList({
                           {order.status}
                         </span>
                       </td>
-                      <td>
-                        <button className="align-center rounded-full border active:scale-95">
+                      {/* <td>
+                        <button className="align-center rounded-full border active:scale-95"
+                        onClick={() => btnClick(order)}>
                           <div className="flex flex-row p-3">
                             <ArrowDownToLine />
                             <span>Download</span>
@@ -135,7 +136,7 @@ export default function DropDownList({
                             <span>Upload</span>
                           </div>
                         </button>
-                      </td>
+                      </td> */}
                       <td className="p-4">
                         <button
                           className="text-[#41B544] font-medium text-sm hover:underline"
