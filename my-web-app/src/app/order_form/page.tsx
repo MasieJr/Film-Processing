@@ -99,6 +99,7 @@ export default function OrderFormPage() {
     const isEmailEmpty = form.email.trim() === "";
     const isPhoneEmpty = form.phone.trim() === "";
     const isSalesPersonEmpty = form.salesPerson === "";
+    
 
     if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
       setFormErrors((prev) => ({
@@ -127,7 +128,16 @@ export default function OrderFormPage() {
 
   const checkError = (key: string) => {
     hasError();
+if (key === "email") {
+    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+    setFormErrors((prev) => ({ ...prev, [key]: true }));
+  }
+  if (key === "phone") {
+    const isValid = /^\+?[0-9\s\-()]{10,15}$/.test(form.phone);
+   setFormErrors((prev) => ({ ...prev, [key]: true }));
+  }
     if (form[key as keyof typeof form] === "") {
+
       setFormErrors((prev) => ({ ...prev, [key]: true }));
     }
   };

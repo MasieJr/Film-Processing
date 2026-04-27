@@ -28,6 +28,16 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^\+?[0-9\s\-()]{10,15}$/;
+    if (!body.email || !emailRegex.test(body.email)) {
+      return NextResponse.json({ error: "Invalid email address provided" }, { status: 400 });
+    }
+
+    if (!body.phone || !phoneRegex.test(body.phone)) {
+      return NextResponse.json({ error: "Invalid phone number provided" }, { status: 400 });
+    }
+
     const chosenService = body.selectedService || "";
   
     const isPrintingService = chosenService.toLowerCase().includes("print");
@@ -35,8 +45,8 @@ export async function POST(request: Request) {
     const newOrder = await prisma.order.create({
       data: {
         customerName: body.customerName,
-        email: body.email,
-        phone: body.phone,
+        email: body.email.trim(),
+        phone: body.phone.trim(),
         quantity: parseInt(body.quantity),
         salesPerson: body.salesPerson,
         services: body.services,
