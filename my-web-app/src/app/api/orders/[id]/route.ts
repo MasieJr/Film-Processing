@@ -49,7 +49,7 @@ export async function PATCH(
               </a>
             </div>
             
-            <p><strong>Note:</strong> This link will expire, so please download your files to a safe location as soon as possible.</p>
+            <p><strong>Note:</strong> This link will expire after 30 days, so please download your files to a safe location as soon as possible.</p>
             <p>Thanks for choosing our Foto First Cresta!</p>
           </div>
         `,

@@ -28,6 +28,10 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    const chosenService = body.selectedService || "";
+  
+    const isPrintingService = chosenService.toLowerCase().includes("print");
+
     const newOrder = await prisma.order.create({
       data: {
         customerName: body.customerName,
@@ -36,8 +40,10 @@ export async function POST(request: Request) {
         quantity: parseInt(body.quantity),
         salesPerson: body.salesPerson,
         services: body.services,
-        selectedSize: body.selectedSize || null,
-        selectedFinish: body.selectedFinish || null,
+        selectedSize: isPrintingService ? (body.selectedSize || null) : null,
+        selectedFinish: isPrintingService ? (body.selectedFinish || null) : null,
+        // selectedSize: body.selectedSize || null,
+        // selectedFinish: body.selectedFinish || null,
         keepNegatives: body.keepNegatives || false,
         totalPrice:parseFloat(body.totalPrice),
       }
