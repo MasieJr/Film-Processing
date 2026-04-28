@@ -1,6 +1,6 @@
-"use client"; // Required in Next.js because we are using useState
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import RadioGroup from "@/components/RadioGroup";
 import TextInput from "@/components/TextInput";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export default function OrderFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState(260);
-  const [servicesIndex, setservicesIndex] = useState(0);
+  const [servicesIndex, setServicesIndex] = useState(0);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
   const router = useRouter();
@@ -31,9 +31,7 @@ export default function OrderFormPage() {
   ];
 
   const printsSizes = ["9x13 cm", "10x15 cm", "13x18 cm", "15x20 cm"];
-
   const finishes = ["Glossy", "Matte"];
-
   const printPrices = [445, 329, 895, 931];
   const prices = [260, 240, 329, 329, 95];
 
@@ -55,95 +53,95 @@ export default function OrderFormPage() {
     email: false,
     phone: false,
     salesPerson: false,
-    hasError: false,
+    hasGlobalError: false,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    const isNameEmpty = form.customerName.trim() === "";
-    const isEmailEmpty = form.email.trim() === "";
-    const isPhoneEmpty = form.phone.trim() === "";
-    const isSalesPersonEmpty = form.salesPerson === "";
 
-    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    } else {
-      e.preventDefault();
-      setIsSubmitting(true);
+  
+  const validateField = (key: string, value: string) => {
+    let hasError = false;
 
-      try {
-        const response = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          router.push("/thank-you");
-        } else {
-          alert("Failed to submit order: " + data.error);
-        }
-      } catch (error) {
-        console.error("Error submitting order:", error);
-        alert("Something went wrong connecting to the server.");
-      } finally {
-        setIsSubmitting(false);
-      }
+    if (value.trim() === "") {
+      hasError = true;
+    } else if (key === "email") {
+      hasError = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    } else if (key === "phone") {
+      hasError = !/^\+?[0-9\s\-()]{10,15}$/.test(value);
     }
-  };
 
-  const hasError = () => {
-    const isNameEmpty = form.customerName.trim() === "";
-    const isEmailEmpty = form.email.trim() === "";
-    const isPhoneEmpty = form.phone.trim() === "";
-    const isSalesPersonEmpty = form.salesPerson === "";
-    
-
-    if (isNameEmpty || isEmailEmpty || isPhoneEmpty || isSalesPersonEmpty) {
-      setFormErrors((prev) => ({
-        ...prev,
-        hasError: true,
-      }));
-    } else {
-      setFormErrors((prev) => ({
-        ...prev,
-        hasError: false,
-      }));
-    }
+    return hasError;
   };
 
   const handleInputChange = (key: string, value: string | boolean) => {
+    // 1. Update the form state
     setForm((prev) => ({ ...prev, [key]: value }));
-    if (value === "") {
-      setFormErrors((prev) => ({ ...prev, [key]: true }));
-      hasError();
-    } else {
-      setFormErrors((prev) => ({ ...prev, [key]: false }));
-      // removeError();
-      hasError();
+
+    // 2. Clear the error immediately as they type, so the red box vanishes
+    if (typeof value === "string") {
+      setFormErrors((prev) => ({ ...prev, [key]: false, hasGlobalError: false }));
     }
   };
 
-  const checkError = (key: string) => {
-    hasError();
-if (key === "email") {
-    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
-    setFormErrors((prev) => ({ ...prev, [key]: true }));
-  }
-  if (key === "phone") {
-    const isValid = /^\+?[0-9\s\-()]{10,15}$/.test(form.phone);
-   setFormErrors((prev) => ({ ...prev, [key]: true }));
-  }
-    if (form[key as keyof typeof form] === "") {
+  const handleBlur = (key: string) => {
+    // Grab the current value directly from the state
+    const value = form[key as keyof typeof form] as string;
+    const isError = validateField(key, value);
 
-      setFormErrors((prev) => ({ ...prev, [key]: true }));
+    setFormErrors((prev) => ({ ...prev, [key]: isError }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 1. Validate ALL fields right before submit
+    const nameError = validateField("customerName", form.customerName);
+    const emailError = validateField("email", form.email);
+    const phoneError = validateField("phone", form.phone);
+    const salesError = validateField("salesPerson", form.salesPerson);
+
+    // 2. Update all UI errors at once so the user sees what they missed
+    setFormErrors({
+      customerName: nameError,
+      email: emailError,
+      phone: phoneError,
+      salesPerson: salesError,
+      hasGlobalError: nameError || emailError || phoneError || salesError,
+    });
+
+    // 3. If any error exists, stop the submission!
+    if (nameError || emailError || phoneError || salesError) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // 4. If everything is perfect, send it to the lab!
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (data.success || response.ok) {
+        
+        router.push(  "/thank-you");
+      } else {
+        alert("Failed to submit order: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      alert("Something went wrong connecting to the server.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  // --- PRICING LOGIC ---
   const selectService = (index: number) => {
-    setservicesIndex(index);
+    setServicesIndex(index);
     setSelectedSizeIndex(1);
     setSelectedPrice(prices[index]);
     setForm((prev) => ({
@@ -197,7 +195,7 @@ if (key === "email") {
     <main className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
-        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] m-y-4 p-4 flex justify-center">
+        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] m-y-4 p-4 flex justify-center z-10">
           <Image
             src="/logo.png"
             alt="Company Logo"
@@ -207,52 +205,45 @@ if (key === "email") {
             className="rounded-full min-w-full"
           />
         </div>
-        {formErrors.hasError && (
-          <div className="bg-red-100 w-50 text-red-500 w-full">
-            {formErrors.customerName && (
-              <p className="text-sm font-light">Please enter Name & Surname</p>
-            )}
-            {formErrors.email && (
-              <p className="text-sm font-light">
-                Please enter valid email Address
-              </p>
-            )}
-            {formErrors.phone && (
-              <p className="text-sm font-light">
-                Please enter valid Phone Number
-              </p>
-            )}
-            {formErrors.salesPerson && (
-              <p className="text-xs font-light">Please Select Sales Person</p>
-            )}
+
+        {formErrors.hasGlobalError && (
+          <div className="bg-red-100 p-4 rounded-lg text-red-600 w-full border border-red-200">
+            <p className="font-bold mb-1">Please fix the following errors:</p>
+            <ul className="list-disc pl-5 text-sm space-y-1">
+              {formErrors.customerName && <li>Please enter a valid Name & Surname</li>}
+              {formErrors.email && <li>Please enter a valid Email Address</li>}
+              {formErrors.phone && <li>Please enter a valid Phone Number</li>}
+              {formErrors.salesPerson && <li>Please select a Sales Person</li>}
+            </ul>
           </div>
         )}
+
         <TextInput
           label="Name and Surname"
-          type="text"
           value="customerName"
+          type="text"
           autoComplete="name"
           hasError={formErrors.customerName}
           onChange={handleInputChange}
-          onBlur={checkError}
+          onBlur={handleBlur}
         />
         <TextInput
           label="Email Address"
-          type="email"
           value="email"
+          type="email"
           autoComplete="email"
           hasError={formErrors.email}
           onChange={handleInputChange}
-          onBlur={checkError}
+          onBlur={handleBlur}
         />
         <TextInput
           label="Phone number"
-          type="tel"
           value="phone"
+          type="tel"
           autoComplete="tel"
           hasError={formErrors.phone}
           onChange={handleInputChange}
-          onBlur={checkError}
+          onBlur={handleBlur}
         />
 
         {/* --- Quantity Stepper --- */}
@@ -260,6 +251,7 @@ if (key === "email") {
           <label className="text-xl font-medium">Quantity</label>
           <div className="flex flex-row items-center space-x-4">
             <button
+              type="button"
               onClick={decrement}
               className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95"
             >
@@ -269,6 +261,7 @@ if (key === "email") {
               {form.quantity}
             </span>
             <button
+              type="button"
               onClick={increment}
               className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
             >
@@ -281,10 +274,12 @@ if (key === "email") {
         <div className="flex flex-col">
           <label className="text-xl mb-1 font-medium">Sales Person</label>
           <select
-            className={`border ${formErrors.salesPerson ? "border-red-500" : "border-[#41B544]"} rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg appearance-none`}
+            className={`border ${
+              formErrors.salesPerson ? "border-red-500" : "border-[#41B544]"
+            } rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg appearance-none outline-none focus:ring-2 focus:ring-[#41B544]/50`}
             value={form.salesPerson}
             onChange={(e) => handleInputChange("salesPerson", e.target.value)}
-            onBlur={() => checkError("salePerson")}
+            onBlur={() => handleBlur("salesPerson")}
           >
             <option value="" disabled>
               Please Select Sales Person
@@ -334,11 +329,14 @@ if (key === "email") {
           <label className="text-xl mb-1 font-medium">Keep Negatives</label>
           <div className="flex flex-row space-x-8">
             <button
+              type="button"
               onClick={() => handleInputChange("keepNegatives", true)}
               className="flex items-center space-x-2"
             >
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${form.keepNegatives ? "border-[#41B544]" : "border-gray-400"}`}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  form.keepNegatives ? "border-[#41B544]" : "border-gray-400"
+                }`}
               >
                 {form.keepNegatives && (
                   <div className="w-3 h-3 rounded-full bg-[#41B544]" />
@@ -347,11 +345,14 @@ if (key === "email") {
               <span className="text-lg">Yes</span>
             </button>
             <button
+              type="button"
               onClick={() => handleInputChange("keepNegatives", false)}
               className="flex items-center space-x-2"
             >
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${!form.keepNegatives ? "border-[#41B544]" : "border-gray-400"}`}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                  !form.keepNegatives ? "border-[#41B544]" : "border-gray-400"
+                }`}
               >
                 {!form.keepNegatives && (
                   <div className="w-3 h-3 rounded-full bg-[#41B544]" />
@@ -363,7 +364,7 @@ if (key === "email") {
         </div>
       </div>
 
-      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-[#1a1a1a] border-t border-gray-300 dark:border-gray-800 p-4 shadow-lg">
+      <div className="sticky bottom-0 left-0 right-0 bg-white dark:bg-[#1a1a1a] border-t border-gray-300 dark:border-gray-800 p-4 shadow-lg z-20">
         <div className="w-full max-w-2xl mx-auto flex flex-row justify-between items-center px-2">
           <div className="flex items-baseline space-x-2">
             <span className="text-xl font-bold">Total:</span>
@@ -375,7 +376,7 @@ if (key === "email") {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-[55%] h-[45px] bg-[#41B544] text-white rounded-[15px] font-bold text-xl active:scale-95 transition-transform"
+            className="w-[55%] h-[45px] bg-[#41B544] text-white rounded-[15px] font-bold text-xl active:scale-95 transition-transform disabled:opacity-50"
           >
             {isSubmitting ? "Sending to Lab..." : "Submit Order"}
           </button>

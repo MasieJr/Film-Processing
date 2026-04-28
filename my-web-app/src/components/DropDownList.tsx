@@ -18,7 +18,7 @@ type DropDownListProp = {
     quantity: number;
     totalPrice: number;
     status: string;
-    date: string;
+    createdAt: string;
   }[];
   type: string;
 };

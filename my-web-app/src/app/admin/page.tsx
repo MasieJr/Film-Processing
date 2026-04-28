@@ -16,7 +16,7 @@ const initialOrders = [
     quantity: 2,
     totalPrice: 658,
     status: "Pending",
-    date: "Oct 24, 2023",
+    createdAt: "2026-04-24 14:30:00.000",
   },
   {
     id: "ORD-002",
@@ -26,7 +26,7 @@ const initialOrders = [
     quantity: 1,
     totalPrice: 95,
     status: "Processing",
-    date: "Oct 24, 2023",
+    createdAt: "2026-04-24 16:45:00.000",
   },
   {
     id: "ORD-003",
@@ -36,7 +36,7 @@ const initialOrders = [
     quantity: 5,
     totalPrice: 1300,
     status: "Completed",
-    date: "Oct 23, 2023",
+    createdAt: "2026-04-23 09:15:00.000",
   },
 ];
 
@@ -48,16 +48,20 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [activeMonth, setActiveMonth] = useState("All");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
     completedOrder: false,
   });
+
   const pdfRef = useRef<HTMLDivElement>(null);
+
   const handlePrint1 = useReactToPrint({
     contentRef: pdfRef,
     documentTitle: `WorkOrder_${selectedOrder?.id}`,
   });
+
   const fetchOrders = async () => {
     try {
       const res = await fetch("/api/orders");
@@ -77,7 +81,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#121212]">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-20 h-20 border-4 border-red-300 dark:border-gray-700 border-t-[#41B544] rounded-full animate-spin"></div>
+          <div className="w-20 h-20 border-4 border-gray-300 dark:border-gray-700 border-t-[#41B544] dark:border-t-[#41B544] rounded-full animate-spin"></div>
           <p className="text-2xl font-medium text-gray-600 dark:text-gray-400">
             Loading Film orders...
           </p>
@@ -96,12 +100,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const handlePrint = () => {
-    handlePrint1();
-    changeStatus();
-    setSelectedOrder(null);
-  };
-
   const changeStatus = async () => {
     try {
       const updateRes = await fetch(`/api/orders/${selectedOrder.id}`, {
@@ -110,11 +108,17 @@ export default function AdminDashboard() {
       });
 
       if (updateRes.ok) {
-        fetchOrders(); // Silently move it to the Pending dropdown!
+        fetchOrders();
       }
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handlePrint = () => {
+    handlePrint1();
+    changeStatus();
+    setSelectedOrder(null);
   };
 
   const handleAdminFileUpload = async () => {
@@ -178,6 +182,42 @@ export default function AdminDashboard() {
     }
   };
 
+const uniqueMonths = new Set<string>();
+  orders.forEach((order) => {
+    const rawDate = order.createdAt;
+    if (rawDate) {
+      const safeDateString = String(rawDate).replace(" ", "T");
+      const dateObj = new Date(safeDateString);
+      if (!isNaN(dateObj.getTime())) {
+        uniqueMonths.add(dateObj.toLocaleString("en-US", { month: "short" }));
+      }
+    }
+  });
+  
+  
+  const dynamicTabs = ["All", ...Array.from(uniqueMonths)];
+
+  const displayedOrders =
+    activeMonth === "All"
+      ? orders
+      : orders.filter((order) => {
+          const safeDateString = order.createdAt ? order.createdAt.replace(" ", "T") : "";
+          if (!safeDateString) return false;
+
+          const dateObj = new Date(safeDateString);
+          return (
+            dateObj.toLocaleString("en-US", { month: "short" }) === activeMonth
+          );
+        });
+
+  const pendingCount = displayedOrders.filter(
+    (o) => o.status === "Pending",
+  ).length;
+  const totalRevenue = displayedOrders.reduce(
+    (sum, order) => sum + (Number(order.totalPrice) || 0),
+    0,
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#121212] p-8">
       {/* Header */}
@@ -190,32 +230,57 @@ export default function AdminDashboard() {
             Manage incoming film processing orders.
           </p>
         </div>
-        {/* <button className="bg-[#41B544] text-white px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-[#359638] transition-colors">
-          Export Data
-        </button> */}
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
           <h3 className="text-gray-500 font-medium">Total Orders</h3>
-          <p className="text-3xl font-bold mt-2">{orders.length}</p>
+          <p className="text-3xl font-bold mt-2">{displayedOrders.length}</p>
         </div>
         <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
           <h3 className="text-gray-500 font-medium">Pending Processing</h3>
-          <p className="text-3xl font-bold mt-2 text-yellow-600">12</p>
+          <p className="text-3xl font-bold mt-2 text-yellow-600">
+            {pendingCount}
+          </p>
         </div>
         <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <h3 className="text-gray-500 font-medium">Revenue (Today)</h3>
-          <p className="text-3xl font-bold mt-2 text-[#41B544]">R 2,053</p>
+          <h3 className="text-gray-500 font-medium">Revenue</h3>
+          <p className="text-3xl font-bold mt-2 text-[#41B544]">
+            R {totalRevenue.toLocaleString()}
+          </p>
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* --- MONTH TABS --- */}
+      <div className="mb-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex space-x-8 overflow-x-auto hide-scrollbar">
+          {dynamicTabs.map((month) => (
+            <button
+              key={month}
+              onClick={() => setActiveMonth(month)}
+              className={`pb-4 text-lg font-medium transition-colors whitespace-nowrap relative ${
+                activeMonth === month
+                  ? "text-[#41B544]"
+                  : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
+            >
+              {month === "All" ? "All Time" : `${month} 2026`}
+
+              {/* The active green underline indicator */}
+              {activeMonth === month && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#41B544] rounded-t-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* --- ORDERS TABLES--- */}
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.newOrder}
-        orders={orders.filter((order) => order.status === "New")}
+        orders={displayedOrders.filter((order) => order.status === "New")}
         type="newOrder"
         name="New Orders"
         btnClick={setSelectedOrder}
@@ -223,7 +288,7 @@ export default function AdminDashboard() {
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.pendingOrder}
-        orders={orders.filter((order) => order.status === "Pending")}
+        orders={displayedOrders.filter((order) => order.status === "Pending")}
         type="pendingOrder"
         name="Pending orders"
         btnClick={setSelectedOrder}
@@ -231,13 +296,13 @@ export default function AdminDashboard() {
       <DropDownList
         onClick={openDropdown}
         open={dropDowns.completedOrder}
-        orders={orders.filter((order) => order.status === "Completed")}
+        orders={displayedOrders.filter((order) => order.status === "Completed")}
         type="completedOrder"
         name="Completed Orders"
         btnClick={setSelectedOrder}
       />
 
-      {/* --- THE MODAL --- */}
+      {/* --- VIEW / UPLOAD MODAL --- */}
       {selectedOrder && (
         <ViewModal
           order={selectedOrder}
@@ -250,7 +315,7 @@ export default function AdminDashboard() {
         />
       )}
 
-      {/* SUCCESS MODAL */}
+      {/* --- SUCCESS MODAL --- */}
       {showSuccessModal && (
         <SuccessModal
           fetchOrders={fetchOrders}
@@ -259,6 +324,7 @@ export default function AdminDashboard() {
         />
       )}
 
+      {/* --- HIDDEN PDF TEMPLATE --- */}
       <div className="hidden">
         <OrderPdfTemplate ref={pdfRef} order={selectedOrder} />
       </div>
