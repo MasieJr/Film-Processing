@@ -34,8 +34,7 @@ export async function PATCH(
       const downloadLink = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${body.fileUrl}`;
 
       await resend.emails.send({
-        //'onboarding@resend.dev' for testing,
-        from: "Film Lab <onboarding@resend.dev>", 
+        from: "Foto First Cresta <film@masieseremu.co.za>",
         to: updatedOrder.email, 
         subject: `Your film ORDER is ready! 🎞️`,
         html: `
