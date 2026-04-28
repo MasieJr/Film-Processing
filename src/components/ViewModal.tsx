@@ -5,6 +5,7 @@ type ViewModalProps = {
     id: string;
     customerName: string;
     email: string;
+    phone: string;
     services: string;
     quantity: number;
     totalPrice: number;
@@ -60,6 +61,9 @@ export default function ViewModal({
               </p>
               <p>
                 <span className="font-medium">Email:</span> {order.email}
+              </p>
+              <p>
+                <span className="font-medium">Phone Number:</span> {order.phone}
               </p>
               <p>
                 <span className="font-medium">Date:</span> {order.createdAt}

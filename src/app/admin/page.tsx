@@ -6,12 +6,14 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
+import { Search } from "lucide-react";
 
 const initialOrders = [
   {
     id: "ORD-001",
     customerName: "John Doe",
     email: "john@example.com",
+    phone: "1234567890",
     services: "Print and email",
     quantity: 2,
     totalPrice: 658,
@@ -22,6 +24,7 @@ const initialOrders = [
     id: "ORD-002",
     customerName: "Sarah Smith",
     email: "sarah.s@example.com",
+    phone: "1234567890",
     services: "Develop only",
     quantity: 1,
     totalPrice: 95,
@@ -32,6 +35,7 @@ const initialOrders = [
     id: "ORD-003",
     customerName: "Mike Johnson",
     email: "mikej@example.com",
+    phone: "1234567890",
     services: "Email in High Resolution",
     quantity: 5,
     totalPrice: 1300,
@@ -49,6 +53,7 @@ export default function AdminDashboard() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [activeMonth, setActiveMonth] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
@@ -182,7 +187,7 @@ export default function AdminDashboard() {
     }
   };
 
-const uniqueMonths = new Set<string>();
+  const uniqueMonths = new Set<string>();
   orders.forEach((order) => {
     const rawDate = order.createdAt;
     if (rawDate) {
@@ -193,22 +198,41 @@ const uniqueMonths = new Set<string>();
       }
     }
   });
-  
-  
+
   const dynamicTabs = ["All", ...Array.from(uniqueMonths)];
 
-  const displayedOrders =
-    activeMonth === "All"
-      ? orders
-      : orders.filter((order) => {
-          const safeDateString = order.createdAt ? order.createdAt.replace(" ", "T") : "";
-          if (!safeDateString) return false;
+  const displayedOrders = orders.filter((order) => {
+    // Check Month Match
+    let matchesMonth = true;
+    if (activeMonth !== "All") {
+      const rawDate = order.createdAt;
+      if (!rawDate) {
+        matchesMonth = false;
+      } else {
+        const safeDateString = String(rawDate).replace(" ", "T");
+        const dateObj = new Date(safeDateString);
+        if (isNaN(dateObj.getTime())) {
+          matchesMonth = false;
+        } else {
+          matchesMonth =
+            dateObj.toLocaleString("en-US", { month: "short" }) === activeMonth;
+        }
+      }
+    }
 
-          const dateObj = new Date(safeDateString);
-          return (
-            dateObj.toLocaleString("en-US", { month: "short" }) === activeMonth
-          );
-        });
+    // Check Search Match (Checks Name, Email, or Order ID)
+    let matchesSearch = true;
+    if (searchQuery.trim() !== "") {
+      const lowerQuery = searchQuery.toLowerCase();
+      matchesSearch =
+        order.customerName?.toLowerCase().includes(lowerQuery) ||
+        order.email?.toLowerCase().includes(lowerQuery) ||
+        order.phone?.toLowerCase().includes(lowerQuery);
+    }
+
+    // Only show the order if it matches BOTH filters
+    return matchesMonth && matchesSearch;
+  });
 
   const pendingCount = displayedOrders.filter(
     (o) => o.status === "Pending",
@@ -229,6 +253,20 @@ const uniqueMonths = new Set<string>();
           <p className="text-gray-500 mt-1">
             Manage incoming film processing orders.
           </p>
+        </div>
+
+        {/* --- SEARCH BAR --- */}
+        <div className="mb-6 relative w-100 h-">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="text-gray-500" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search by Customer Name, Email or Phone number.."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="block w-full h-15 pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl leading-5 bg-white dark:bg-[#1e1e1e] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#41B544] focus:border-[#41B544] sm:text-sm transition-colors"
+          />
         </div>
       </div>
 
