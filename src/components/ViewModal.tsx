@@ -14,7 +14,7 @@ type ViewModalProps = {
     fileUrl: string;
   };
   isUploading: boolean;
-  setSelectedOrder: (order: any | null) => void;
+  closeOrder: () => void;
   handleprint: () => void;
   setSelectedFile: (file: File | null) => void;
   handleUpload: () => void;
@@ -24,7 +24,7 @@ type ViewModalProps = {
 
 export default function ViewModal({
   order,
-  setSelectedOrder,
+  closeOrder,
   handleprint,
   isUploading,
   setSelectedFile,
@@ -42,7 +42,7 @@ export default function ViewModal({
             <h2 className="text-xl font-bold">Order Details</h2>
           </div>
           <button
-            onClick={() => setSelectedOrder(null)}
+            onClick={closeOrder}
             className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />

@@ -143,7 +143,10 @@ export default function AdminDashboard() {
     setIsAddOrderSendOpen(false);
     setAddOrderFile(null);
   };
-
+  const closeView = () => {
+    setSelectedFile(null);
+    setSelectedOrder(null);
+  };
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
 
@@ -439,7 +442,7 @@ export default function AdminDashboard() {
         <ViewModal
           order={selectedOrder}
           handleprint={handlePrint}
-          setSelectedOrder={setSelectedOrder}
+          closeOrder={closeView}
           handleUpload={handleAdminFileUpload}
           isUploading={isUploading}
           setSelectedFile={setSelectedFile}
