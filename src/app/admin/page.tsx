@@ -6,7 +6,16 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import { Search } from "lucide-react";
+import {
+  CircleCheck,
+  CloudUpload,
+  Plus,
+  Search,
+  Send,
+  Upload,
+  X,
+} from "lucide-react";
+import AddOrder from "@/components/AddOrder";
 
 const initialOrders = [
   {
@@ -43,7 +52,6 @@ const initialOrders = [
     createdAt: "2026-04-23 09:15:00.000",
   },
 ];
-
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState(initialOrders);
@@ -54,6 +62,11 @@ export default function AdminDashboard() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [activeMonth, setActiveMonth] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
+  const [addOrderName, setAddOrderName] = useState("");
+  const [addOrderEmail, setAddOrderEmail] = useState("");
+  const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
+  const [isaddOrderSending, setIsaddOrderSending] = useState(false);
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
@@ -126,6 +139,14 @@ export default function AdminDashboard() {
     setSelectedOrder(null);
   };
 
+  const closeAddOrder = () => {
+    setIsAddOrderSendOpen(false);
+    setAddOrderFile(null);
+  };
+  const closeView = () => {
+    setSelectedFile(null);
+    setSelectedOrder(null);
+  };
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
 
@@ -187,6 +208,79 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddOrderSendSubmit = async () => {
+    if (!addOrderEmail || !addOrderFile) return;
+    setIsaddOrderSending(true);
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const urlRes = await fetch("/api/upload", {
+        method: "POST",
+        body: JSON.stringify({
+          filename: addOrderFile.name,
+          contentType: addOrderFile.type || "application/zip",
+        }),
+      });
+      const { uploadUrl, finalFileKey } = await urlRes.json();
+
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadUrl, true);
+        xhr.setRequestHeader(
+          "Content-Type",
+          addOrderFile.type || "application/zip",
+        );
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = Math.round(
+              (event.loaded / event.total) * 100,
+            );
+            setUploadProgress(percentComplete);
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.response);
+          else reject(new Error(`Upload failed: ${xhr.status}`));
+        };
+        xhr.onerror = () => reject(new Error("Network Error"));
+
+        xhr.send(addOrderFile);
+      });
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: addOrderName || "Walk-in Customer",
+          email: addOrderEmail,
+          phone: "0123456789",
+          services: "addOrder Delivery",
+          quantity: 1,
+          salesPerson: "Shop Upload",
+          totalPrice: 0.0,
+          status: "Completed",
+          fileUrl: finalFileKey,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create addOrder order");
+
+      setAddOrderEmail("");
+      setAddOrderName("");
+      setAddOrderFile(null);
+      setIsAddOrderSendOpen(false);
+      setUploadProgress(0);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong with the file upload.");
+    } finally {
+      setIsaddOrderSending(false);
+    }
+  };
+
   const uniqueMonths = new Set<string>();
   orders.forEach((order) => {
     const rawDate = order.createdAt;
@@ -202,7 +296,6 @@ export default function AdminDashboard() {
   const dynamicTabs = ["All", ...Array.from(uniqueMonths)];
 
   const displayedOrders = orders.filter((order) => {
-    // Check Month Match
     let matchesMonth = true;
     if (activeMonth !== "All") {
       const rawDate = order.createdAt;
@@ -220,7 +313,6 @@ export default function AdminDashboard() {
       }
     }
 
-    // Check Search Match (Checks Name, Email, or Order ID)
     let matchesSearch = true;
     if (searchQuery.trim() !== "") {
       const lowerQuery = searchQuery.toLowerCase();
@@ -230,7 +322,6 @@ export default function AdminDashboard() {
         order.phone?.toLowerCase().includes(lowerQuery);
     }
 
-    // Only show the order if it matches BOTH filters
     return matchesMonth && matchesSearch;
   });
 
@@ -254,19 +345,26 @@ export default function AdminDashboard() {
             Manage incoming film processing orders.
           </p>
         </div>
-
-        {/* --- SEARCH BAR --- */}
-        <div className="mb-6 relative w-100 h-">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="text-gray-500" />
+        <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center">
+          <div className="relative flex-grow w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="text-gray-500" />
+            </div>
+            <input
+              type="text"
+              placeholder="Name, Email or Phone"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl leading-5 bg-white dark:bg-[#1e1e1e] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#41B544] focus:border-[#41B544] sm:text-sm transition-colors"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search by Customer Name, Email or Phone number.."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full h-15 pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl leading-5 bg-white dark:bg-[#1e1e1e] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#41B544] focus:border-[#41B544] sm:text-sm transition-colors"
-          />
+          <button
+            onClick={() => setIsAddOrderSendOpen(true)}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-[#41B544] text-white rounded-xl font-bold hover:bg-[#359638] transition-colors whitespace-nowrap"
+          >
+            <Plus />
+            Add order
+          </button>
         </div>
       </div>
 
@@ -305,7 +403,6 @@ export default function AdminDashboard() {
             >
               {month === "All" ? "All Time" : `${month} 2026`}
 
-              {/* The active green underline indicator */}
               {activeMonth === month && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#41B544] rounded-t-full" />
               )}
@@ -345,11 +442,12 @@ export default function AdminDashboard() {
         <ViewModal
           order={selectedOrder}
           handleprint={handlePrint}
-          setSelectedOrder={setSelectedOrder}
+          closeOrder={closeView}
           handleUpload={handleAdminFileUpload}
           isUploading={isUploading}
           setSelectedFile={setSelectedFile}
           uploadProgress={uploadProgress}
+          selectedFile={selectedFile}
         />
       )}
 
@@ -359,6 +457,22 @@ export default function AdminDashboard() {
           fetchOrders={fetchOrders}
           setSelectedOrder={setSelectedOrder}
           setShowSuccessModal={setShowSuccessModal}
+        />
+      )}
+
+      {/* --- addOrder SEND MODAL --- */}
+      {isaddOrderSendOpen && (
+        <AddOrder
+          addOrderEmail={addOrderEmail}
+          addOrderFile={addOrderFile}
+          addOrderName={addOrderName}
+          closeAddOrder={closeAddOrder}
+          handleAddOrderSendSubmit={handleAddOrderSendSubmit}
+          isAddOrderSending={isaddOrderSending}
+          setAddOrderEmail={setAddOrderEmail}
+          setAddOrderFile={setAddOrderFile}
+          setAddOrderName={setAddOrderName}
+          uploadProgress={uploadProgress}
         />
       )}
 
