@@ -71,7 +71,6 @@ export default function OrderFormPage() {
   };
 
   const handleInputChange = (key: string, value: string | boolean) => {
-    e;
     setForm((prev) => ({ ...prev, [key]: value }));
 
     if (typeof value === "string") {
