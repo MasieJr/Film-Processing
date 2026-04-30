@@ -5,7 +5,7 @@ type ServiceItemProps = {
 
 export default function ServiceItem({ service, price }: ServiceItemProps) {
   return (
-    <div className="flex flex-row justify-between items-center p-4 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-[#1a1a1a]">
+    <div className="flex flex-row justify-between items-center p-4 border border-gray-300 dark:border-blue-500 rounded-lg bg-gray-50 dark:bg-[#1a1a1a]">
       <span className="text-lg font-medium text-black dark:text-white max-w-[70%]">
         {service}
       </span>

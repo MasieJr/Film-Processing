@@ -3,8 +3,8 @@ import { CheckCircle, Mail, MapPin, ArrowRight, Clock } from "lucide-react";
 
 export default async function ThankYouPage({}) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black flex items-center justify-center p-5">
-      <div className="max-w-xl w-full bg-white dark:bg-[#1e1e1e] rounded-3xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] flex items-center justify-center p-5">
+      <div className="max-w-xl w-full bg-[#F3F4F6] dark:bg-[#2c2c2c] border border-gray-300 dark:border-blue-500 rounded-3xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="bg-[#41B544] h-5 w-full"></div>
 
         <div className="p-8 md:p-10 flex flex-col items-center text-center">

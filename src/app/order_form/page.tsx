@@ -56,8 +56,6 @@ export default function OrderFormPage() {
     hasGlobalError: false,
   });
 
-
-  
   const validateField = (key: string, value: string) => {
     let hasError = false;
 
@@ -73,17 +71,19 @@ export default function OrderFormPage() {
   };
 
   const handleInputChange = (key: string, value: string | boolean) => {
-    // 1. Update the form state
+    e;
     setForm((prev) => ({ ...prev, [key]: value }));
 
-    // 2. Clear the error immediately as they type, so the red box vanishes
     if (typeof value === "string") {
-      setFormErrors((prev) => ({ ...prev, [key]: false, hasGlobalError: false }));
+      setFormErrors((prev) => ({
+        ...prev,
+        [key]: false,
+        hasGlobalError: false,
+      }));
     }
   };
 
   const handleBlur = (key: string) => {
-    // Grab the current value directly from the state
     const value = form[key as keyof typeof form] as string;
     const isError = validateField(key, value);
 
@@ -93,13 +93,11 @@ export default function OrderFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validate ALL fields right before submit
     const nameError = validateField("customerName", form.customerName);
     const emailError = validateField("email", form.email);
     const phoneError = validateField("phone", form.phone);
     const salesError = validateField("salesPerson", form.salesPerson);
 
-    // 2. Update all UI errors at once so the user sees what they missed
     setFormErrors({
       customerName: nameError,
       email: emailError,
@@ -108,13 +106,11 @@ export default function OrderFormPage() {
       hasGlobalError: nameError || emailError || phoneError || salesError,
     });
 
-    // 3. If any error exists, stop the submission!
     if (nameError || emailError || phoneError || salesError) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    // 4. If everything is perfect, send it to the lab!
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/orders", {
@@ -126,8 +122,7 @@ export default function OrderFormPage() {
       const data = await response.json();
 
       if (data.success || response.ok) {
-        
-        router.push(  "/thank-you");
+        router.push("/thank-you");
       } else {
         alert("Failed to submit order: " + data.error);
       }
@@ -210,7 +205,9 @@ export default function OrderFormPage() {
           <div className="bg-red-100 p-4 rounded-lg text-red-600 w-full border border-red-200">
             <p className="font-bold mb-1">Please fix the following errors:</p>
             <ul className="list-disc pl-5 text-sm space-y-1">
-              {formErrors.customerName && <li>Please enter a valid Name & Surname</li>}
+              {formErrors.customerName && (
+                <li>Please enter a valid Name & Surname</li>
+              )}
               {formErrors.email && <li>Please enter a valid Email Address</li>}
               {formErrors.phone && <li>Please enter a valid Phone Number</li>}
               {formErrors.salesPerson && <li>Please select a Sales Person</li>}
@@ -266,6 +263,40 @@ export default function OrderFormPage() {
               className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
             >
               +
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            How many rolls are we developing?{" "}
+            <span className="text-red-500">*</span>
+          </label>
+
+          <div className="flex items-center w-full max-w-xs">
+            {/* Minus Button */}
+            <button
+              type="button"
+              onClick={() => decrement}
+              className="px-5 py-3 bg-gray-100 dark:bg-gray-800 rounded-l-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-200 transition"
+            >
+              <span className="text-xl font-bold text-gray-700 dark:text-white">
+                −
+              </span>
+            </button>
+
+            {/* Number Display */}
+            <div className="flex-grow flex items-center justify-center py-3 border-y border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] text-xl font-bold">
+              {form.quantity}
+            </div>
+
+            {/* Plus Button */}
+            <button
+              type="button"
+              onClick={() => increment}
+              className="px-5 py-3 bg-[#41B544] rounded-r-xl border border-[#41B544] hover:bg-[#359a37] transition"
+            >
+              <span className="text-xl font-bold text-white">+</span>
             </button>
           </div>
         </div>
