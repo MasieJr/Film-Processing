@@ -1,4 +1,4 @@
-import { X, Printer, Upload } from "lucide-react";
+import { X, Printer, Upload, CloudUpload, CircleCheck } from "lucide-react";
 
 type ViewModalProps = {
   order: {
@@ -19,6 +19,7 @@ type ViewModalProps = {
   setSelectedFile: (file: File | null) => void;
   handleUpload: () => void;
   uploadProgress: number;
+  selectedFile: File | null;
 };
 
 export default function ViewModal({
@@ -29,6 +30,7 @@ export default function ViewModal({
   setSelectedFile,
   handleUpload,
   uploadProgress,
+  selectedFile,
 }: ViewModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -38,7 +40,6 @@ export default function ViewModal({
         <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-800">
           <div>
             <h2 className="text-xl font-bold">Order Details</h2>
-            <p className="text-sm text-gray-500">{order.id}</p>
           </div>
           <button
             onClick={() => setSelectedOrder(null)}
@@ -49,7 +50,7 @@ export default function ViewModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-5">
           {/* Customer Info */}
           <div>
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
@@ -90,49 +91,81 @@ export default function ViewModal({
           </div>
 
           <div className="mb-4">
-            <div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-neutral-800">
-              <h3 className="font-bold mb-2">Attach Scans (.zip)</h3>
-              {order.fileUrl ? (
-                <p className="text-green-600 font-medium">
-                  ✅ File attached: {order.fileUrl}
-                </p>
-              ) : (
-                // 1. Added a flex-col wrapper so the bar sits below the button
-                <div className="flex flex-col gap-4">
-                  {/* Input and Button Row */}
-                  <div>
-                    <input
-                      type="file"
-                      accept=".zip,.rar,.tar"
-                      name="Masie"
-                      onChange={(e) =>
-                        setSelectedFile(e.target.files?.[0] || null)
-                      }
-                      className="text-xl"
-                    />
-                  </div>
+            {order.fileUrl ? (
+              <p className="text-green-600 font-medium">
+                ✅ File attached: {order.fileUrl}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <div>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    accept=".zip,.rar,.tar"
+                    onChange={(e) =>
+                      setSelectedFile(e.target.files?.[0] || null)
+                    }
+                    disabled={isUploading}
+                  />
 
-                  {isUploading && (
-                    <div className="w-full mt-2">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
-                          Uploading Files
-                        </span>
-                        <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
-                          {uploadProgress}%
-                        </span>
+                  <label
+                    htmlFor="file-upload"
+                    className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                      selectedFile
+                        ? "border-[#41B544] bg-[#41B544]/10 dark:bg-[#41B544]/5"
+                        : "border-gray-300 hover:border-[#41B544]/50 dark:border-gray-700 dark:hover:border-gray-500 bg-gray-50 dark:bg-[#1a1a1a]"
+                    } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    {selectedFile ? (
+                      <div className="flex flex-col items-center text-center space-y-2 p-4">
+                        <CircleCheck className="text-[#41B544]" />
+                        <div>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[250px]">
+                            {selectedFile.name}
+                          </p>
+                          <p className="text-xs text-[#41B544] font-medium mt-1">
+                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                            • Ready to upload
+                          </p>
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
-                        <div
-                          className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
+                    ) : (
+                      <div className="flex flex-col items-center text-center space-y-2 p-4">
+                        <CloudUpload className="text-gray-600 dark:text-gray-300" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                            Click to browse for files
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            .ZIP, .RAR files
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </label>
                 </div>
-              )}
-            </div>
+
+                {isUploading && (
+                  <div className="w-full mt-2">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                        Uploading Files
+                      </span>
+                      <span className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                        {uploadProgress}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                      <div
+                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -141,8 +174,8 @@ export default function ViewModal({
           <div className="flex flex-row space-x-3 align-between ">
             <button
               onClick={handleUpload}
-              disabled={isUploading}
-              className="flex items-center space-x-2 px-4 py-2 text-xl font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
+              disabled={!selectedFile || isUploading}
+              className="flex items-center space-x-2 px-4 py-2 text-xl font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Upload className="w-4 h-4" />
               <span>{isUploading ? "Uploading" : "Send Files"}</span>
