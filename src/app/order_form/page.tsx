@@ -256,7 +256,7 @@ export default function OrderFormPage() {
             <button
               type="button"
               onClick={decrement}
-              className="px-5 py-3 bg-gray-100 dark:bg-[#41B544] rounded-l-xl border border-[#41B544]"
+              className="px-5 py-3 bg-[#41B544] rounded-l-xl border border-[#41B544]"
             >
               <span className="text-xl font-bold text-gray-700 dark:text-white">
                 −

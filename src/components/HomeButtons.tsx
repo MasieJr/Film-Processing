@@ -20,11 +20,11 @@ export default function HomeButton({
   return (
     <Link
       href={link}
-      className="group relative bg-[#F3F4F6] dark:bg-[#2c2c2c] p-8 sm:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-blue-500 overflow-hidden"
+      className="group relative bg-[#F3F4F6] dark:bg-[#2c2c2c] p-8 sm:p-10 rounded-3xl shadow-sm border border-[#41B544] overflow-hidden"
     >
       <div className="flex flex-col h-full">
-        <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-6">
-          <Icon className="w-7 h-7 text-gray-700 dark:text-gray-300" />
+        <div className="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center mb-6">
+          <Icon className="w-7 h-7 text-[#41B544] dark:text-gray-300" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           {heading}

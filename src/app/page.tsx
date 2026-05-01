@@ -8,7 +8,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-white dark:bg-[#1e1e1e] flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 pb-10">
       {/* HEADER SECTION */}
       <div className="text-center mb-12 animate-fade-in-up">
-        <div className="inline-flex items-center justify-center w-20 h-20 border border-blue-500 rounded-full bg-[#41B544]/10 mb-6">
+        <div className="inline-flex items-center justify-center w-20 h-20 border border-blue-500 rounded-full bg-[#41B544]/10 mb-6 ">
           <Image
             src="/icon.png"
             alt="Company Logo"

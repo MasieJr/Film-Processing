@@ -43,7 +43,7 @@ export default function TrackOrderPage() {
 
         {/* SEARCH FORM */}
         <form
-          className="mt-8 bg-[#F3F4F6] dark:bg-[#2c2c2c] p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-blue-500"
+          className="mt-8 bg-[#F3F4F6] dark:bg-[#2c2c2c] p-8 rounded-2xl shadow-sm border border-[#41B544]"
           onSubmit={handleTrackOrder}
         >
           <div className="flex flex-col sm:flex-row gap-4">
@@ -55,7 +55,7 @@ export default function TrackOrderPage() {
                 placeholder="The email you gave the lab..."
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:ring-[#41B544] focus:border-[#41B544]"
+                className="block w-full px-4 py-3 border border-[#41B544] rounded-xl bg-gray-50 dark:bg-[#1a1a1a] text-gray-900 dark:text-white focus:ring-[#41B544] focus:border-[#41B544]"
               />
             </div>
             <button
@@ -84,9 +84,9 @@ export default function TrackOrderPage() {
             {ordersList.map((orderData) => (
               <div
                 key={orderData.id}
-                className="bg-[#F3F4F6] dark:bg-[#2c2c2c] p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-blue-500"
+                className="bg-[#F3F4F6] dark:bg-[#2c2c2c] p-6 sm:p-8 rounded-2xl shadow-sm border border-[#41B544]"
               >
-                <div className="flex justify-between items-start border-b border-gray-200 dark:border-blue-500 pb-4 mb-6">
+                <div className="flex justify-between items-start border-b border-[#41B544] pb-4 mb-6">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">
                       Order Date:{" "}
