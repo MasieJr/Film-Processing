@@ -185,7 +185,7 @@ export default function ViewModal({
               className="flex items-center space-x-2 px-4 py-2 text-lg font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
             >
               <Printer className="w-4 h-4" />
-              <span>Save PDF</span>
+              <span>Print Docket</span>
             </button>
           </div>
         </div>
