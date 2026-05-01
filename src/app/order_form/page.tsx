@@ -244,56 +244,32 @@ export default function OrderFormPage() {
 
         {/* --- Quantity Stepper --- */}
         <div className="flex flex-row justify-between items-center">
-          <label className="text-xl font-medium">Quantity</label>
-          <div className="flex flex-row items-center space-x-4">
+          <div className="flex flex-col">
+            <label className="text-xl font-medium">Quantity</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              How many rolls are we developing?{" "}
+              <span className="text-red-500">*</span>
+            </label>
+          </div>
+
+          <div className="flex items-center w-full max-w-xs">
             <button
               type="button"
               onClick={decrement}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95"
-            >
-              -
-            </button>
-            <span className="text-2xl font-bold w-6 text-center">
-              {form.quantity}
-            </span>
-            <button
-              type="button"
-              onClick={increment}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
-            >
-              +
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            How many rolls are we developing?{" "}
-            <span className="text-red-500">*</span>
-          </label>
-
-          <div className="flex items-center w-full max-w-xs">
-            {/* Minus Button */}
-            <button
-              type="button"
-              onClick={() => decrement}
-              className="px-5 py-3 bg-gray-100 dark:bg-gray-800 rounded-l-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-200 transition"
+              className="px-5 py-3 bg-gray-100 dark:bg-[#41B544] rounded-l-xl border border-[#41B544]"
             >
               <span className="text-xl font-bold text-gray-700 dark:text-white">
                 −
               </span>
             </button>
 
-            {/* Number Display */}
-            <div className="flex-grow flex items-center justify-center py-3 border-y border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1a1a1a] text-xl font-bold">
+            <div className="flex-grow flex items-center justify-center py-3 border-y border-[#41B544] bg-white dark:bg-[#1a1a1a] text-xl font-bold">
               {form.quantity}
             </div>
-
-            {/* Plus Button */}
             <button
               type="button"
-              onClick={() => increment}
-              className="px-5 py-3 bg-[#41B544] rounded-r-xl border border-[#41B544] hover:bg-[#359a37] transition"
+              onClick={increment}
+              className="px-5 py-3 bg-[#41B544] rounded-r-xl border border-[#41B544]"
             >
               <span className="text-xl font-bold text-white">+</span>
             </button>
