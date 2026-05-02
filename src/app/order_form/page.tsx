@@ -5,6 +5,7 @@ import RadioGroup from "@/components/RadioGroup";
 import TextInput from "@/components/TextInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 export default function OrderFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,8 +57,6 @@ export default function OrderFormPage() {
     hasGlobalError: false,
   });
 
-
-  
   const validateField = (key: string, value: string) => {
     let hasError = false;
 
@@ -73,17 +72,18 @@ export default function OrderFormPage() {
   };
 
   const handleInputChange = (key: string, value: string | boolean) => {
-    // 1. Update the form state
     setForm((prev) => ({ ...prev, [key]: value }));
 
-    // 2. Clear the error immediately as they type, so the red box vanishes
     if (typeof value === "string") {
-      setFormErrors((prev) => ({ ...prev, [key]: false, hasGlobalError: false }));
+      setFormErrors((prev) => ({
+        ...prev,
+        [key]: false,
+        hasGlobalError: false,
+      }));
     }
   };
 
   const handleBlur = (key: string) => {
-    // Grab the current value directly from the state
     const value = form[key as keyof typeof form] as string;
     const isError = validateField(key, value);
 
@@ -93,13 +93,11 @@ export default function OrderFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 1. Validate ALL fields right before submit
     const nameError = validateField("customerName", form.customerName);
     const emailError = validateField("email", form.email);
     const phoneError = validateField("phone", form.phone);
     const salesError = validateField("salesPerson", form.salesPerson);
 
-    // 2. Update all UI errors at once so the user sees what they missed
     setFormErrors({
       customerName: nameError,
       email: emailError,
@@ -108,13 +106,11 @@ export default function OrderFormPage() {
       hasGlobalError: nameError || emailError || phoneError || salesError,
     });
 
-    // 3. If any error exists, stop the submission!
     if (nameError || emailError || phoneError || salesError) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    // 4. If everything is perfect, send it to the lab!
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/orders", {
@@ -126,8 +122,7 @@ export default function OrderFormPage() {
       const data = await response.json();
 
       if (data.success || response.ok) {
-        
-        router.push(  "/thank-you");
+        router.push("/thank-you");
       } else {
         alert("Failed to submit order: " + data.error);
       }
@@ -195,22 +190,25 @@ export default function OrderFormPage() {
     <main className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
-        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] m-y-4 p-4 flex justify-center z-10">
-          <Image
-            src="/logo.png"
-            alt="Company Logo"
-            loading="eager"
-            width={632}
-            height={127}
-            className="rounded-full min-w-full"
-          />
+        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] p-1 flex justify-center z-10">
+          <div className="relative w-full max-w-[300px] sm:max-w-[400px] h-24">
+            <Image
+              src="/logo.png"
+              alt="Foto First Lab Logo"
+              fill
+              priority
+              className="object-contain"
+            />
+          </div>
         </div>
 
         {formErrors.hasGlobalError && (
           <div className="bg-red-100 p-4 rounded-lg text-red-600 w-full border border-red-200">
             <p className="font-bold mb-1">Please fix the following errors:</p>
             <ul className="list-disc pl-5 text-sm space-y-1">
-              {formErrors.customerName && <li>Please enter a valid Name & Surname</li>}
+              {formErrors.customerName && (
+                <li>Please enter a valid Name & Surname</li>
+              )}
               {formErrors.email && <li>Please enter a valid Email Address</li>}
               {formErrors.phone && <li>Please enter a valid Phone Number</li>}
               {formErrors.salesPerson && <li>Please select a Sales Person</li>}
@@ -248,24 +246,34 @@ export default function OrderFormPage() {
 
         {/* --- Quantity Stepper --- */}
         <div className="flex flex-row justify-between items-center">
-          <label className="text-xl font-medium">Quantity</label>
-          <div className="flex flex-row items-center space-x-4">
+          <div className="flex flex-col">
+            <label className="text-xl font-medium">Quantity</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              How many rolls are we developing?{" "}
+              <span className="text-red-500">*</span>
+            </label>
+          </div>
+
+          <div className="flex items-center w-full max-w-xs">
             <button
               type="button"
               onClick={decrement}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95"
+              className="px-5 py-3 bg-[#41B544] rounded-l-xl border border-[#41B544]"
             >
-              -
+              <span className="text-xl font-bold text-gray-700 dark:text-white">
+                −
+              </span>
             </button>
-            <span className="text-2xl font-bold w-6 text-center">
+
+            <div className="flex-grow flex items-center justify-center py-3 border-y border-[#41B544] bg-white dark:bg-[#1a1a1a] text-xl font-bold">
               {form.quantity}
-            </span>
+            </div>
             <button
               type="button"
               onClick={increment}
-              className="w-10 h-10 bg-gray-100 dark:bg-[#252525] rounded-lg flex items-center justify-center text-2xl active:scale-95 touch-manipulation select-none"
+              className="px-5 py-3 bg-[#41B544] rounded-r-xl border border-[#41B544]"
             >
-              +
+              <span className="text-xl font-bold text-white">+</span>
             </button>
           </div>
         </div>

@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import "./globals.css"; // Assuming your CSS is imported here
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +14,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// --- PWA METADATA ---
 export const metadata: Metadata = {
   title: "Film Development",
-  description:
-    "A high-performance, full-stack Next.js 15 application designed to streamline commercial film lab operations. This platform manages the entire lifecycle of a film order—from customer intake to processing, massive file delivery, and automated email notifications.",
+  description: "Film management",
+  applicationName: "Film Development",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Film Development",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000", // Your brand green for the mobile browser bar!
 };
 
 export default function RootLayout({
@@ -26,14 +39,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Your Main App Content */}
         {children}
-        <Analytics />
+
+        {/* Vercel Analytics & Speed Insights */}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

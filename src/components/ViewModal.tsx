@@ -20,6 +20,7 @@ type ViewModalProps = {
   handleUpload: () => void;
   uploadProgress: number;
   selectedFile: File | null;
+  formatDate: (rawDate: Date | string) => string;
 };
 
 export default function ViewModal({
@@ -31,6 +32,7 @@ export default function ViewModal({
   handleUpload,
   uploadProgress,
   selectedFile,
+  formatDate,
 }: ViewModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -67,7 +69,8 @@ export default function ViewModal({
                 <span className="font-medium">Phone Number:</span> {order.phone}
               </p>
               <p>
-                <span className="font-medium">Date:</span> {order.createdAt}
+                <span className="font-medium">Date:</span>{" "}
+                {formatDate(order.createdAt)}
               </p>
             </div>
           </div>
@@ -185,7 +188,7 @@ export default function ViewModal({
               className="flex items-center space-x-2 px-4 py-2 text-lg font-medium bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
             >
               <Printer className="w-4 h-4" />
-              <span>Save PDF</span>
+              <span>Print Docket</span>
             </button>
           </div>
         </div>
