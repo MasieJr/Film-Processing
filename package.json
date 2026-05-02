@@ -26,7 +26,6 @@
     "resend": "^6.12.2"
   },
   "devDependencies": {
-    "@serwist/turbopack": "^9.5.10",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.39",
     "@types/pg": "^8.20.0",
