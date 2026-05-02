@@ -6,16 +6,10 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import {
-  CircleCheck,
-  CloudUpload,
-  Plus,
-  Search,
-  Send,
-  Upload,
-  X,
-} from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
+import StatsCards from "@/components/StatsCards";
+import AutoRefresh from "@/components/AutoRefresh";
 
 const initialOrders = [
   {
@@ -60,13 +54,13 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [activeMonth, setActiveMonth] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
   const [addOrderName, setAddOrderName] = useState("");
   const [addOrderEmail, setAddOrderEmail] = useState("");
   const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
   const [isaddOrderSending, setIsaddOrderSending] = useState(false);
+  const [activeTab, setActiveTab] = useState("All");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
@@ -280,6 +274,24 @@ export default function AdminDashboard() {
       setIsaddOrderSending(false);
     }
   };
+  const formatDate = (rawDate: Date | string) => {
+    if (!rawDate) return "Unknown Date";
+
+    const safeDateString =
+      typeof rawDate === "string" ? rawDate.replace(" ", "T") : rawDate;
+    const dateObj = new Date(safeDateString);
+
+    if (isNaN(dateObj.getTime())) return "Invalid Date";
+
+    const hours = String(dateObj.getHours()).padStart(2, "0");
+    const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = dateObj.toLocaleString("en-GB", { month: "short" });
+    const year = dateObj.getFullYear();
+
+    return `${hours}:${minutes} ${day} ${month} ${year}`;
+  };
 
   const uniqueMonths = new Set<string>();
   orders.forEach((order) => {
@@ -288,41 +300,46 @@ export default function AdminDashboard() {
       const safeDateString = String(rawDate).replace(" ", "T");
       const dateObj = new Date(safeDateString);
       if (!isNaN(dateObj.getTime())) {
-        uniqueMonths.add(dateObj.toLocaleString("en-US", { month: "short" }));
+        uniqueMonths.add(dateObj.toLocaleString("en-GB", { month: "short" }));
       }
     }
   });
 
-  const dynamicTabs = ["All", ...Array.from(uniqueMonths)];
+  const dynamicTabs = ["All", "Today", ...Array.from(uniqueMonths)];
 
   const displayedOrders = orders.filter((order) => {
-    let matchesMonth = true;
-    if (activeMonth !== "All") {
-      const rawDate = order.createdAt;
-      if (!rawDate) {
-        matchesMonth = false;
-      } else {
-        const safeDateString = String(rawDate).replace(" ", "T");
-        const dateObj = new Date(safeDateString);
-        if (isNaN(dateObj.getTime())) {
-          matchesMonth = false;
-        } else {
-          matchesMonth =
-            dateObj.toLocaleString("en-US", { month: "short" }) === activeMonth;
-        }
-      }
-    }
-
-    let matchesSearch = true;
     if (searchQuery.trim() !== "") {
       const lowerQuery = searchQuery.toLowerCase();
-      matchesSearch =
+      const matchesSearch =
         order.customerName?.toLowerCase().includes(lowerQuery) ||
         order.email?.toLowerCase().includes(lowerQuery) ||
         order.phone?.toLowerCase().includes(lowerQuery);
+      if (!matchesSearch) return false;
     }
 
-    return matchesMonth && matchesSearch;
+    if (activeTab === "All") return true;
+
+    const rawDate = order.createdAt;
+    if (!rawDate) return false;
+
+    // Safely parse the date using your excellent fix
+    const safeDateString = String(rawDate).replace(" ", "T");
+    const dateObj = new Date(safeDateString);
+    if (isNaN(dateObj.getTime())) return false;
+
+    // Handle the "Today" Tab
+    if (activeTab === "Today") {
+      const today = new Date();
+      return (
+        dateObj.getDate() === today.getDate() &&
+        dateObj.getMonth() === today.getMonth() &&
+        dateObj.getFullYear() === today.getFullYear()
+      );
+    }
+
+    // Handle the Month Tabs (e.g., "Jan", "Feb")
+    const orderMonth = dateObj.toLocaleString("en-US", { month: "short" });
+    return orderMonth === activeTab;
   });
 
   const pendingCount = displayedOrders.filter(
@@ -334,7 +351,8 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] p-8">
+    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] p-8">
+      <AutoRefresh interval={15000} />
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -370,40 +388,39 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <h3 className="text-gray-500 font-medium">Total Orders</h3>
-          <p className="text-3xl font-bold mt-2">{displayedOrders.length}</p>
-        </div>
-        <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <h3 className="text-gray-500 font-medium">Pending Processing</h3>
-          <p className="text-3xl font-bold mt-2 text-yellow-600">
-            {pendingCount}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-[#1e1e1e] p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
-          <h3 className="text-gray-500 font-medium">Revenue</h3>
-          <p className="text-3xl font-bold mt-2 text-[#41B544]">
-            R {totalRevenue.toLocaleString()}
-          </p>
-        </div>
+        <StatsCards
+          label="Total Orders"
+          stat={displayedOrders.length.toLocaleString()}
+          colour="blue-500"
+        />
+        <StatsCards
+          label="Pending Processing"
+          stat={pendingCount.toLocaleString()}
+          colour="yellow-600"
+        />
+        <StatsCards
+          label="Revenue"
+          stat={`R ${totalRevenue.toLocaleString()}`}
+          colour="[#41B544]"
+        />
       </div>
 
       {/* --- MONTH TABS --- */}
-      <div className="mb-6 border-b border-gray-200 dark:border-gray-800">
-        <div className="flex space-x-8 overflow-x-auto hide-scrollbar">
-          {dynamicTabs.map((month) => (
+      <div className="sticky top-0 h-15 bg-white dark:bg-[#1e1e1e] mb-6 border-b border-gray-200 dark:border-gray-800 z-10">
+        <div className=" space-x-8 overflow-x-auto hide-scrollbar">
+          {dynamicTabs.map((tab) => (
             <button
-              key={month}
-              onClick={() => setActiveMonth(month)}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
               className={`pb-4 text-lg font-medium transition-colors whitespace-nowrap relative ${
-                activeMonth === month
+                activeTab === tab
                   ? "text-[#41B544]"
                   : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               }`}
             >
-              {month === "All" ? "All Time" : `${month} 2026`}
+              {tab === "All" ? "All orders" : `${tab}`}
 
-              {activeMonth === month && (
+              {activeTab === tab && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#41B544] rounded-t-full" />
               )}
             </button>
@@ -419,6 +436,7 @@ export default function AdminDashboard() {
         type="newOrder"
         name="New Orders"
         btnClick={setSelectedOrder}
+        formatDate={formatDate}
       />
       <DropDownList
         onClick={openDropdown}
@@ -427,6 +445,7 @@ export default function AdminDashboard() {
         type="pendingOrder"
         name="Pending orders"
         btnClick={setSelectedOrder}
+        formatDate={formatDate}
       />
       <DropDownList
         onClick={openDropdown}
@@ -435,6 +454,7 @@ export default function AdminDashboard() {
         type="completedOrder"
         name="Completed Orders"
         btnClick={setSelectedOrder}
+        formatDate={formatDate}
       />
 
       {/* --- VIEW / UPLOAD MODAL --- */}
@@ -448,6 +468,7 @@ export default function AdminDashboard() {
           setSelectedFile={setSelectedFile}
           uploadProgress={uploadProgress}
           selectedFile={selectedFile}
+          formatDate={formatDate}
         />
       )}
 

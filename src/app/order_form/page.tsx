@@ -5,6 +5,7 @@ import RadioGroup from "@/components/RadioGroup";
 import TextInput from "@/components/TextInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/BackButton";
 
 export default function OrderFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -189,15 +190,16 @@ export default function OrderFormPage() {
     <main className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
-        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] m-y-4 p-4 flex justify-center z-10">
-          <Image
-            src="/logo.png"
-            alt="Company Logo"
-            loading="eager"
-            width={632}
-            height={127}
-            className="rounded-full min-w-full"
-          />
+        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] p-1 flex justify-center z-10">
+          <div className="relative w-full max-w-[300px] sm:max-w-[400px] h-24">
+            <Image
+              src="/logo.png"
+              alt="Foto First Lab Logo"
+              fill
+              priority
+              className="object-contain"
+            />
+          </div>
         </div>
 
         {formErrors.hasGlobalError && (

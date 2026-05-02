@@ -25,6 +25,25 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
       </div>
     );
 
+    const formatDate = (rawDate: Date | string) => {
+      if (!rawDate) return "Unknown Date";
+
+      const safeDateString =
+        typeof rawDate === "string" ? rawDate.replace(" ", "T") : rawDate;
+      const dateObj = new Date(safeDateString);
+
+      if (isNaN(dateObj.getTime())) return "Invalid Date";
+
+      const hours = String(dateObj.getHours()).padStart(2, "0");
+      const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const month = dateObj.toLocaleString("en-GB", { month: "short" });
+      const year = dateObj.getFullYear();
+
+      return `${hours}:${minutes} ${day} ${month} ${year}`;
+    };
+
     return (
       // 1. REF MOVED TO THE OUTERMOST DIV
       // 2. HEIGHT CHANGED TO 209mm (Magic number to prevent page spilling)
@@ -42,7 +61,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
             }
             html, body {
               margin: 0 !important;
-              padding: 0 !important;
+              padding: 5 !important;
               height: 100% !important;
               overflow: hidden !important;
               -webkit-print-color-adjust: exact;
@@ -53,8 +72,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
 
         {/* 4. Changed to flex-col and h-full to prevent vertical stretching */}
         {/* 5. Slightly reduced padding (p-10 instead of p-12) to give content breathing room */}
-        <div className="p-10 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
-          
+        <div className="p-15 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
           {/* Title */}
           <h1 className="text-[2rem] font-bold text-black tracking-tight mb-2">
             FILM DEVELOPMENT ORDER
@@ -65,7 +83,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
             <p>
               Date In:{" "}
               <span className="font-bold border-b border-black pb-1">
-                {order.date || new Date().toLocaleDateString()}
+                {formatDate(order.createdAt) || new Date().toLocaleDateString()}
               </span>
             </p>
             <p className="flex items-end">
@@ -121,14 +139,16 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
 
               <p>
                 - Scans:{" "}
-                <span className="font-bold italic">{order.service || order.services}</span>
+                <span className="font-bold italic">
+                  {order.service || order.services}
+                </span>
               </p>
 
               {/* Conditional rendering for Print sizing */}
-              {(order.service === "Print Only" ||
-              order.service === "Print and email" || 
-              order.services === "Print Only" || 
-              order.services === "Print and email") ? (
+              {order.service === "Print Only" ||
+              order.service === "Print and email" ||
+              order.services === "Print Only" ||
+              order.services === "Print and email" ? (
                 <p>
                   - Prints Size:{" "}
                   <span className="font-bold italic">

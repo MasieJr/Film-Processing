@@ -1,9 +1,4 @@
-import {
-  ArrowDownToLine,
-  ArrowUpToLine,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 type DropDownListProp = {
   name: string;
@@ -21,6 +16,7 @@ type DropDownListProp = {
     createdAt: string;
   }[];
   type: string;
+  formatDate: (rawDate: Date | string) => string;
 };
 
 export default function DropDownList({
@@ -30,6 +26,7 @@ export default function DropDownList({
   open,
   orders,
   type,
+  formatDate,
 }: DropDownListProp) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -44,9 +41,9 @@ export default function DropDownList({
     }
   };
   return (
-    <div className="bg-">
+    <div>
       <button
-        className="sticky top-1 w-full flex flex-row justify-between p-3 hover:bg-white dark:hover:bg-[#1e1e1e] hover:border border-[#41B544] cursor-pointer rounded-xl mb-2"
+        className="sticky top-15 bg-white dark:bg-[#1e1e1e] w-full flex flex-row justify-between p-3 hover:border border-[#41B544] cursor-pointer mb-2 z-5"
         onClick={() => onClick(type)}
       >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -73,6 +70,9 @@ export default function DropDownList({
                       Customer
                     </th>
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
+                      Date
+                    </th>
+                    <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
                       Service
                     </th>
                     <th className="p-4 font-semibold text-sm text-gray-600 dark:text-gray-300">
@@ -95,6 +95,7 @@ export default function DropDownList({
                         </p>
                         <p className="text-lg text-gray-500">{order.email}</p>
                       </td>
+                      <td className="p-4">{formatDate(order.createdAt)}</td>
                       <td className="p-4">
                         <p className="text-xl">{order.services}</p>
                         <p className="text-lg text-gray-500">
