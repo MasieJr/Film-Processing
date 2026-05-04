@@ -8,12 +8,11 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL as string });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> } 
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const body = await request.json();
@@ -24,20 +23,19 @@ export async function PATCH(
       where: { id: orderId },
       data: {
         fileUrl: body.fileUrl,
-        status: body.status, 
+        status: body.status,
       },
     });
 
-    
     if (body.fileUrl) {
-      
-      const downloadLink = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${body.fileUrl}`;
+      // const downloadLink = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${body.fileUrl}`;
+      const downloadLink = `${process.env.NEXT_PUBLIC_BASE_URL}/api/download/${orderId}`;
 
       await resend.emails.send({
-  from: "Foto First Cresta <film@masieseremu.co.za>",
-  to: updatedOrder.email, 
-  subject: "Your photos are ready to download! 🎞️",
-  html: `
+        from: "Foto First Cresta <film@masieseremu.co.za>",
+        to: updatedOrder.email,
+        subject: "Your photos are ready to download! 🎞️",
+        html: `
     <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
       <tbody>
         <tr>
@@ -108,13 +106,16 @@ export async function PATCH(
         </tr>
       </tbody>
     </table>
-  `
-});
+  `,
+      });
     }
 
     return NextResponse.json({ success: true, order: updatedOrder });
   } catch (error) {
     console.error("Database Update Error:", error);
-    return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update order" },
+      { status: 500 },
+    );
   }
 }

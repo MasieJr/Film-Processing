@@ -41,7 +41,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
       const month = dateObj.toLocaleString("en-GB", { month: "short" });
       const year = dateObj.getFullYear();
 
-      return `${hours}:${minutes} ${day} ${month} ${year}`;
+      return `${day} ${month} ${year} ${hours}:${minutes}`;
     };
 
     return (

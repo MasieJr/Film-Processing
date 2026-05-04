@@ -11,13 +11,30 @@ const S3 = new S3Client({
   },
 });
 
+const formatDate = (rawDate: Date | string) => {
+  if (!rawDate) return "Unknown Date";
+
+  const safeDateString =
+    typeof rawDate === "string" ? rawDate.replace(" ", "T") : rawDate;
+  const dateObj = new Date(safeDateString);
+
+  if (isNaN(dateObj.getTime())) return "Invalid Date";
+
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  const month = dateObj.toLocaleString("en-GB", { month: "short" });
+  const year = dateObj.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
+
 export async function POST(request: Request) {
   try {
-    const { filename, contentType } = await request.json();
+    const { filename, contentType, customerName, createdAt } =
+      await request.json();
 
     // 1. Clean the filename and add a timestamp so files never overwrite each other
-    const cleanFileName = filename.replace(/\s+/g, '-').toLowerCase();
-    const uniqueFilename = `${Date.now()}-${cleanFileName}`;
+    const cleanFileName = filename.replace(/\s+/g, "-").toLowerCase();
+    const uniqueFilename = `${customerName}-${formatDate(createdAt)}-${cleanFileName}`;
 
     // 2. Create the command to put a file in your bucket
     const command = new PutObjectCommand({
@@ -26,18 +43,17 @@ export async function POST(request: Request) {
       ContentType: contentType,
     });
 
-    // 3. Generate the signed URL (expires in 1 hour)
     const signedUrl = await getSignedUrl(S3, command, { expiresIn: 3600 });
 
-    // 4. Send the URL back to the frontend
-    // (Also send back the final public URL so we can save it to Prisma later)
-    return NextResponse.json({ 
-      uploadUrl: signedUrl, 
-      finalFileKey: uniqueFilename 
+    return NextResponse.json({
+      uploadUrl: signedUrl,
+      finalFileKey: uniqueFilename,
     });
-
   } catch (error) {
     console.error("Error generating signed URL:", error);
-    return NextResponse.json({ error: "Failed to create upload URL" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create upload URL" },
+      { status: 500 },
+    );
   }
 }
