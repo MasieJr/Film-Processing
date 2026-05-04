@@ -6,11 +6,12 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, X } from "lucide-react"; // <-- Added X icon
 import AddOrder from "@/components/AddOrder";
 import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
 
+// Your existing initialOrders array goes here...
 const initialOrders = [
   {
     id: "ORD-001",
@@ -46,20 +47,29 @@ const initialOrders = [
     createdAt: "2026-04-23 09:15:00.000",
   },
 ];
+
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState(initialOrders);
+
+  // Modals & Selection State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
+
+  // Upload State
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isaddOrderSending, setIsaddOrderSending] = useState(false);
+
+  // Form State
   const [searchQuery, setSearchQuery] = useState("");
-  const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
   const [addOrderName, setAddOrderName] = useState("");
   const [addOrderEmail, setAddOrderEmail] = useState("");
   const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
-  const [isaddOrderSending, setIsaddOrderSending] = useState(false);
+
+  // UI State
   const [activeTab, setActiveTab] = useState("All");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
@@ -85,6 +95,7 @@ export default function AdminDashboard() {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -93,9 +104,9 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#121212]">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-20 h-20 border-4 border-gray-300 dark:border-gray-700 border-t-[#41B544] dark:border-t-[#41B544] rounded-full animate-spin"></div>
-          <p className="text-2xl font-medium text-gray-600 dark:text-gray-400">
-            Loading Film orders...
+          <div className="w-20 h-20 border-4 border-gray-200 dark:border-gray-800 border-t-[#41B544] dark:border-t-[#41B544] rounded-full animate-spin"></div>
+          <p className="text-xl font-bold text-gray-600 dark:text-gray-400 animate-pulse">
+            Loading Lab Data...
           </p>
         </div>
       </div>
@@ -103,13 +114,10 @@ export default function AdminDashboard() {
   }
 
   const openDropdown = (status: string) => {
-    setDropDowns((prev) => {
-      const current = prev[status as keyof typeof dropDowns];
-      return {
-        ...prev,
-        [status]: !current,
-      };
-    });
+    setDropDowns((prev) => ({
+      ...prev,
+      [status]: !prev[status as keyof typeof dropDowns],
+    }));
   };
 
   const changeStatus = async () => {
@@ -118,16 +126,14 @@ export default function AdminDashboard() {
         method: "PATCH",
         body: JSON.stringify({ status: "Pending" }),
       });
-
-      if (updateRes.ok) {
-        fetchOrders();
-      }
+      if (updateRes.ok) fetchOrders();
     } catch (error) {
       console.error(error);
     }
   };
 
   const handlePrint = () => {
+    console.log(selectedOrder);
     handlePrint1();
     changeStatus();
     setSelectedOrder(null);
@@ -137,13 +143,15 @@ export default function AdminDashboard() {
     setIsAddOrderSendOpen(false);
     setAddOrderFile(null);
   };
+
   const closeView = () => {
     setSelectedFile(null);
     setSelectedOrder(null);
   };
+
+  // --- KEPT YOUR EXACT UPLOAD LOGIC ---
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
-
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -153,6 +161,8 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           filename: selectedFile.name,
           contentType: selectedFile.type || "application/zip",
+          customerName: selectedOrder.customerName,
+          createdAt: selectedOrder.createdAt,
         }),
       });
       const { uploadUrl, finalFileKey } = await urlRes.json();
@@ -167,10 +177,7 @@ export default function AdminDashboard() {
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
-            const percentComplete = Math.round(
-              (event.loaded / event.total) * 100,
-            );
-            setUploadProgress(percentComplete);
+            setUploadProgress(Math.round((event.loaded / event.total) * 100));
           }
         };
 
@@ -179,7 +186,6 @@ export default function AdminDashboard() {
           else reject(new Error(`Upload failed: ${xhr.status}`));
         };
         xhr.onerror = () => reject(new Error("Network Error"));
-
         xhr.send(selectedFile);
       });
 
@@ -228,10 +234,7 @@ export default function AdminDashboard() {
 
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
-            const percentComplete = Math.round(
-              (event.loaded / event.total) * 100,
-            );
-            setUploadProgress(percentComplete);
+            setUploadProgress(Math.round((event.loaded / event.total) * 100));
           }
         };
 
@@ -240,7 +243,6 @@ export default function AdminDashboard() {
           else reject(new Error(`Upload failed: ${xhr.status}`));
         };
         xhr.onerror = () => reject(new Error("Network Error"));
-
         xhr.send(addOrderFile);
       });
 
@@ -267,6 +269,7 @@ export default function AdminDashboard() {
       setAddOrderFile(null);
       setIsAddOrderSendOpen(false);
       setUploadProgress(0);
+      fetchOrders();
     } catch (error) {
       console.error(error);
       alert("Something went wrong with the file upload.");
@@ -274,18 +277,16 @@ export default function AdminDashboard() {
       setIsaddOrderSending(false);
     }
   };
+
   const formatDate = (rawDate: Date | string) => {
     if (!rawDate) return "Unknown Date";
-
     const safeDateString =
       typeof rawDate === "string" ? rawDate.replace(" ", "T") : rawDate;
     const dateObj = new Date(safeDateString);
-
     if (isNaN(dateObj.getTime())) return "Invalid Date";
 
     const hours = String(dateObj.getHours()).padStart(2, "0");
     const minutes = String(dateObj.getMinutes()).padStart(2, "0");
-
     const day = String(dateObj.getDate()).padStart(2, "0");
     const month = dateObj.toLocaleString("en-GB", { month: "short" });
     const year = dateObj.getFullYear();
@@ -293,6 +294,7 @@ export default function AdminDashboard() {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
+  // Generate unique months for tabs
   const uniqueMonths = new Set<string>();
   orders.forEach((order) => {
     const rawDate = order.createdAt;
@@ -307,6 +309,7 @@ export default function AdminDashboard() {
 
   const dynamicTabs = ["All", "Today", ...Array.from(uniqueMonths)];
 
+  // Filter Orders
   const displayedOrders = orders.filter((order) => {
     if (searchQuery.trim() !== "") {
       const lowerQuery = searchQuery.toLowerCase();
@@ -322,12 +325,10 @@ export default function AdminDashboard() {
     const rawDate = order.createdAt;
     if (!rawDate) return false;
 
-    // Safely parse the date using your excellent fix
     const safeDateString = String(rawDate).replace(" ", "T");
     const dateObj = new Date(safeDateString);
     if (isNaN(dateObj.getTime())) return false;
 
-    // Handle the "Today" Tab
     if (activeTab === "Today") {
       const today = new Date();
       return (
@@ -337,9 +338,7 @@ export default function AdminDashboard() {
       );
     }
 
-    // Handle the Month Tabs (e.g., "Jan", "Feb")
-    const orderMonth = dateObj.toLocaleString("en-US", { month: "short" });
-    return orderMonth === activeTab;
+    return dateObj.toLocaleString("en-US", { month: "short" }) === activeTab;
   });
 
   const pendingCount = displayedOrders.filter(
@@ -351,113 +350,126 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] font-sans pb-20">
       <AutoRefresh interval={15000} />
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Manage incoming film processing orders.
-          </p>
-        </div>
-        <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center">
-          <div className="relative flex-grow w-full">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="text-gray-500" />
-            </div>
-            <input
-              type="text"
-              placeholder="Name, Email or Phone"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-xl leading-5 bg-white dark:bg-[#1e1e1e] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#41B544] focus:border-[#41B544] sm:text-sm transition-colors"
-            />
+
+      <div className="bg-white dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-gray-800 px-6 py-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-500 font-medium mt-1">
+              Manage incoming film processing orders.
+            </p>
           </div>
-          <button
-            onClick={() => setIsAddOrderSendOpen(true)}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-[#41B544] text-white rounded-xl font-bold hover:bg-[#359638] transition-colors whitespace-nowrap"
-          >
-            <Plus />
-            Add order
-          </button>
-        </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatsCards
-          label="Total Orders"
-          stat={displayedOrders.length.toLocaleString()}
-          colour="blue-500"
-        />
-        <StatsCards
-          label="Pending Processing"
-          stat={pendingCount.toLocaleString()}
-          colour="yellow-600"
-        />
-        <StatsCards
-          label="Revenue"
-          stat={`R ${totalRevenue.toLocaleString()}`}
-          colour="[#41B544]"
-        />
-      </div>
+          <div className="flex w-full md:w-auto items-center gap-3">
+            <div className="relative flex-grow md:w-80">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search size={18} className="text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search orders..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-11 pr-10 py-3 border-none bg-gray-100 dark:bg-[#2a2a2a] rounded-2xl text-sm font-medium text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#41B544] transition-all"
+              />
 
-      {/* --- MONTH TABS --- */}
-      <div className="sticky top-0 h-15 bg-white dark:bg-[#1e1e1e] mb-6 border-b border-gray-200 dark:border-gray-800 z-10">
-        <div className=" space-x-8 overflow-x-auto hide-scrollbar">
-          {dynamicTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-lg font-medium transition-colors whitespace-nowrap relative ${
-                activeTab === tab
-                  ? "text-[#41B544]"
-                  : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              }`}
-            >
-              {tab === "All" ? "All orders" : `${tab}`}
-
-              {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#41B544] rounded-t-full" />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                >
+                  <X size={16} />
+                </button>
               )}
+            </div>
+
+            <button
+              onClick={() => setIsAddOrderSendOpen(true)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-[#41B544] text-white rounded-2xl font-bold hover:bg-[#359638] active:scale-95 transition-all shadow-lg shadow-[#41B544]/20 whitespace-nowrap"
+            >
+              <Plus size={20} />
+              <span className="hidden sm:inline">Add Order</span>
             </button>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* --- ORDERS TABLES--- */}
-      <DropDownList
-        onClick={openDropdown}
-        open={dropDowns.newOrder}
-        orders={displayedOrders.filter((order) => order.status === "New")}
-        type="newOrder"
-        name="New Orders"
-        btnClick={setSelectedOrder}
-        formatDate={formatDate}
-      />
-      <DropDownList
-        onClick={openDropdown}
-        open={dropDowns.pendingOrder}
-        orders={displayedOrders.filter((order) => order.status === "Pending")}
-        type="pendingOrder"
-        name="Pending orders"
-        btnClick={setSelectedOrder}
-        formatDate={formatDate}
-      />
-      <DropDownList
-        onClick={openDropdown}
-        open={dropDowns.completedOrder}
-        orders={displayedOrders.filter((order) => order.status === "Completed")}
-        type="completedOrder"
-        name="Completed Orders"
-        btnClick={setSelectedOrder}
-        formatDate={formatDate}
-      />
+      <div className="max-w-7xl mx-auto px-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
+          <StatsCards
+            label="Filtered Orders"
+            stat={displayedOrders.length.toLocaleString()}
+            colour="blue-500"
+          />
+          <StatsCards
+            label="Pending Processing"
+            stat={pendingCount.toLocaleString()}
+            colour="yellow-500"
+          />
+          <StatsCards
+            label="Total Revenue"
+            stat={`R ${totalRevenue.toLocaleString()}`}
+            colour="[#41B544]"
+          />
+        </div>
 
-      {/* --- VIEW / UPLOAD MODAL --- */}
+        <div className="mb-8">
+          <div className="flex space-x-2 overflow-x-auto hide-scrollbar pb-2">
+            {dynamicTabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
+                  activeTab === tab
+                    ? "bg-[#41B544] text-white shadow-md shadow-[#41B544]/20"
+                    : "bg-white dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] border border-gray-200 dark:border-gray-800"
+                }`}
+              >
+                {tab === "All" ? "All Orders" : tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.newOrder}
+            orders={displayedOrders.filter((order) => order.status === "New")}
+            type="newOrder"
+            name="New Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.pendingOrder}
+            orders={displayedOrders.filter(
+              (order) => order.status === "Pending",
+            )}
+            type="pendingOrder"
+            name="Pending Processing"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.completedOrder}
+            orders={displayedOrders.filter(
+              (order) => order.status === "Completed",
+            )}
+            type="completedOrder"
+            name="Completed Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
+        </div>
+      </div>
+
       {selectedOrder && (
         <ViewModal
           order={selectedOrder}
@@ -472,7 +484,6 @@ export default function AdminDashboard() {
         />
       )}
 
-      {/* --- SUCCESS MODAL --- */}
       {showSuccessModal && (
         <SuccessModal
           fetchOrders={fetchOrders}
@@ -481,7 +492,6 @@ export default function AdminDashboard() {
         />
       )}
 
-      {/* --- addOrder SEND MODAL --- */}
       {isaddOrderSendOpen && (
         <AddOrder
           addOrderEmail={addOrderEmail}

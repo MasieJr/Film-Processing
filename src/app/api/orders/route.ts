@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Resend} from "resend";
-
+import { Resend } from "resend";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL as string });
 
@@ -17,12 +16,15 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function GET() {
   try {
     const orders = await prisma.order.findMany({
-      orderBy: { createdAt: 'desc' } 
+      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(orders);
   } catch (error) {
     console.error("Database Error:", error);
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch orders" },
+      { status: 500 },
+    );
   }
 }
 
@@ -34,16 +36,25 @@ export async function POST(request: Request) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?[0-9\s\-()]{10,15}$/;
     if (!body.email || !emailRegex.test(body.email)) {
-      return NextResponse.json({ error: "Invalid email address provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid email address provided" },
+        { status: 400 },
+      );
     }
 
     if (!body.phone || !phoneRegex.test(body.phone)) {
-      return NextResponse.json({ error: "Invalid phone number provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid phone number provided" },
+        { status: 400 },
+      );
     }
 
-    const chosenService = body.selectedService || "";
-  
+    const chosenService = body.services || "";
+
     const isPrintingService = chosenService.toLowerCase().includes("print");
+    console.log(isPrintingService);
+    console.log(body.selectedService);
+    console.log(body.selectedSize);
 
     const newOrder = await prisma.order.create({
       data: {
@@ -53,20 +64,20 @@ export async function POST(request: Request) {
         quantity: parseInt(body.quantity),
         salesPerson: body.salesPerson,
         services: body.services,
-        selectedSize: isPrintingService ? (body.selectedSize || null) : null,
-        selectedFinish: isPrintingService ? (body.selectedFinish || null) : null,
+        selectedSize: isPrintingService ? body.selectedSize || null : null,
+        selectedFinish: isPrintingService ? body.selectedFinish || null : null,
         // selectedSize: body.selectedSize || null,
         // selectedFinish: body.selectedFinish || null,
         keepNegatives: body.keepNegatives || false,
-        totalPrice:parseFloat(body.totalPrice),
-      }
+        totalPrice: parseFloat(body.totalPrice),
+      },
     });
 
     await resend.emails.send({
-  from: "Foto First Cresta <film@masieseremu.co.za>",
-  to: body.email, // Or whatever variable holds the customer's email
-  subject: "Thank you for submitting your film! 🎞️",
-  html: `
+      from: "Foto First Cresta <film@masieseremu.co.za>",
+      to: body.email, // Or whatever variable holds the customer's email
+      subject: "Thank you for submitting your film! 🎞️",
+      html: `
     <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
       <tbody>
         <tr>
@@ -79,7 +90,7 @@ export async function POST(request: Request) {
                       <tbody style="width:100%">
                         <tr style="width:100%">
                           <td align="center" data-id="__react-email-column">
-                            <img alt='The words "FOTO FIRST" are displayed in large, bold, blue letters with a green outline and a 3D effect.' src="https://resend-attachments.s3.amazonaws.com/0b878869-9789-42b5-a88b-64b270ac9628" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100" />
+                            <img alt='The words "FOTO FIRST" are displayed in large, bold, blue letters with a green outline and a 3D effect.' src="${process.env.NEXT_PUBLIC_BASE_URL}/icon.png" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100" />
                           </td>
                         </tr>
                       </tbody>
@@ -115,7 +126,7 @@ export async function POST(request: Request) {
                       <tbody style="width:100%">
                         <tr style="width:100%">
                           <td align="center" data-id="__react-email-column">
-                            <img alt='Logo for Foto First, a photographic and digital printing company, with the tagline "Welcome to the Bigger Picture."' src="https://resend-attachments.s3.amazonaws.com/4031321f-3326-43de-895b-7877edab88c4" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100%" />
+                            <img alt='Logo for Foto First, a photographic and digital printing company, with the tagline "Welcome to the Bigger Picture."' src="${process.env.NEXT_PUBLIC_BASE_URL}/banner.jpg" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100%" />
                           </td>
                         </tr>
                       </tbody>
@@ -131,12 +142,15 @@ export async function POST(request: Request) {
         </tr>
       </tbody>
     </table>
-  `
-});
+  `,
+    });
 
     return NextResponse.json({ success: true, order: newOrder });
   } catch (error) {
     console.error("Database Error:", error);
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create order" },
+      { status: 500 },
+    );
   }
 }
