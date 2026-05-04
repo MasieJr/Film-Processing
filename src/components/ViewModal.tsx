@@ -1,4 +1,11 @@
-import { X, Printer, Upload, CloudUpload, CircleCheck } from "lucide-react";
+import {
+  X,
+  Printer,
+  Upload,
+  CloudUpload,
+  CircleCheck,
+  Film,
+} from "lucide-react";
 
 type ViewModalProps = {
   order: {
