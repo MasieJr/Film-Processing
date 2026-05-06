@@ -45,7 +45,7 @@ export default function OrderFormPage() {
     services: services[0],
     selectedSize: printsSizes[1],
     selectedFinish: finishes[0],
-    totalPrice: 260,
+    totalPrice: 200,
     keepNegatives: false,
   });
 
