@@ -48,7 +48,7 @@ export async function PATCH(
                       <tbody style="width:100%">
                         <tr style="width:100%">
                           <td align="center" data-id="__react-email-column">
-                            <img alt='The words "FOTO FIRST" are displayed in large, bold, blue letters with a green outline and a 3D effect.' src="https://resend-attachments.s3.amazonaws.com/0b878869-9789-42b5-a88b-64b270ac9628" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100" />
+                            <img alt='The words "FOTO FIRST" are displayed in large, bold, blue letters with a green outline and a 3D effect.' src="${process.env.NEXT_PUBLIC_BASE_URL}/icon.png" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100" />
                           </td>
                         </tr>
                       </tbody>
@@ -90,7 +90,7 @@ export async function PATCH(
                       <tbody style="width:100%">
                         <tr style="width:100%">
                           <td align="center" data-id="__react-email-column">
-                            <img alt='Logo for Foto First, a photographic and digital printing company, with the tagline "Welcome to the Bigger Picture."' src="https://resend-attachments.s3.amazonaws.com/4031321f-3326-43de-895b-7877edab88c4" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100%" />
+                            <img alt='Logo for Foto First, a photographic and digital printing company, with the tagline "Welcome to the Bigger Picture."' src="${process.env.NEXT_PUBLIC_BASE_URL}/banner.jpg" style="display:block;outline:none;border:none;text-decoration:none;max-width:100%;border-radius:8px" width="100%" />
                           </td>
                         </tr>
                       </tbody>
