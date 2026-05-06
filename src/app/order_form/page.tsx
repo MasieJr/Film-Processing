@@ -34,7 +34,7 @@ export default function OrderFormPage() {
   const printsSizes = ["9x13 cm", "10x15 cm", "13x18 cm", "15x20 cm"];
   const finishes = ["Glossy", "Matte"];
   const printPrices = [445, 329, 895, 931];
-  const prices = [260, 240, 329, 329, 95];
+  const prices = [200, 180, 329, 329, 95];
 
   const [form, setForm] = useState({
     customerName: "",
