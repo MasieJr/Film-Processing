@@ -9,7 +9,7 @@ import BackButton from "@/components/BackButton";
 
 export default function OrderFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(260);
+  const [selectedPrice, setSelectedPrice] = useState(200);
   const [servicesIndex, setServicesIndex] = useState(0);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
