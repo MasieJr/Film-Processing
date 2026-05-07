@@ -75,6 +75,7 @@ export default function AdminDashboard() {
     newOrder: true,
     pendingOrder: false,
     completedOrder: false,
+    downloadedOrder: false,
   });
 
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -468,6 +469,17 @@ export default function AdminDashboard() {
             formatDate={formatDate}
           />
         </div>
+        <DropDownList
+          onClick={openDropdown}
+          open={dropDowns.downloadedOrder}
+          orders={displayedOrders.filter(
+            (order) => order.status === "Downloaded",
+          )}
+          type="downloadedOrder"
+          name="Downloaded Orders"
+          btnClick={setSelectedOrder}
+          formatDate={formatDate}
+        />
       </div>
 
       {selectedOrder && (
