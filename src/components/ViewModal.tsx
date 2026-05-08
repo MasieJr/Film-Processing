@@ -1,3 +1,4 @@
+import { useState } from "react"; // <-- Added this
 import { X, Printer, Upload, CloudUpload, CircleCheck } from "lucide-react";
 
 type ViewModalProps = {
@@ -34,9 +35,13 @@ export default function ViewModal({
   selectedFile,
   formatDate,
 }: ViewModalProps) {
+  // ADDED: State to toggle the replace file mode
+  const [isReplacing, setIsReplacing] = useState(false);
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-[#1e1e1e] w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-800">
+        {/* Header */}
         <div className="flex justify-between items-center p-6 md:p-8 pb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
             Order Details
@@ -49,7 +54,9 @@ export default function ViewModal({
           </button>
         </div>
 
+        {/* Body */}
         <div className="p-6 md:p-8 pt-2 space-y-6">
+          {/* Customer Info (Unchanged) */}
           <div>
             <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
               Customer Information
@@ -84,6 +91,7 @@ export default function ViewModal({
             </div>
           </div>
 
+          {/* Order Info (Unchanged) */}
           <div>
             <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
               Order Request
@@ -108,16 +116,45 @@ export default function ViewModal({
             </div>
           </div>
 
+          {/* --- THE UPGRADED UPLOAD SECTION --- */}
           <div>
-            {order.fileUrl ? (
-              <div className="flex items-center gap-3 p-4 bg-[#41B544]/10 border border-[#41B544]/20 rounded-2xl">
-                <CircleCheck className="text-[#41B544] w-6 h-6 shrink-0" />
-                <p className="text-[#41B544] font-bold text-sm truncate">
-                  File attached: {order.fileUrl}
-                </p>
+            {order.fileUrl && !isReplacing ? (
+              // State 1: File exists, show it with a Replace button
+              <div className="flex items-center justify-between p-4 bg-[#41B544]/10 border border-[#41B544]/20 rounded-2xl gap-3">
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <CircleCheck className="text-[#41B544] w-6 h-6 shrink-0" />
+                  <p className="text-[#41B544] font-bold text-sm truncate">
+                    Attached: {order.fileUrl}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsReplacing(true)}
+                  className="px-4 py-2 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#252525] transition-all shadow-sm shrink-0 active:scale-95"
+                >
+                  Replace File
+                </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
+              // State 2: No file OR user clicked Replace
+              <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                {/* Optional: Show a "Cancel" button if they are replacing a file and change their mind */}
+                {order.fileUrl && isReplacing && (
+                  <div className="flex justify-between items-center mb-[-8px]">
+                    <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                      Upload Replacement
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setIsReplacing(false);
+                        setSelectedFile(null); // Clear any file they selected
+                      }}
+                      className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors"
+                    >
+                      Cancel Replace
+                    </button>
+                  </div>
+                )}
+
                 <div>
                   <input
                     type="file"
@@ -158,7 +195,7 @@ export default function ViewModal({
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                            Click to browse files
+                            Click to browse for {isReplacing ? "new " : ""}files
                           </p>
                           <p className="text-xs font-medium text-gray-400 mt-0.5">
                             .ZIP, .RAR files only
@@ -192,6 +229,7 @@ export default function ViewModal({
           </div>
         </div>
 
+        {/* Modal Footer */}
         <div className="p-6 md:p-8 pt-0 flex flex-col-reverse sm:flex-row justify-end gap-3 w-full">
           <button
             onClick={handleprint}
@@ -207,7 +245,13 @@ export default function ViewModal({
             className="flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto text-sm font-bold bg-[#41B544] text-white rounded-xl hover:bg-[#359638] disabled:opacity-50 disabled:active:scale-100 active:scale-95 shadow-lg shadow-[#41B544]/20 transition-all"
           >
             <Upload className="w-4 h-4" />
-            <span>{isUploading ? "Uploading..." : "Send Files"}</span>
+            <span>
+              {isUploading
+                ? "Uploading..."
+                : isReplacing
+                  ? "Send New Files"
+                  : "Send Files"}
+            </span>
           </button>
         </div>
       </div>
