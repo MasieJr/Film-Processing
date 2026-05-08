@@ -38,6 +38,9 @@ export default function DropDownList({
         return "bg-[#41B544]/10 text-[#41B544] border-[#41B544]/20";
       case "Downloaded":
         return "bg-[#00E7FF]/10 text-[#00E7FF] border-[#00E7FF]/20";
+
+      case "Blank":
+        return "bg-red-500/10 text-red-500 border-red-500/20";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10";
     }
