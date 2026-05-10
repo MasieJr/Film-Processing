@@ -76,6 +76,7 @@ export default function AdminDashboard() {
     pendingOrder: false,
     completedOrder: false,
     downloadedOrder: false,
+    blankOrder: false,
   });
 
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -279,6 +280,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleBlankOrPrint = async (
+    type: string,
+    status: string,
+    blankCount?: number,
+  ) => {
+    const updateRes = await fetch(`/api/orders/${selectedOrder.id}`, {
+      method: "POST",
+      body: JSON.stringify({
+        type: type,
+        status: status,
+        blankCount: blankCount,
+      }),
+    });
+
+    if (updateRes.ok) {
+      setShowSuccessModal(true);
+      setSelectedFile(null);
+      setUploadProgress(0);
+    }
+  };
+
   const formatDate = (rawDate: Date | string) => {
     if (!rawDate) return "Unknown Date";
     const safeDateString =
@@ -468,18 +490,27 @@ export default function AdminDashboard() {
             btnClick={setSelectedOrder}
             formatDate={formatDate}
           />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.downloadedOrder}
+            orders={displayedOrders.filter(
+              (order) => order.status === "Downloaded",
+            )}
+            type="downloadedOrder"
+            name="Downloaded Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.blankOrder}
+            orders={displayedOrders.filter((order) => order.status === "Blank")}
+            type="blankOrder"
+            name="Blank Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
         </div>
-        <DropDownList
-          onClick={openDropdown}
-          open={dropDowns.downloadedOrder}
-          orders={displayedOrders.filter(
-            (order) => order.status === "Downloaded",
-          )}
-          type="downloadedOrder"
-          name="Downloaded Orders"
-          btnClick={setSelectedOrder}
-          formatDate={formatDate}
-        />
       </div>
 
       {selectedOrder && (
@@ -493,6 +524,8 @@ export default function AdminDashboard() {
           uploadProgress={uploadProgress}
           selectedFile={selectedFile}
           formatDate={formatDate}
+          handleBlankFilmComplete={handleBlankOrPrint}
+          handlePrintOnlyComplete={handleBlankOrPrint}
         />
       )}
 
