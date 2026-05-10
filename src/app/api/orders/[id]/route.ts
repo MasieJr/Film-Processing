@@ -171,7 +171,7 @@ export async function POST(
                   </tbody>
                 </table>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
-                  <strong>Good day </strong><strong>${body.customerName}</strong>
+                  <strong>Good day </strong><strong>${updatedOrder.customerName}</strong>
                 </p>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
                   Great news! Your film has been processed and your physical prints are ready for collection.
@@ -183,10 +183,10 @@ export async function POST(
                   You can pop into <strong>Foto First Cresta</strong> at your earliest convenience to pick them up. Just provide your name at the counter.
                 </p>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
-                  You selected: ${body.services}.
+                  You selected: ${updatedOrder.services}.
                 </p>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
-                  The total cost of your order is R${body.totalPrice}
+                  The total cost of your order is R${updatedOrder.totalPrice}
                 </p>
                 <p style="margin:0;padding:0;font-size:1em;padding-top:0.5em;padding-bottom:0.5em">
                   <br />
@@ -246,7 +246,7 @@ export async function POST(
                   </tbody>
                 </table>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
-                  <strong>Good day </strong><strong>${body.customerName}</strong>
+                  <strong>Good day </strong><strong>${updatedOrder.customerName}</strong>
                 </p>
                 <p style="margin:0;padding:0;font-size:18px;padding-top:0.5em;padding-bottom:0.5em">
                   We have finished processing your recent film order, but unfortunately, we have some bad news.
