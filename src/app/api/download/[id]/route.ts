@@ -33,7 +33,8 @@ export async function GET(
         data: { status: "Downloaded" },
       });
     }
-    const redirectUrl = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${order.fileUrl}`;
+    // const redirectUrl = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${order.fileUrl}`;
+    const redirectUrl = `https://storage.film-process.masieseremu.co.za/${order.fileUrl}`;
     return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error("Download Route Error:", error);
