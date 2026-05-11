@@ -23,6 +23,7 @@ const initialOrders = [
     totalPrice: 658,
     status: "Pending",
     createdAt: "2026-04-24 14:30:00.000",
+    salesPerson: "Masie Seremu",
   },
   {
     id: "ORD-002",
@@ -34,6 +35,7 @@ const initialOrders = [
     totalPrice: 95,
     status: "Processing",
     createdAt: "2026-04-24 16:45:00.000",
+    salesPerson: "Masie Seremu",
   },
   {
     id: "ORD-003",
@@ -45,6 +47,7 @@ const initialOrders = [
     totalPrice: 1300,
     status: "Completed",
     createdAt: "2026-04-23 09:15:00.000",
+    salesPerson: "Masie Seremu",
   },
 ];
 
