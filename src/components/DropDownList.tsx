@@ -14,6 +14,7 @@ type DropDownListProp = {
     totalPrice: number;
     status: string;
     createdAt: string;
+    salesPerson: string;
   }[];
   type: string;
   formatDate: (rawDate: Date | string) => string;
@@ -36,6 +37,11 @@ export default function DropDownList({
         return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20";
       case "Completed":
         return "bg-[#41B544]/10 text-[#41B544] border-[#41B544]/20";
+      case "Downloaded":
+        return "bg-[#00E7FF]/10 text-[#00E7FF] border-[#00E7FF]/20";
+
+      case "Blank":
+        return "bg-red-500/10 text-red-500 border-red-500/20";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10";
     }
@@ -95,6 +101,9 @@ export default function DropDownList({
                       Services
                     </th>
                     <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Sales Person
+                    </th>
+                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       Status
                     </th>
                     <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
@@ -130,7 +139,11 @@ export default function DropDownList({
                           <span className="font-bold">{order.quantity}</span>
                         </p>
                       </td>
-
+                      <td>
+                        <p className="font-medium text-sm text-gray-900 dark:text-white">
+                          {order.salesPerson}
+                        </p>
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}

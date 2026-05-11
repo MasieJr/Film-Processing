@@ -23,6 +23,7 @@ const initialOrders = [
     totalPrice: 658,
     status: "Pending",
     createdAt: "2026-04-24 14:30:00.000",
+    salesPerson: "Masie Seremu",
   },
   {
     id: "ORD-002",
@@ -34,6 +35,7 @@ const initialOrders = [
     totalPrice: 95,
     status: "Processing",
     createdAt: "2026-04-24 16:45:00.000",
+    salesPerson: "Masie Seremu",
   },
   {
     id: "ORD-003",
@@ -45,6 +47,7 @@ const initialOrders = [
     totalPrice: 1300,
     status: "Completed",
     createdAt: "2026-04-23 09:15:00.000",
+    salesPerson: "Masie Seremu",
   },
 ];
 
@@ -75,6 +78,8 @@ export default function AdminDashboard() {
     newOrder: true,
     pendingOrder: false,
     completedOrder: false,
+    downloadedOrder: false,
+    blankOrder: false,
   });
 
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -278,6 +283,27 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleBlankOrPrint = async (
+    type: string,
+    status: string,
+    blankCount?: number,
+  ) => {
+    const updateRes = await fetch(`/api/orders/${selectedOrder.id}`, {
+      method: "POST",
+      body: JSON.stringify({
+        type: type,
+        status: status,
+        blankCount: blankCount,
+      }),
+    });
+
+    if (updateRes.ok) {
+      setShowSuccessModal(true);
+      setSelectedFile(null);
+      setUploadProgress(0);
+    }
+  };
+
   const formatDate = (rawDate: Date | string) => {
     if (!rawDate) return "Unknown Date";
     const safeDateString =
@@ -467,6 +493,26 @@ export default function AdminDashboard() {
             btnClick={setSelectedOrder}
             formatDate={formatDate}
           />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.downloadedOrder}
+            orders={displayedOrders.filter(
+              (order) => order.status === "Downloaded",
+            )}
+            type="downloadedOrder"
+            name="Downloaded Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
+          <DropDownList
+            onClick={openDropdown}
+            open={dropDowns.blankOrder}
+            orders={displayedOrders.filter((order) => order.status === "Blank")}
+            type="blankOrder"
+            name="Blank Orders"
+            btnClick={setSelectedOrder}
+            formatDate={formatDate}
+          />
         </div>
       </div>
 
@@ -481,6 +527,8 @@ export default function AdminDashboard() {
           uploadProgress={uploadProgress}
           selectedFile={selectedFile}
           formatDate={formatDate}
+          handleBlankFilmComplete={handleBlankOrPrint}
+          handlePrintOnlyComplete={handleBlankOrPrint}
         />
       )}
 
