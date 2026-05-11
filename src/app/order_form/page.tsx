@@ -306,6 +306,7 @@ export default function OrderFormPage() {
           options={services}
           selectedIndex={servicesIndex}
           onChange={(index) => selectService(index)}
+          price={prices}
         />
 
         {/* Prints Sizes */}
@@ -316,6 +317,7 @@ export default function OrderFormPage() {
             options={printsSizes}
             selectedIndex={selectedSizeIndex}
             onChange={(index) => selectSize(index)}
+            price={printPrices}
           />
         )}
 

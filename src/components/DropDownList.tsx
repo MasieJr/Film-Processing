@@ -14,6 +14,7 @@ type DropDownListProp = {
     totalPrice: number;
     status: string;
     createdAt: string;
+    salesPerson: string;
   }[];
   type: string;
   formatDate: (rawDate: Date | string) => string;
@@ -100,6 +101,9 @@ export default function DropDownList({
                       Services
                     </th>
                     <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                      Sales Person
+                    </th>
+                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                       Status
                     </th>
                     <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
@@ -135,7 +139,11 @@ export default function DropDownList({
                           <span className="font-bold">{order.quantity}</span>
                         </p>
                       </td>
-
+                      <td>
+                        <p className="font-medium text-sm text-gray-900 dark:text-white">
+                          {order.salesPerson}
+                        </p>
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
