@@ -6,12 +6,11 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import { Plus, Search, X } from "lucide-react"; // <-- Added X icon
+import { Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
 import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
 
-// Your existing initialOrders array goes here...
 const initialOrders = [
   {
     id: "ORD-001",
@@ -154,7 +153,6 @@ export default function AdminDashboard() {
     setSelectedOrder(null);
   };
 
-  // --- KEPT YOUR EXACT UPLOAD LOGIC ---
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
     setIsUploading(true);
