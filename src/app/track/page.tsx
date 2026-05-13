@@ -136,7 +136,7 @@ export default function TrackOrderPage() {
 
                       return (
                         <>
-                          {/* Step 1: Received (Always Green) */}
+                          {/* Received */}
                           <div className="flex items-center">
                             <div className="w-8 h-8 rounded-full bg-[#41B544] flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10">
                               <Check className="w-4 h-4 text-white" />
@@ -148,7 +148,7 @@ export default function TrackOrderPage() {
                             </div>
                           </div>
 
-                          {/* Step 2: In the Lab */}
+                          {/*In the lab */}
                           <div className="flex items-center">
                             <div
                               className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10 
@@ -171,7 +171,6 @@ export default function TrackOrderPage() {
                             </div>
                           </div>
 
-                          {/* Step 3: Completed / Sent (Hidden if Blank) */}
                           {!isBlank && (
                             <div className="flex items-center">
                               <div
@@ -194,7 +193,6 @@ export default function TrackOrderPage() {
                             </div>
                           )}
 
-                          {/* Step 4: Downloaded (Only show if it's a digital order) */}
                           {!isBlank && orderData.services !== "Print Only" && (
                             <div className="flex items-center">
                               <div
