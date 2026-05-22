@@ -1,4 +1,11 @@
-import { ChevronDown, ChevronUp, Inbox } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Inbox,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 type DropDownListProp = {
   name: string;
@@ -14,7 +21,6 @@ type DropDownListProp = {
     totalPrice: number;
     status: string;
     createdAt: string;
-    salesPerson: string;
   }[];
   type: string;
   formatDate: (rawDate: Date | string) => string;
@@ -29,6 +35,17 @@ export default function DropDownList({
   type,
   formatDate,
 }: DropDownListProp) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [orders.length]);
+
+  const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentOrders = orders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending":
@@ -57,12 +74,10 @@ export default function DropDownList({
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {name}
           </h2>
-
           <span className="flex items-center justify-center bg-gray-100 dark:bg-[#2a2a2a] text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-bold">
             {orders.length}
           </span>
         </div>
-
         <div className="text-gray-400 dark:text-gray-500">
           {open ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
         </div>
@@ -87,83 +102,112 @@ export default function DropDownList({
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto border-t border-gray-100 dark:border-gray-800">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 dark:bg-[#252525] border-b border-gray-100 dark:border-gray-800">
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      Customer
-                    </th>
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      Date Logged
-                    </th>
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      Services
-                    </th>
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      Sales Person
-                    </th>
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                  {orders.map((order) => (
-                    <tr
-                      key={order.id}
-                      className="hover:bg-gray-50 dark:hover:bg-[#252525]/50 transition-colors group"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-bold text-sm text-gray-900 dark:text-white">
-                          {order.customerName}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          {order.email}
-                        </p>
-                      </td>
-
-                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
-                        {formatDate(order.createdAt)}
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-sm text-gray-900 dark:text-white">
-                          {order.services}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          Quantity:{" "}
-                          <span className="font-bold">{order.quantity}</span>
-                        </p>
-                      </td>
-                      <td>
-                        <p className="font-medium text-sm text-gray-900 dark:text-white">
-                          {order.salesPerson}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-4 text-right">
-                        <button
-                          className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 group-hover:bg-[#41B544] group-hover:text-white rounded-xl text-sm font-bold transition-all shadow-sm"
-                          onClick={() => btnClick(order)}
-                        >
-                          View Details
-                        </button>
-                      </td>
+            <div className="flex flex-col border-t border-gray-100 dark:border-gray-800">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 dark:bg-[#252525] border-b border-gray-100 dark:border-gray-800">
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Customer
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Date Logged
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Services
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
+                        Action
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {currentOrders.map((order) => (
+                      <tr
+                        key={order.id}
+                        className="hover:bg-gray-50 dark:hover:bg-[#252525]/50 transition-colors group"
+                      >
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-sm text-gray-900 dark:text-white">
+                            {order.customerName}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {order.email}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                          {formatDate(order.createdAt)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-medium text-sm text-gray-900 dark:text-white">
+                            {order.services}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            Quantity:{" "}
+                            <span className="font-bold">{order.quantity}</span>
+                          </p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
+                          >
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 group-hover:bg-[#41B544] group-hover:text-white rounded-xl text-sm font-bold transition-all shadow-sm"
+                            onClick={() => btnClick(order)}
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 bg-gray-50 dark:bg-[#252525] border-t border-gray-100 dark:border-gray-800">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    Showing{" "}
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {startIndex + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {Math.min(startIndex + ITEMS_PER_PAGE, orders.length)}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-bold text-gray-900 dark:text-white">
+                      {orders.length}
+                    </span>{" "}
+                    entries
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

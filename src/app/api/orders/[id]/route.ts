@@ -29,12 +29,12 @@ export async function PATCH(
     });
 
     if (body.fileUrl) {
-      // const downloadLink = `https://pub-2211504cc3954264949ef6ba81981173.r2.dev/${body.fileUrl}`;
       const downloadLink = `${process.env.NEXT_PUBLIC_BASE_URL}/download/${orderId}`;
 
       await resend.emails.send({
         from: "Foto First Cresta <film@masieseremu.co.za>",
         to: updatedOrder.email,
+        bcc: "fotocresta@gmail.com",
         subject: "Your photos are ready to download! 🎞️",
         html: `
    <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
