@@ -10,6 +10,7 @@ import { Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
 import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
+import Analytics from "@/components/Analytics";
 
 const initialOrders = [
   {
@@ -450,7 +451,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
           <StatsCards
             label="Filtered Orders"
             stat={displayedOrders.length.toLocaleString()}
@@ -466,7 +467,8 @@ export default function AdminDashboard() {
             stat={`R ${totalRevenue.toLocaleString()}`}
             colour="[#41B544]"
           />
-        </div>
+        </div> */}
+        <Analytics orders={orders} />
 
         <div className="mb-8">
           <div className="flex space-x-2 overflow-x-auto hide-scrollbar pb-2">
