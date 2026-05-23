@@ -6,12 +6,11 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import { Plus, Search, X } from "lucide-react"; // <-- Added X icon
+import { Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
 import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
 
-// Your existing initialOrders array goes here...
 const initialOrders = [
   {
     id: "ORD-001",
@@ -154,7 +153,6 @@ export default function AdminDashboard() {
     setSelectedOrder(null);
   };
 
-  // --- KEPT YOUR EXACT UPLOAD LOGIC ---
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
     setIsUploading(true);
@@ -320,7 +318,6 @@ export default function AdminDashboard() {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
-  // Generate unique months for tabs
   const uniqueMonths = new Set<string>();
   orders.forEach((order) => {
     const rawDate = order.createdAt;
@@ -333,9 +330,33 @@ export default function AdminDashboard() {
     }
   });
 
-  const dynamicTabs = ["All", "Today", ...Array.from(uniqueMonths)];
+  const today = new Date();
+  const lastSevenDay = new Set<string>();
+  for (let i = 1; i < 7; i++) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    lastSevenDay.add(
+      `${d.getDate()} ${d.toLocaleString("en-GB", { month: "short" })}`,
+    );
+  }
+  orders.forEach((order) => {
+    const rawDate = order.createdAt;
+    if (rawDate) {
+      const safeDateString = String(rawDate).replace(" ", "T");
+      const dateObj = new Date(safeDateString);
+      if (!isNaN(dateObj.getTime())) {
+        uniqueMonths.add(dateObj.toLocaleString("en-GB", { month: "short" }));
+      }
+    }
+  });
 
-  // Filter Orders
+  const dynamicTabs = [
+    "All",
+    "Today",
+    ...Array.from(lastSevenDay),
+    ...Array.from(uniqueMonths),
+  ];
+
   const displayedOrders = orders.filter((order) => {
     if (searchQuery.trim() !== "") {
       const lowerQuery = searchQuery.toLowerCase();
@@ -362,6 +383,10 @@ export default function AdminDashboard() {
         dateObj.getMonth() === today.getMonth() &&
         dateObj.getFullYear() === today.getFullYear()
       );
+    }
+    if (lastSevenDay.has(activeTab)) {
+      const orderDayStr = `${dateObj.getDate()} ${dateObj.toLocaleString("en-GB", { month: "short" })}`;
+      return orderDayStr === activeTab;
     }
 
     return dateObj.toLocaleString("en-US", { month: "short" }) === activeTab;

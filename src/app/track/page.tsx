@@ -28,6 +28,24 @@ export default function TrackOrderPage() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20";
+      case "New":
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20";
+      case "Completed":
+        return "bg-[#41B544]/10 text-[#41B544] border-[#41B544]/20";
+      case "Downloaded":
+        return "bg-[#00E7FF]/10 text-[#00E7FF] border-[#00E7FF]/20";
+
+      case "Blank":
+        return "bg-red-500/10 text-red-500 border-red-500/20";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-white/5 dark:text-gray-300 dark:border-white/10";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#1e1e1e] flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8 ">
@@ -97,64 +115,104 @@ export default function TrackOrderPage() {
                     </p>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${orderData.status === "Completed" ? "bg-[#41B544]/10 text-[#41B544]" : "bg-blue-500/10 text-blue-500"}`}
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(orderData.status)}`}
                   >
                     {orderData.status}
                   </span>
                 </div>
 
                 {/* Visual Status Timeline */}
-                <div className="relative pl-2">
+                <div className="relative pl-2 mt-6">
                   <div className="absolute left-[1.35rem] top-4 bottom-4 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
 
                   <div className="space-y-6 relative">
-                    {/* Step 1: Received */}
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-[#41B544] flex items-center justify-center border-4 border-white dark:border-[#1e1e1e] z-10">
-                        <Check className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="font-bold text-gray-900 dark:text-white">
-                          Order Received
-                        </p>
-                      </div>
-                    </div>
+                    {(() => {
+                      const s = orderData.status;
+                      const isPending = s === "Pending" || s === "New";
+                      const isCompleted =
+                        s === "Completed" || s === "Downloaded";
+                      const isDownloaded = s === "Downloaded";
+                      const isBlank = s === "Blank";
 
-                    {/* Step 2: In the Lab */}
-                    <div className="flex items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-white dark:border-[#1e1e1e] z-10 ${orderData.status === "Completed" ? "bg-[#41B544]" : orderData.status === "Pending" ? "bg-blue-500 animate-pulse" : "bg-gray-300 dark:bg-gray-700"}`}
-                      >
-                        {orderData.status === "Completed" ? (
-                          <Check className="w-4 h-4 text-white" />
-                        ) : (
-                          <FlaskConical className="w-4 h-4 text-white" />
-                        )}
-                      </div>
-                      <div className="ml-4">
-                        <p
-                          className={`font-bold ${orderData.status === "Pending" ? "text-blue-500" : "text-gray-900 dark:text-white"}`}
-                        >
-                          In the Lab
-                        </p>
-                      </div>
-                    </div>
+                      return (
+                        <>
+                          {/* Received */}
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 rounded-full bg-[#41B544] flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10">
+                              <Check className="w-4 h-4 text-white" />
+                            </div>
+                            <div className="ml-4">
+                              <p className="font-bold text-gray-900 dark:text-white">
+                                Order Received
+                              </p>
+                            </div>
+                          </div>
 
-                    {/* Step 3: Completed */}
-                    <div className="flex items-center">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-white dark:border-[#1e1e1e] z-10 ${orderData.status === "Completed" ? "bg-[#41B544]" : "bg-gray-300 dark:bg-gray-700"}`}
-                      >
-                        <Download className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="ml-4">
-                        <p
-                          className={`font-bold ${orderData.status === "Completed" ? "text-[#41B544]" : "text-gray-400"}`}
-                        >
-                          Order Sent
-                        </p>
-                      </div>
-                    </div>
+                          {/*In the lab */}
+                          <div className="flex items-center">
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10 
+                                ${isCompleted ? "bg-[#41B544]" : isPending ? "bg-blue-500 animate-pulse" : isBlank ? "bg-red-500 " : "bg-gray-300 dark:bg-gray-700"}`}
+                            >
+                              {isCompleted ? (
+                                <Check className="w-4 h-4 text-white" />
+                              ) : (
+                                <FlaskConical className="w-4 h-4 text-white" />
+                              )}
+                            </div>
+                            <div className="ml-4">
+                              <p
+                                className={`font-bold ${isCompleted ? "text-gray-900 dark:text-white" : isPending ? "text-blue-500" : isBlank ? "text-red-500" : "text-gray-400"}`}
+                              >
+                                {isBlank
+                                  ? "One or more rolls Blank"
+                                  : "In the Lab"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {!isBlank && (
+                            <div className="flex items-center">
+                              <div
+                                className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10 
+                                  ${isCompleted ? "bg-[#41B544]" : "bg-gray-300 dark:bg-gray-700"}`}
+                              >
+                                {isDownloaded ? (
+                                  <Check className="w-4 h-4 text-white" />
+                                ) : (
+                                  <Download className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                              <div className="ml-4">
+                                <p
+                                  className={`font-bold ${isCompleted ? "text-gray-900 dark:text-white" : "text-gray-400"}`}
+                                >
+                                  Order Ready
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {!isBlank && orderData.services !== "Print Only" && (
+                            <div className="flex items-center">
+                              <div
+                                className={`w-8 h-8 rounded-full flex items-center justify-center border-4 border-[#F3F4F6] dark:border-[#2c2c2c] z-10 
+                                  ${isDownloaded ? "bg-[#00E7FF]" : "bg-gray-300 dark:bg-gray-700"}`}
+                              >
+                                <Check className="w-4 h-4 text-white" />
+                              </div>
+                              <div className="ml-4">
+                                <p
+                                  className={`font-bold ${isDownloaded ? "text-[#00E7FF]" : "text-gray-400"}`}
+                                >
+                                  Files Downloaded
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>

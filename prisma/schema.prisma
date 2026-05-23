@@ -35,6 +35,7 @@ model Order {
   fileUrl         String?
   
   // Timestamps
+  uploadedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

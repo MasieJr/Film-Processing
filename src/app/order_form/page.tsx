@@ -5,8 +5,6 @@ import RadioGroup from "@/components/RadioGroup";
 import TextInput from "@/components/TextInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import BackButton from "@/components/BackButton";
-
 export default function OrderFormPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState(200);
@@ -29,6 +27,7 @@ export default function OrderFormPage() {
     "Prudence Ndlovu",
     "Yanga Bululu",
     "Hloni Smith",
+    "Luisa Gravito",
   ];
 
   const printsSizes = ["9x13 cm", "10x15 cm", "13x18 cm", "15x20 cm"];

@@ -66,8 +66,6 @@ export async function POST(request: Request) {
         services: body.services,
         selectedSize: isPrintingService ? body.selectedSize || null : null,
         selectedFinish: isPrintingService ? body.selectedFinish || null : null,
-        // selectedSize: body.selectedSize || null,
-        // selectedFinish: body.selectedFinish || null,
         keepNegatives: body.keepNegatives || false,
         totalPrice: parseFloat(body.totalPrice),
       },
@@ -75,7 +73,7 @@ export async function POST(request: Request) {
 
     await resend.emails.send({
       from: "Foto First Cresta <film@masieseremu.co.za>",
-      to: body.email, // Or whatever variable holds the customer's email
+      to: body.email,
       subject: "Thank you for submitting your film! 🎞️",
       html: `
     <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
