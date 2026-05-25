@@ -1,13 +1,10 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -18,81 +15,85 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-export const description = "A simple area chart";
-
-type AreaChartProps = {
+type ReusableAreaChartProps = {
   title: string;
   description: string;
   data: any[];
+  config: ChartConfig;
+  dataKey: string;
+  xAxisKey?: string;
+  valuePrefix?: string;
 };
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+export function ChartAreaDefault({
+  title,
+  description,
+  data,
+  config,
+  dataKey,
+  xAxisKey = "date",
+  valuePrefix = "",
+}: ReusableAreaChartProps) {
+  if (!data || data.length === 0) {
+    return (
+      <Card className="bg-transparent border-0 shadow-none">
+        <CardHeader className="px-0 pt-0">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+        <CardContent className="h-[250px] flex items-center justify-center text-muted-foreground px-0">
+          Loading chart data...
+        </CardContent>
+      </Card>
+    );
+  }
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
-
-export function ChartAreaDefault({ title, description, data }: AreaChartProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-transparent border-0 shadow-none">
+      <CardHeader className="px-0 pt-0">
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="px-0 pb-0">
+        <ChartContainer config={config} className="h-[250px] w-full">
           <AreaChart
             accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+            data={data}
+            margin={{ left: 12, right: 12, top: 12 }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray="3 3"
+              opacity={0.2}
+            />
+
             <XAxis
-              dataKey="month"
+              dataKey={xAxisKey}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
+
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              content={
+                <ChartTooltipContent
+                  indicator="line"
+                  formatter={(value) => `${valuePrefix}${value}`}
+                />
+              }
             />
+
             <Area
-              dataKey="desktop"
+              dataKey={dataKey}
               type="natural"
-              fill="var(--color-desktop)"
+              fill={`var(--color-${dataKey})`}
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke={`var(--color-${dataKey})`}
             />
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              January - June 2024
-            </div>
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

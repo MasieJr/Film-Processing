@@ -21,14 +21,14 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import { ChartAreaDefault } from "./AreaChart";
+import { ChartConfig } from "./ui/chart";
 
-// 1. Define the props so this component can receive your database orders
 type AnalyticsProps = {
   orders: any[];
 };
 
 export default function Analytics({ orders }: AnalyticsProps) {
-  // 2. Calculate the KPIs and Chart Data dynamically
   const { kpis, chartData } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -40,7 +40,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
       completedToday: 0,
     };
 
-    // Chart Data Setup
     const dailyStats: Record<
       string,
       { date: string; orders: number; revenue: number }
@@ -67,7 +66,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
       if (!order.createdAt) return;
       const orderDate = new Date(order.createdAt);
 
-      // --- KPI Calculations ---
       if (orderDate >= today) {
         stats.ordersToday += 1;
         if (order.status === "Completed" || order.status === "Downloaded") {
@@ -89,7 +87,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
         stats.waitingOver48h += 1;
       }
 
-      // --- Chart Data Calculations ---
       const dateStr = orderDate.toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
@@ -127,11 +124,23 @@ export default function Analytics({ orders }: AnalyticsProps) {
     };
   }, [orders]);
 
+  const revenueConfig = {
+    revenue: {
+      label: "Revenue",
+      color: "#3b82f6",
+    },
+  } satisfies ChartConfig;
+
+  const ordersConfig = {
+    orders: {
+      label: "Total Orders",
+      color: "#41B544",
+    },
+  } satisfies ChartConfig;
+
   return (
     <div>
-      {/* --- KPI STAT CARDS --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        {/* Orders Today */}
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-500 flex items-center justify-center">
@@ -148,25 +157,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
           </div>
         </div>
 
-        {/* Turnaround Time (Placeholder for now) */}
-        {/* <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-500 flex items-center justify-center">
-              <Clock className="w-5 h-5" />
-            </div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Turnaround Time
-            </p>
-          </div>
-          <div className="mt-2">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              2.4{" "}
-              <span className="text-lg font-normal text-gray-400">days</span>
-            </h3>
-          </div>
-        </div> */}
-
-        {/* Revenue This Month */}
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 flex items-center justify-center">
@@ -183,29 +173,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
           </div>
         </div>
 
-        {/* Waiting > 48h */}
-        {/* <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-500 flex items-center justify-center">
-              <Hourglass className="w-5 h-5" />
-            </div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Waiting &gt; 48h
-            </p>
-          </div>
-          <div className="mt-2">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {kpis.waitingOver48h}
-            </h3>
-            {kpis.waitingOver48h > 0 && (
-              <p className="text-xs text-orange-500 mt-1 flex items-center font-medium">
-                Needs attention
-              </p>
-            )}
-          </div>
-        </div> */}
-
-        {/* Completed Today */}
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-500 flex items-center justify-center">
@@ -223,9 +190,30 @@ export default function Analytics({ orders }: AnalyticsProps) {
         </div>
       </div>
 
-      {/* --- CHARTS ROW --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
+          <ChartAreaDefault
+            title="Revenue Trend"
+            description="Total earnings over the last 14 days"
+            data={chartData.daily}
+            config={revenueConfig}
+            dataKey="revenue"
+            valuePrefix="R "
+          />
+        </div>
+
+        <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm">
+          <ChartAreaDefault
+            title="Orders per Day"
+            description="Volume of film dropped off"
+            data={chartData.daily}
+            config={ordersConfig}
+            dataKey="orders"
+          />
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Orders per Day */}
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 min-h-[300px] flex flex-col shadow-sm">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">
@@ -234,8 +222,8 @@ export default function Analytics({ orders }: AnalyticsProps) {
             </h3>
           </div>
           <div className="flex-grow w-full h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
+            {/* <ResponsiveContainer width="100%" height="100%"> */}
+            {/* <LineChart
                 data={chartData.daily}
                 margin={{ top: 5, right: 5, left: -20, bottom: 0 }}
               >
@@ -278,8 +266,8 @@ export default function Analytics({ orders }: AnalyticsProps) {
                   dot={false}
                   activeDot={{ r: 6 }}
                 />
-              </LineChart>
-            </ResponsiveContainer>
+              </LineChart> */}
+            {/* </ResponsiveContainer> */}
           </div>
         </div>
 
@@ -351,7 +339,6 @@ export default function Analytics({ orders }: AnalyticsProps) {
           </div>
         </div>
 
-        {/* Orders by Status */}
         <div className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl p-5 min-h-[300px] flex flex-col shadow-sm">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">
             Orders by Status
