@@ -1,15 +1,24 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
-import { Plus, Search, X } from "lucide-react";
+import { Calendar, Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
 import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar as CustomCalendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const initialOrders = [
   {
@@ -72,7 +81,7 @@ export default function AdminDashboard() {
   const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
 
   // UI State
-  const [activeTab, setActiveTab] = useState("All");
+  // const [activeTab, setActiveTab] = useState("All");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
@@ -80,6 +89,35 @@ export default function AdminDashboard() {
     downloadedOrder: false,
     blankOrder: false,
   });
+
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const displayedOrders = useMemo(() => {
+    return orders.filter((order) => {
+      if (searchQuery.trim() !== "") {
+        const lowerQuery = searchQuery.toLowerCase();
+        const matchesSearch =
+          order.customerName?.toLowerCase().includes(lowerQuery) ||
+          order.email?.toLowerCase().includes(lowerQuery) ||
+          order.phone?.toLowerCase().includes(lowerQuery);
+        if (!matchesSearch) return false;
+      }
+
+      if (!selectedDate) return true;
+
+      const rawDate = order.createdAt;
+      if (!rawDate) return false;
+
+      const safeDateString = String(rawDate).replace(" ", "T");
+      const dateObj = new Date(safeDateString);
+      if (isNaN(dateObj.getTime())) return false;
+
+      return (
+        dateObj.getDate() === selectedDate.getDate() &&
+        dateObj.getMonth() === selectedDate.getMonth() &&
+        dateObj.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+  }, [orders, selectedDate, searchQuery]);
 
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -350,48 +388,6 @@ export default function AdminDashboard() {
     }
   });
 
-  const dynamicTabs = [
-    "All",
-    "Today",
-    ...Array.from(lastSevenDay),
-    ...Array.from(uniqueMonths),
-  ];
-
-  const displayedOrders = orders.filter((order) => {
-    if (searchQuery.trim() !== "") {
-      const lowerQuery = searchQuery.toLowerCase();
-      const matchesSearch =
-        order.customerName?.toLowerCase().includes(lowerQuery) ||
-        order.email?.toLowerCase().includes(lowerQuery) ||
-        order.phone?.toLowerCase().includes(lowerQuery);
-      if (!matchesSearch) return false;
-    }
-
-    if (activeTab === "All") return true;
-
-    const rawDate = order.createdAt;
-    if (!rawDate) return false;
-
-    const safeDateString = String(rawDate).replace(" ", "T");
-    const dateObj = new Date(safeDateString);
-    if (isNaN(dateObj.getTime())) return false;
-
-    if (activeTab === "Today") {
-      const today = new Date();
-      return (
-        dateObj.getDate() === today.getDate() &&
-        dateObj.getMonth() === today.getMonth() &&
-        dateObj.getFullYear() === today.getFullYear()
-      );
-    }
-    if (lastSevenDay.has(activeTab)) {
-      const orderDayStr = `${dateObj.getDate()} ${dateObj.toLocaleString("en-GB", { month: "short" })}`;
-      return orderDayStr === activeTab;
-    }
-
-    return dateObj.toLocaleString("en-US", { month: "short" }) === activeTab;
-  });
-
   const pendingCount = displayedOrders.filter(
     (o) => o.status === "Pending",
   ).length;
@@ -401,7 +397,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] font-sans pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] font-mono pb-20">
       <AutoRefresh interval={15000} />
 
       <div className="bg-white dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-gray-800 px-6 py-8">
@@ -469,20 +465,73 @@ export default function AdminDashboard() {
         </div>
 
         <div className="mb-8">
-          <div className="flex space-x-2 overflow-x-auto hide-scrollbar pb-2">
-            {dynamicTabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
-                  activeTab === tab
-                    ? "bg-[#41B544] text-white shadow-md shadow-[#41B544]/20"
-                    : "bg-white dark:bg-[#1e1e1e] text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] border border-gray-200 dark:border-gray-800"
-                }`}
-              >
-                {tab === "All" ? "All Orders" : tab}
-              </button>
-            ))}
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-gray-400" />
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+                Filter by Date
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <div className="flex items-center gap-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] justify-start text-left font-medium rounded-xl transition-all h-11 border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1e1e] hover:bg-gray-50 dark:hover:bg-[#2a2a2a] text-gray-900 dark:text-white",
+                          !selectedDate && "text-gray-500 dark:text-gray-400",
+                        )}
+                      >
+                        <Calendar className="mr-3 h-4 w-4 text-[#41B544]" />
+                        {selectedDate ? (
+                          format(selectedDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto p-0 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl"
+                      align="start"
+                    >
+                      <CustomCalendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        className="text-[#41B544]"
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  {selectedDate && (
+                    <button
+                      onClick={() => setSelectedDate(undefined)}
+                      className="flex items-center justify-center w-11 h-11 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
+                      title="Clear Date Filter"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+
+                  <div className="ml-auto sm:ml-4 flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] rounded-xl border border-gray-200 dark:border-gray-800">
+                    <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
+                      {displayedOrders.length}{" "}
+                      {displayedOrders.length === 1 ? "Order" : "Orders"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ml-auto sm:ml-4 flex items-center justify-center px-3 py-1 bg-gray-100 dark:bg-[#2a2a2a] rounded-full">
+                <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
+                  {displayedOrders.length}{" "}
+                  {displayedOrders.length === 1 ? "Order" : "Orders"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

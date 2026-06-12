@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css"; // Assuming your CSS is imported here
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000", // Your brand green for the mobile browser bar!
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -43,10 +43,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Your Main App Content */}
         {children}
 
-        {/* Vercel Analytics & Speed Insights */}
         <SpeedInsights />
         <Analytics />
       </body>
