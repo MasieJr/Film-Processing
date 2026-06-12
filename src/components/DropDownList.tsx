@@ -5,6 +5,7 @@ import {
   Inbox,
   ChevronLeft,
   ChevronRight,
+  Edit,
 } from "lucide-react";
 
 type DropDownListProp = {
@@ -122,6 +123,9 @@ export default function DropDownList({
                       <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
                         Action
                       </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
+                        Edit
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -163,6 +167,14 @@ export default function DropDownList({
                             onClick={() => btnClick(order)}
                           >
                             View Details
+                          </button>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            className="inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-300 group-hover:text-[#41B544] text-sm font-bold transition-all shadow-sm"
+                            onClick={() => btnClick(order)}
+                          >
+                            <Edit />
                           </button>
                         </td>
                       </tr>

@@ -19,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import EditOrder from "@/components/EditOrder";
 
 const initialOrders = [
   {
@@ -65,9 +66,11 @@ export default function AdminDashboard() {
 
   // Modals & Selection State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [selectedEditOrder, setSelectedEditOrder] = useState<any | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
+  const [selectedOrderEdit, setSelectedOrderEdit] = useState(true);
 
   // Upload State
   const [isUploading, setIsUploading] = useState(false);
@@ -248,6 +251,15 @@ export default function AdminDashboard() {
       setIsUploading(false);
     }
   };
+
+  const dummie = {
+    id: "ID",
+    customerName: "Name",
+    email: "Email",
+    phone: "Phone",
+    status: "Status",
+  };
+  const handleEdit = async () => {};
 
   const handleAddOrderSendSubmit = async () => {
     if (!addOrderEmail || !addOrderFile) return;
@@ -627,6 +639,10 @@ export default function AdminDashboard() {
           setAddOrderName={setAddOrderName}
           uploadProgress={uploadProgress}
         />
+      )}
+
+      {selectedOrderEdit && (
+        <EditOrder order={dummie} closeEdit={() => {}} handleEdit={() => {}} />
       )}
 
       {/* --- HIDDEN PDF TEMPLATE --- */}
