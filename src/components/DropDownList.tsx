@@ -12,6 +12,7 @@ type DropDownListProp = {
   name: string;
   onClick: (status: string) => void;
   btnClick: (order: any) => void;
+  editOrder: (order: any) => void;
   open: boolean;
   orders: {
     id: string;
@@ -22,6 +23,7 @@ type DropDownListProp = {
     totalPrice: number;
     status: string;
     createdAt: string;
+    salesPerson: string;
   }[];
   type: string;
   formatDate: (rawDate: Date | string) => string;
@@ -31,6 +33,7 @@ export default function DropDownList({
   name,
   onClick,
   btnClick,
+  editOrder,
   open,
   orders,
   type,
@@ -68,7 +71,7 @@ export default function DropDownList({
   return (
     <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden transition-all">
       <button
-        className="w-full flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors focus:outline-none"
+        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-[#252525] transition-colors focus:outline-none"
         onClick={() => onClick(type)}
       >
         <div className="flex items-center gap-3">
@@ -118,12 +121,15 @@ export default function DropDownList({
                         Services
                       </th>
                       <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Sales Person
+                      </th>
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Status
                       </th>
-                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
                         Action
                       </th>
-                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 text-right">
+                      <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 ">
                         Edit
                       </th>
                     </tr>
@@ -134,7 +140,7 @@ export default function DropDownList({
                         key={order.id}
                         className="hover:bg-gray-50 dark:hover:bg-[#252525]/50 transition-colors group"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
                           <p className="font-bold text-sm text-gray-900 dark:text-white">
                             {order.customerName}
                           </p>
@@ -142,10 +148,10 @@ export default function DropDownList({
                             {order.email}
                           </p>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">
                           {formatDate(order.createdAt)}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
                           <p className="font-medium text-sm text-gray-900 dark:text-white">
                             {order.services}
                           </p>
@@ -154,14 +160,19 @@ export default function DropDownList({
                             <span className="font-bold">{order.quantity}</span>
                           </p>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
+                          <p className="font-medium text-sm text-gray-900 dark:text-white">
+                            {order.salesPerson}
+                          </p>
+                        </td>
+                        <td className="px-5 py-4">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}
                           >
                             {order.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-5 py-4 text-right">
                           <button
                             className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] text-gray-700 dark:text-gray-300 group-hover:bg-[#41B544] group-hover:text-white rounded-xl text-sm font-bold transition-all shadow-sm"
                             onClick={() => btnClick(order)}
@@ -169,10 +180,10 @@ export default function DropDownList({
                             View Details
                           </button>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-5 py-4">
                           <button
                             className="inline-flex items-center justify-center px-4 py-2 text-gray-700 dark:text-gray-300 group-hover:text-[#41B544] text-sm font-bold transition-all shadow-sm"
-                            onClick={() => btnClick(order)}
+                            onClick={() => editOrder(order)}
                           >
                             <Edit />
                           </button>
