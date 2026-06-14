@@ -53,11 +53,11 @@ export default function ViewModal({
   handleBlankFilmComplete,
 }: ViewModalProps) {
   const [isReplacing, setIsReplacing] = useState(false);
-  // NEW: Tab state for the processing action
+
   const [actionType, setActionType] = useState<"upload" | "print" | "blank">(
     "upload",
   );
-  // NEW: State for blank films
+
   const [blankCount, setBlankCount] = useState(1);
 
   return (
@@ -78,7 +78,6 @@ export default function ViewModal({
 
         {/* Body */}
         <div className="p-6 md:p-8 pt-2 space-y-6">
-          {/* Customer & Order Info (Combined for space) */}
           <div className="bg-gray-50 dark:bg-[#252525] p-5 rounded-2xl border border-gray-100 dark:border-gray-800/50">
             <div className="flex justify-between items-start mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
               <div>
