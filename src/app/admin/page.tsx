@@ -498,11 +498,17 @@ export default function AdminDashboard() {
             colour="yellow-500"
           />
           <StatsCards
-            label="Total Revenue"
-            stat={`R ${totalRevenue.toLocaleString()}`}
+            label="Revenue This Month"
+            stat={`R ${analytics.kpis.current.revenue.toLocaleString()}`}
             colour="[#41B544]"
+            isHigh={analytics.kpis.trends.revenueIsUp}
+            percentage={analytics.kpis.trends.revenuePercent}
           />
         </div>
+        <DashboardCharts
+          data={analytics.chartData}
+          timeframeLabel={timeframe === "week" ? "This Week" : "This Month"}
+        />
 
         <div className="mb-8">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">

@@ -19,15 +19,37 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
   let previousEnd = new Date();
 
   if (timeframe === "week") {
+    // Current Week: Go back 7 days
     currentStart.setDate(now.getDate() - 7);
+
+    // Previous Week: Go back 14 days, ending 7 days ago
     previousStart.setDate(now.getDate() - 14);
     previousEnd = new Date(currentStart);
   } else {
+    // Current Month: 1st of the current month
     currentStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Previous Month Start: 1st of the previous month
     previousStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    previousEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    // PREVIOUS MONTH END: The crucial fix!
+    // Set the end date to exactly one month ago from today's specific date and time.
+    // E.g., if today is June 17, previousEnd becomes May 17.
+    previousEnd = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      now.getDate(),
+    );
+
+    // Edge case safety: If today is March 31, "Feb 31" doesn't exist.
+    // JS will auto-wrap it into March, which breaks the math.
+    // We force it to stick to the last day of the previous month if necessary.
+    if (previousEnd.getMonth() === now.getMonth()) {
+      previousEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    }
   }
 
+  // Set exact times for accurate query slicing
   currentStart.setHours(0, 0, 0, 0);
   previousStart.setHours(0, 0, 0, 0);
   previousEnd.setHours(23, 59, 59, 999);
