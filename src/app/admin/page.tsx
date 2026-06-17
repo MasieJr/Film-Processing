@@ -20,6 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import EditOrder from "@/components/EditOrder";
+import { fetchDashboardAnalytics } from "@/actions/analytics";
+import DashboardCharts from "@/components/DashboardCharts";
 
 const initialOrders = [
   {
@@ -82,6 +84,8 @@ export default function AdminDashboard() {
   const [addOrderName, setAddOrderName] = useState("");
   const [addOrderEmail, setAddOrderEmail] = useState("");
   const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [timeframe, setTimeframe] = useState<"week" | "month">("month");
 
   // UI State
   // const [activeTab, setActiveTab] = useState("All");
@@ -140,6 +144,14 @@ export default function AdminDashboard() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    async function loadData() {
+      const data = await fetchDashboardAnalytics(timeframe);
+      setAnalytics(data);
+    }
+    loadData();
+  }, [timeframe]);
 
   useEffect(() => {
     fetchOrders();
@@ -407,6 +419,8 @@ export default function AdminDashboard() {
     (sum, order) => sum + (Number(order.totalPrice) || 0),
     0,
   );
+
+  if (!analytics) return <div>Loading dashboard...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#121212] font-mono pb-20">
