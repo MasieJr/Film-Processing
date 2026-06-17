@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import EditOrder from "@/components/EditOrder";
+import EditCustomerModal from "@/components/EditCustomerModal";
 import { fetchDashboardAnalytics } from "@/actions/analytics";
 import DashboardCharts from "@/components/DashboardCharts";
 
@@ -65,14 +65,13 @@ const initialOrders = [
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState(initialOrders);
+  const [editingOrder, setEditingOrder] = useState<any | null>(null);
 
   // Modals & Selection State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
-  const [selectedEditOrder, setSelectedEditOrder] = useState<any | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
-  const [selectedOrderEdit, setSelectedOrderEdit] = useState(true);
 
   // Upload State
   const [isUploading, setIsUploading] = useState(false);
@@ -88,7 +87,6 @@ export default function AdminDashboard() {
   const [timeframe, setTimeframe] = useState<"week" | "month">("month");
 
   // UI State
-  // const [activeTab, setActiveTab] = useState("All");
   const [dropDowns, setDropDowns] = useState({
     newOrder: true,
     pendingOrder: false,
@@ -264,14 +262,30 @@ export default function AdminDashboard() {
     }
   };
 
-  const dummie = {
-    id: "ID",
-    customerName: "Name",
-    email: "Email",
-    phone: "Phone",
-    status: "Status",
+  const handleSaveCustomerDetails = async (
+    orderId: string,
+    updatedData: any,
+  ) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, ...updatedData } : order,
+      ),
+    );
+
+    try {
+      const editRes = await fetch(`/api/orders/${orderId}/edit`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          customerName: updatedData.customerName,
+          email: updatedData.email,
+          phone: updatedData.phone,
+        }),
+      });
+      if (editRes.ok) fetchOrders();
+    } catch (error) {
+      console.error(error);
+    }
   };
-  const handleEdit = async () => {};
 
   const handleAddOrderSendSubmit = async () => {
     if (!addOrderEmail || !addOrderFile) return;
@@ -471,7 +485,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-8">
+      <div className="max-w-7xl mx-auto px-4 mt-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
           <StatsCards
             label="Filtered Orders"
@@ -541,21 +555,7 @@ export default function AdminDashboard() {
                       <X className="w-4 h-4" />
                     </button>
                   )}
-
-                  <div className="ml-auto sm:ml-4 flex items-center justify-center px-4 py-2 bg-gray-100 dark:bg-[#2a2a2a] rounded-xl border border-gray-200 dark:border-gray-800">
-                    <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
-                      {displayedOrders.length}{" "}
-                      {displayedOrders.length === 1 ? "Order" : "Orders"}
-                    </span>
-                  </div>
                 </div>
-              </div>
-
-              <div className="ml-auto sm:ml-4 flex items-center justify-center px-3 py-1 bg-gray-100 dark:bg-[#2a2a2a] rounded-full">
-                <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                  {displayedOrders.length}{" "}
-                  {displayedOrders.length === 1 ? "Order" : "Orders"}
-                </span>
               </div>
             </div>
           </div>
@@ -570,6 +570,7 @@ export default function AdminDashboard() {
             name="New Orders"
             btnClick={setSelectedOrder}
             formatDate={formatDate}
+            editOrder={setEditingOrder}
           />
           <DropDownList
             onClick={openDropdown}
@@ -581,6 +582,7 @@ export default function AdminDashboard() {
             name="Pending Processing"
             btnClick={setSelectedOrder}
             formatDate={formatDate}
+            editOrder={setEditingOrder}
           />
           <DropDownList
             onClick={openDropdown}
@@ -592,6 +594,7 @@ export default function AdminDashboard() {
             name="Completed Orders"
             btnClick={setSelectedOrder}
             formatDate={formatDate}
+            editOrder={setEditingOrder}
           />
           <DropDownList
             onClick={openDropdown}
@@ -603,6 +606,7 @@ export default function AdminDashboard() {
             name="Downloaded Orders"
             btnClick={setSelectedOrder}
             formatDate={formatDate}
+            editOrder={setEditingOrder}
           />
           <DropDownList
             onClick={openDropdown}
@@ -612,6 +616,7 @@ export default function AdminDashboard() {
             name="Blank Orders"
             btnClick={setSelectedOrder}
             formatDate={formatDate}
+            editOrder={setEditingOrder}
           />
         </div>
       </div>
@@ -655,8 +660,12 @@ export default function AdminDashboard() {
         />
       )}
 
-      {selectedOrderEdit && (
-        <EditOrder order={dummie} closeEdit={() => {}} handleEdit={() => {}} />
+      {editingOrder && (
+        <EditCustomerModal
+          order={editingOrder}
+          onClose={() => setEditingOrder(null)}
+          onSave={handleSaveCustomerDetails}
+        />
       )}
 
       {/* --- HIDDEN PDF TEMPLATE --- */}
