@@ -429,10 +429,6 @@ export default function AdminDashboard() {
   const pendingCount = displayedOrders.filter(
     (o) => o.status === "Pending",
   ).length;
-  const totalRevenue = displayedOrders.reduce(
-    (sum, order) => sum + (Number(order.totalPrice) || 0),
-    0,
-  );
 
   if (!analytics) return <div>Loading dashboard...</div>;
 

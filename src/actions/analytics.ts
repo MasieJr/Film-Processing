@@ -59,7 +59,11 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
   // and doing it in memory for 30 days of data is incredibly fast and reliable).
   const currentOrdersRaw = await prisma.order.findMany({
     where: { createdAt: { gte: currentStart } },
-    select: { createdAt: true, totalPrice: true, status: true },
+    select: { createdAt: true, totalPrice: true, status: true, services: true },
+  });
+  const prevOrdersRaw = await prisma.order.findMany({
+    where: { createdAt: { gte: previousStart } },
+    select: { createdAt: true, totalPrice: true, status: true, services: true },
   });
 
   // 3. Build the Daily Chart Data Array

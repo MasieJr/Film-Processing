@@ -25,6 +25,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { ChartLineMultiple } from "./MultiLineCharr";
 
 // This is the data structure your Server Action will pass to this component
 export type DailyStat = {
@@ -62,7 +63,6 @@ export default function DashboardCharts({
   data,
   timeframeLabel,
 }: DashboardChartsProps) {
-  // Safe fallback if data is still loading
   if (!data || data.length === 0) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 h-[350px]">
@@ -77,7 +77,7 @@ export default function DashboardCharts({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
       {/* --- REVENUE AREA CHART --- */}
       <Card className="bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-gray-800 shadow-sm">
         <CardHeader>
@@ -89,7 +89,7 @@ export default function DashboardCharts({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={revenueConfig} className="h-[250px] w-full">
+          <ChartContainer config={revenueConfig} className="w-full">
             <AreaChart
               data={data}
               margin={{ left: -20, right: 12, top: 12, bottom: 0 }}
@@ -208,6 +208,8 @@ export default function DashboardCharts({
           </ChartContainer>
         </CardContent>
       </Card>
+
+      <ChartLineMultiple />
     </div>
   );
 }
