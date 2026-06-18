@@ -25,14 +25,17 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { ChartLineMultiple } from "./MultiLineCharr";
+import ChartLineMultiple from "./MultiLineCharr";
 
 // This is the data structure your Server Action will pass to this component
 export type DailyStat = {
-  date: string; // e.g., "12 Jun"
-  revenue: number;
-  totalOrders: number;
-  completedOrders: number;
+  // date: string; // e.g., "12 Jun"
+  // revenue: number;
+  // totalOrders: number;
+  // completedOrders: number;
+  label: string;
+  currentRevenue: number;
+  previousRevenue: number;
 };
 
 type DashboardChartsProps = {
@@ -209,7 +212,7 @@ export default function DashboardCharts({
         </CardContent>
       </Card>
 
-      <ChartLineMultiple />
+      <ChartLineMultiple chartData={data} />
     </div>
   );
 }

@@ -19,127 +19,120 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
   let previousEnd = new Date();
 
   if (timeframe === "week") {
-    // Current Week: Go back 7 days
     currentStart.setDate(now.getDate() - 7);
-
-    // Previous Week: Go back 14 days, ending 7 days ago
     previousStart.setDate(now.getDate() - 14);
     previousEnd = new Date(currentStart);
   } else {
-    // Current Month: 1st of the current month
     currentStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // Previous Month Start: 1st of the previous month
     previousStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-
-    // PREVIOUS MONTH END: The crucial fix!
-    // Set the end date to exactly one month ago from today's specific date and time.
-    // E.g., if today is June 17, previousEnd becomes May 17.
     previousEnd = new Date(
       now.getFullYear(),
       now.getMonth() - 1,
       now.getDate(),
     );
 
-    // Edge case safety: If today is March 31, "Feb 31" doesn't exist.
-    // JS will auto-wrap it into March, which breaks the math.
-    // We force it to stick to the last day of the previous month if necessary.
     if (previousEnd.getMonth() === now.getMonth()) {
       previousEnd = new Date(now.getFullYear(), now.getMonth(), 0);
     }
   }
 
-  // Set exact times for accurate query slicing
   currentStart.setHours(0, 0, 0, 0);
   previousStart.setHours(0, 0, 0, 0);
   previousEnd.setHours(23, 59, 59, 999);
 
-  // 2. Fetch all orders for the current period to build the charts
-  // (We fetch the raw orders here because SQLite/Postgres handle grouping by day differently,
-  // and doing it in memory for 30 days of data is incredibly fast and reliable).
+  // 2. Fetch all orders (Notice we added 'lte: previousEnd' so it doesn't fetch into the future)
   const currentOrdersRaw = await prisma.order.findMany({
     where: { createdAt: { gte: currentStart } },
-    select: { createdAt: true, totalPrice: true, status: true, services: true },
-  });
-  const prevOrdersRaw = await prisma.order.findMany({
-    where: { createdAt: { gte: previousStart } },
-    select: { createdAt: true, totalPrice: true, status: true, services: true },
+    select: { createdAt: true, totalPrice: true, status: true },
   });
 
-  // 3. Build the Daily Chart Data Array
-  const dailyStatsMap: Record<
-    string,
-    {
-      date: string;
-      revenue: number;
-      totalOrders: number;
-      completedOrders: number;
-    }
+  const prevOrdersRaw = await prisma.order.findMany({
+    where: { createdAt: { gte: previousStart, lte: previousEnd } },
+    select: { createdAt: true, totalPrice: true, status: true },
+  });
+
+  // 3. Build the Unified Chart Data Array
+  const chartDataMap: Record<
+    string | number,
+    { label: string; currentRevenue: number; previousRevenue: number }
   > = {};
 
-  // Pre-fill the array with empty days so the chart lines don't break
-  let loopDate = new Date(currentStart);
-  while (loopDate <= now) {
-    // Format as "12 Jun"
-    const dateStr = loopDate.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-    });
-    dailyStatsMap[dateStr] = {
-      date: dateStr,
-      revenue: 0,
-      totalOrders: 0,
-      completedOrders: 0,
-    };
-    loopDate.setDate(loopDate.getDate() + 1);
+  if (timeframe === "month") {
+    // Fill days 1 to 31 (or current day)
+    const daysInMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+    ).getDate();
+    for (let i = 1; i <= daysInMonth; i++) {
+      chartDataMap[i] = {
+        label: String(i),
+        currentRevenue: 0,
+        previousRevenue: 0,
+      };
+    }
+  } else {
+    // Fill 7 days for the week
+    for (let i = 0; i <= 7; i++) {
+      const d = new Date(currentStart);
+      d.setDate(d.getDate() + i);
+      const label = d.toLocaleDateString("en-GB", { weekday: "short" });
+      chartDataMap[i] = { label, currentRevenue: 0, previousRevenue: 0 };
+    }
   }
 
-  // 4. Populate the daily buckets
+  // Helper function to safely calculate day differences
+  const getDayOffset = (orderDate: Date, startDate: Date) => {
+    const d1 = new Date(orderDate);
+    const d2 = new Date(startDate);
+    d1.setHours(0, 0, 0, 0);
+    d2.setHours(0, 0, 0, 0);
+    return Math.round((d1.getTime() - d2.getTime()) / 86400000);
+  };
+
+  // 4. Populate Current Period
   let currRevTotal = 0;
   let currCompletedTotal = 0;
 
   currentOrdersRaw.forEach((order) => {
-    const orderDateStr = order.createdAt.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-    });
+    const key =
+      timeframe === "month"
+        ? order.createdAt.getDate()
+        : getDayOffset(order.createdAt, currentStart);
 
-    // Safety check just in case timezone math pushes an order slightly out of bounds
-    if (dailyStatsMap[orderDateStr]) {
-      dailyStatsMap[orderDateStr].totalOrders += 1;
-
+    if (chartDataMap[key]) {
       const price = order.totalPrice || 0;
-      dailyStatsMap[orderDateStr].revenue += price;
+      chartDataMap[key].currentRevenue += price;
       currRevTotal += price;
 
       if (order.status === "Completed" || order.status === "Downloaded") {
-        dailyStatsMap[orderDateStr].completedOrders += 1;
         currCompletedTotal += 1;
       }
     }
   });
 
-  const chartData = Object.values(dailyStatsMap);
+  // 5. Populate Previous Period
+  prevOrdersRaw.forEach((order) => {
+    const key =
+      timeframe === "month"
+        ? order.createdAt.getDate()
+        : getDayOffset(order.createdAt, previousStart);
+
+    if (chartDataMap[key]) {
+      chartDataMap[key].previousRevenue += order.totalPrice || 0;
+    }
+  });
+
+  const chartData = Object.values(chartDataMap);
   const currTotalOrders = currentOrdersRaw.length;
-
-  // 5. Fetch Previous Period Aggregations for the KPI % changes
-  const [prevRevenue, prevOrders, prevCompleted] = await Promise.all([
-    prisma.order.aggregate({
-      _sum: { totalPrice: true },
-      where: { createdAt: { gte: previousStart, lte: previousEnd } },
-    }),
-    prisma.order.count({
-      where: { createdAt: { gte: previousStart, lte: previousEnd } },
-    }),
-    prisma.order.count({
-      where: {
-        createdAt: { gte: previousStart, lte: previousEnd },
-        status: { in: ["Completed", "Downloaded"] },
-      },
-    }),
-  ]);
-
-  const prevRevTotal = prevRevenue._sum.totalPrice || 0;
+  const prevTotalOrders = prevOrdersRaw.length;
+  const prevRevTotal = prevOrdersRaw.reduce(
+    (sum, order) => sum + (order.totalPrice || 0),
+    0,
+  );
+  const prevCompletedTotal = prevOrdersRaw.filter(
+    (o) => o.status === "Completed" || o.status === "Downloaded",
+  ).length;
 
   // 6. Calculate Percentage Changes
   const calculateChange = (current: number, previous: number) => {
@@ -158,13 +151,14 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
       },
       trends: {
         revenuePercent: calculateChange(currRevTotal, prevRevTotal),
-        ordersPercent: calculateChange(currTotalOrders, prevOrders),
-        completedPercent: calculateChange(currCompletedTotal, prevCompleted),
+        ordersPercent: calculateChange(currTotalOrders, prevTotalOrders),
+        completedPercent: calculateChange(
+          currCompletedTotal,
+          prevCompletedTotal,
+        ),
         revenueIsUp: currRevTotal >= prevRevTotal,
-        ordersIsUp: currTotalOrders >= prevOrders,
-        completedIsUp: currCompletedTotal >= prevCompleted,
       },
     },
-    chartData, // <--- This feeds directly into the shadcn component!
+    chartData,
   };
 }
