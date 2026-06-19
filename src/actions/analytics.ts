@@ -54,7 +54,16 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
   // 3. Build the Unified Chart Data Array
   const chartDataMap: Record<
     string | number,
-    { label: string; currentRevenue: number; previousRevenue: number }
+    {
+      label: string;
+      currentRevenue: number;
+      previousRevenue: number;
+      emailHigh: number;
+      emailLow: number;
+      printOnly: number;
+      emailPrint: number;
+      DevOnly: number;
+    }
   > = {};
 
   if (timeframe === "month") {
@@ -92,6 +101,7 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
 
   // 4. Populate Current Period
   let currRevTotal = 0;
+  let prevRevTotal = 0;
   let currCompletedTotal = 0;
 
   currentOrdersRaw.forEach((order) => {
@@ -108,6 +118,9 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
       if (order.status === "Completed" || order.status === "Downloaded") {
         currCompletedTotal += 1;
       }
+      if (order.status === "Completed" || order.status === "Downloaded") {
+        currCompletedTotal += 1;
+      }
     }
   });
 
@@ -119,17 +132,19 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
         : getDayOffset(order.createdAt, previousStart);
 
     if (chartDataMap[key]) {
+      const price = order.totalPrice || 0;
       chartDataMap[key].previousRevenue += order.totalPrice || 0;
+      prevRevTotal += price;
     }
   });
 
   const chartData = Object.values(chartDataMap);
   const currTotalOrders = currentOrdersRaw.length;
   const prevTotalOrders = prevOrdersRaw.length;
-  const prevRevTotal = prevOrdersRaw.reduce(
-    (sum, order) => sum + (order.totalPrice || 0),
-    0,
-  );
+  // const prevRevTotal = prevOrdersRaw.reduce(
+  //   (sum, order) => sum + (order.totalPrice || 0),
+  //   0,
+  // );
   const prevCompletedTotal = prevOrdersRaw.filter(
     (o) => o.status === "Completed" || o.status === "Downloaded",
   ).length;
@@ -145,7 +160,8 @@ export async function fetchDashboardAnalytics(timeframe: Timeframe = "week") {
     timeframe,
     kpis: {
       current: {
-        revenue: currRevTotal,
+        currRevenue: currRevTotal,
+        prevRevenue: prevRevTotal,
         totalOrders: currTotalOrders,
         completedOrders: currCompletedTotal,
       },

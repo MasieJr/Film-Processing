@@ -495,7 +495,8 @@ export default function AdminDashboard() {
           />
           <StatsCards
             label="Revenue This Month"
-            stat={`R ${analytics.kpis.current.revenue.toLocaleString()}`}
+            stat={`R ${analytics.kpis.current.currRevenue.toLocaleString()}`}
+            stat2={`R ${analytics.kpis.current.prevRevenue.toLocaleString()}`}
             colour="[#41B544]"
             isHigh={analytics.kpis.trends.revenueIsUp}
             percentage={analytics.kpis.trends.revenuePercent}

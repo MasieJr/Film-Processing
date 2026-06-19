@@ -60,7 +60,7 @@ export default function ChartLineMultiple({ chartData }: chartProp) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className=" w-full">
+        <ChartContainer config={chartConfig} className=" w-full max-h-[300px]">
           <LineChart
             accessibilityLayer
             data={chartData}
