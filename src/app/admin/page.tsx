@@ -8,7 +8,6 @@ import ViewModal from "@/components/ViewModal";
 import SuccessModal from "@/components/SuccessModal";
 import { Calendar, Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
-import StatsCards from "@/components/StatsCards";
 import AutoRefresh from "@/components/AutoRefresh";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,8 @@ import {
 } from "@/components/ui/popover";
 import EditCustomerModal from "@/components/EditCustomerModal";
 import { fetchDashboardAnalytics } from "@/actions/analytics";
-import DashboardCharts from "@/components/DashboardCharts";
+import DashboardAnalytics from "@/components/DashboardAnalytics";
+import KPI from "@/components/KPI";
 
 const initialOrders = [
   {
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
     fetchOrders();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !analytics) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#121212]">
         <div className="flex flex-col items-center space-y-4">
@@ -426,14 +426,8 @@ export default function AdminDashboard() {
     }
   });
 
-  const pendingCount = displayedOrders.filter(
-    (o) => o.status === "Pending",
-  ).length;
-
-  if (!analytics) return <div>Loading dashboard...</div>;
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] font-mono pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#121212] pb-20">
       <AutoRefresh interval={15000} />
 
       <div className="bg-white dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-gray-800 px-6 py-8">
@@ -482,32 +476,9 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 mt-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
-          <StatsCards
-            label="Filtered Orders"
-            stat={displayedOrders.length.toLocaleString()}
-            colour="blue-500"
-          />
-          <StatsCards
-            label="Pending Processing"
-            stat={pendingCount.toLocaleString()}
-            colour="yellow-500"
-          />
-          <StatsCards
-            label="Revenue This Month"
-            stat={`R ${analytics.kpis.current.currRevenue.toLocaleString()}`}
-            stat2={`R ${analytics.kpis.current.prevRevenue.toLocaleString()}`}
-            colour="[#41B544]"
-            isHigh={analytics.kpis.trends.revenueIsUp}
-            percentage={analytics.kpis.trends.revenuePercent}
-          />
-        </div>
-        <DashboardCharts
-          data={analytics.chartData}
-          timeframeLabel={timeframe === "week" ? "This Week" : "This Month"}
-        />
+        <KPI kpis={analytics.kpis} prevLabel="prev month" />
 
-        <div className="mb-8">
+        <div className="mb-8 mt-8">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-gray-400" />
@@ -564,7 +535,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 mb-8">
           <DropDownList
             onClick={openDropdown}
             open={dropDowns.newOrder}
@@ -622,6 +593,7 @@ export default function AdminDashboard() {
             editOrder={setEditingOrder}
           />
         </div>
+        <DashboardAnalytics analytics={analytics} timeframe={timeframe} />
       </div>
 
       {selectedOrder && (

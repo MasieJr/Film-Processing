@@ -74,7 +74,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
         {/* 5. Slightly reduced padding (p-10 instead of p-12) to give content breathing room */}
         <div className="p-15 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
           {/* Title */}
-          <h1 className="text-[2rem] font-bold text-black tracking-tight mb-2">
+          <h1 className="text-[32px] font-bold text-black tracking-tight mb-2">
             FILM DEVELOPMENT ORDER
           </h1>
 
@@ -189,13 +189,11 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
 
           {/* Footer Logo Area - mt-auto pushes this firmly to the bottom */}
           <div className="mt-auto shrink-0">
-            <Image
+            <img
               src="/banner.jpg"
               alt="Company Logo"
-              loading="eager"
-              width={650}
-              height={205}
               className="w-full h-auto object-contain"
+              style={{ maxWidth: "650px", maxHeight: "205px" }}
             />
           </div>
         </div>
