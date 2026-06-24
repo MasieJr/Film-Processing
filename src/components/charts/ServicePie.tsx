@@ -42,39 +42,29 @@ export function ServicePie({ data, thisMonth }: ServicechartProp) {
     );
   }
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Services Renders</CardTitle>
-        <CardDescription>{thisMonth}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={dynamicConfig}
-          className="mx-auto aspect-square max-h-[200px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              content={<ChartTooltipContent nameKey="visitors" hideLabel />}
+    <CardContent className="flex-1 pb-0">
+      <ChartContainer config={dynamicConfig} className="mx-auto h-auto">
+        <PieChart>
+          <ChartTooltip
+            content={<ChartTooltipContent nameKey="visitors" hideLabel />}
+          />
+          <Pie data={data} dataKey="value" />
+        </PieChart>
+      </ChartContainer>
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 w-full">
+        {data.map((entry, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-1.5 text-xs text-gray-300"
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: entry.fill }}
             />
-            <Pie data={data} dataKey="value" />
-          </PieChart>
-        </ChartContainer>
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 w-full">
-          {data.map((entry, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-1.5 text-xs text-gray-300"
-            >
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: entry.fill }}
-              />
-              {entry.name}{" "}
-              <span className="text-gray-500">({entry.value})</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            {entry.name} <span className="text-gray-500">({entry.value})</span>
+          </div>
+        ))}
+      </div>
+    </CardContent>
   );
 }

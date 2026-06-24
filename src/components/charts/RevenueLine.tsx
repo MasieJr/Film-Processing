@@ -3,13 +3,6 @@
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -29,56 +22,64 @@ const chartConfig = {
   },
   previousRevenue: {
     label: "Previous",
-    color: "blue-500",
+    color: "#3b82f6",
   },
 } satisfies ChartConfig;
 
 export function RevenueLine({ data, thisMonth, prevMonth }: RevenuechartProp) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Revenue Trend</CardTitle>
-        <CardDescription>
-          {thisMonth} vs {prevMonth}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <LineChart
-            accessibilityLayer
-            data={data}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="label"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
+    <div className="flex flex-col w-full h-full">
+      <div className="flex flex-row items-center gap-2 mb-4 text-sm font-semibold tracking-wide uppercase">
+        <div className="text-[#41B544]">{thisMonth}</div>
+        <div className="text-gray-500 text-xs lowercase">vs</div>
+        <div className="text-[#3b82f6]">{prevMonth}</div>
+      </div>
 
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Line
-              dataKey="currentRevenue"
-              type="monotone"
-              stroke="#41B544"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="previousRevenue"
-              type="monotone"
-              stroke="blue"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <LineChart
+          accessibilityLayer
+          data={data}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
+          <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.2} />
+          <XAxis
+            dataKey="label"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={(value) => String(value).slice(0, 3)}
+          />
+
+          <ChartTooltip
+            cursor={{ stroke: "#444", strokeWidth: 1, strokeDasharray: "4 4" }}
+            content={
+              <ChartTooltipContent
+                labelFormatter={(value) => `${value} ${thisMonth}`}
+              />
+            }
+          />
+
+          <Line
+            dataKey="currentRevenue"
+            type="monotone"
+            stroke="var(--color-currentRevenue)"
+            strokeWidth={3}
+            dot={false}
+            activeDot={{ r: 6, fill: "var(--color-currentRevenue)" }}
+          />
+          <Line
+            dataKey="previousRevenue"
+            type="monotone"
+            stroke="var(--color-previousRevenue)"
+            strokeDasharray="5 5"
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ChartContainer>
+    </div>
   );
 }

@@ -20,7 +20,7 @@ export default function StatsCard({
   percentage,
 }: StatsCardsProps) {
   return (
-    <div className="bg-[#1e1e1e] p-6 rounded-2xl shadow-sm border border-gray-800 transition-all hover:border-gray-700">
+    <div>
       <h3 className="text-gray-400 font-medium text-sm uppercase tracking-wider">
         {label}
       </h3>
