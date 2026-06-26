@@ -9,14 +9,27 @@ const prisma = new PrismaClient({ adapter });
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: { id: string } },
 ) {
-  try {
-    const body = await request.json();
-    const resolvedParams = await params;
-    const orderId = resolvedParams.id;
+  const body = await request.json();
+  const resolvedParams = await params;
+  const orderId = resolvedParams.id;
 
-    const updatedOrder = await prisma.order.update({
+  try {
+    const updated = await prisma.order.update({
+      where: { id: orderId, status: "Pending" },
+      data: {
+        customerName: body.customerName,
+        email: body.email,
+        phone: body.phone,
+        status: body.status ? "Completed" : "Pending",
+      },
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    // If P2025 (Record not found), it means status was NOT Pending.
+    // Perform a 'Safe Update' that ignores status changes.
+    const safeUpdate = await prisma.order.update({
       where: { id: orderId },
       data: {
         customerName: body.customerName,
@@ -24,13 +37,6 @@ export async function PATCH(
         phone: body.phone,
       },
     });
-
-    return NextResponse.json({ success: true, order: updatedOrder });
-  } catch (error) {
-    console.error("Database Update Error:", error);
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 },
-    );
+    return NextResponse.json(safeUpdate);
   }
 }

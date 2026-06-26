@@ -267,24 +267,23 @@ export default function AdminDashboard() {
     orderId: string,
     updatedData: any,
   ) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, ...updatedData } : order,
-      ),
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, ...updatedData } : o)),
     );
 
     try {
-      const editRes = await fetch(`/api/orders/${orderId}/edit`, {
+      const res = await fetch(`/api/orders/${orderId}/edit`, {
         method: "PATCH",
-        body: JSON.stringify({
-          customerName: updatedData.customerName,
-          email: updatedData.email,
-          phone: updatedData.phone,
-        }),
+        body: JSON.stringify(updatedData),
       });
-      if (editRes.ok) fetchOrders();
-    } catch (error) {
-      console.error(error);
+
+      if (!res.ok) throw new Error("Update failed");
+
+      await fetchOrders();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save. Reverting changes...");
+      fetchOrders();
     }
   };
 
