@@ -1,5 +1,4 @@
 import { forwardRef } from "react";
-import Image from "next/image";
 
 type OrderPdfProps = {
   order: any;
@@ -72,7 +71,7 @@ const OrderPdfTemplate = forwardRef<HTMLDivElement, OrderPdfProps>(
 
         {/* 4. Changed to flex-col and h-full to prevent vertical stretching */}
         {/* 5. Slightly reduced padding (p-10 instead of p-12) to give content breathing room */}
-        <div className="p-15 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
+        <div className="p-12 bg-white text-black w-[148mm] h-full font-sans flex flex-col">
           {/* Title */}
           <h1 className="text-[32px] font-bold text-black tracking-tight mb-2">
             FILM DEVELOPMENT ORDER
