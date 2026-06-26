@@ -4,8 +4,8 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
 import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
-import ViewModal from "@/components/ViewModal";
-import SuccessModal from "@/components/SuccessModal";
+import ViewModal from "@/components/modals/ViewModal";
+import SuccessModal from "@/components/modals/SuccessModal";
 import { Calendar, Plus, Search, X } from "lucide-react";
 import AddOrder from "@/components/AddOrder";
 import AutoRefresh from "@/components/AutoRefresh";
@@ -18,10 +18,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import EditCustomerModal from "@/components/EditCustomerModal";
+import EditCustomerModal from "@/components/modals/EditCustomerModal";
 import { fetchDashboardAnalytics } from "@/actions/analytics";
 import DashboardAnalytics from "@/components/DashboardAnalytics";
-import KPI from "@/components/KPI";
 
 const initialOrders = [
   {
@@ -476,8 +475,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 mt-8">
-        <KPI kpis={analytics.kpis} prevLabel="prev month" />
-
+        <DashboardAnalytics analytics={analytics} timeframe={timeframe} />
         <div className="mb-8 mt-8">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
@@ -593,7 +591,6 @@ export default function AdminDashboard() {
             editOrder={setEditingOrder}
           />
         </div>
-        <DashboardAnalytics analytics={analytics} timeframe={timeframe} />
       </div>
 
       {selectedOrder && (

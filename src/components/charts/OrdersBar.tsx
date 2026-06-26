@@ -9,8 +9,14 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
+type OrderData = {
+  label: string;
+  totalOrders: number;
+};
+
 type BarChartProp = {
-  data: any[];
+  data: OrderData[];
+  thisMonth: string;
 };
 
 const chartConfig = {
@@ -20,15 +26,21 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function OrdersBar({ data }: BarChartProp) {
-  const month = new Date().toLocaleDateString("en-GB", { month: "long" });
+export function OrdersBar({ data, thisMonth }: BarChartProp) {
+  if (!data.length) {
+    return (
+      <div className="flex h-[200px] items-center justify-center text-sm text-muted-foreground">
+        No orders available
+      </div>
+    );
+  }
   return (
-    <ChartContainer config={chartConfig} className="h-auto w-full">
+    <ChartContainer config={chartConfig} className="h-[200px] w-full">
       <BarChart
         accessibilityLayer
         data={data}
         margin={{
-          top: 20,
+          top: 25,
         }}
       >
         <CartesianGrid vertical={false} />
@@ -43,11 +55,15 @@ export function OrdersBar({ data }: BarChartProp) {
           cursor={false}
           content={
             <ChartTooltipContent
-              labelFormatter={(value) => `${value} ${month}`}
+              labelFormatter={(value) => `${value} ${thisMonth}`}
             />
           }
         />
-        <Bar dataKey="totalOrders" fill="#3b82f6" radius={8}>
+        <Bar
+          dataKey="totalOrders"
+          fill="var(--color-totalOrders)"
+          radius={[8, 8, 0, 0]}
+        >
           <LabelList
             position="top"
             offset={12}

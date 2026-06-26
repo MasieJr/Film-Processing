@@ -2,43 +2,44 @@
 
 import { Pie, PieChart } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { useMemo } from "react";
 
-type ServicechartProp = {
-  data: any[];
-  thisMonth: string;
+type ServiceData = {
+  name: string;
+  value: number;
+  fill: string;
 };
 
-export function ServicePie({ data, thisMonth }: ServicechartProp) {
-  const dynamicConfig = data.reduce((config, item) => {
-    if (item.name) {
-      config[item.name] = {
-        label: item.name,
-        color: item.fill,
-      };
-    }
-    return config;
-  }, {} as ChartConfig);
+type ServiceChartProps = {
+  data: ServiceData[];
+};
+
+export function ServicePie({ data }: ServiceChartProps) {
+  const dynamicConfig = useMemo(
+    () =>
+      data.reduce((config, item) => {
+        config[item.name] = {
+          label: item.name,
+          color: item.fill,
+        };
+        return config;
+      }, {} as ChartConfig),
+    [data],
+  );
 
   if (!data || data.length === 0) {
     return (
-      <Card className="flex flex-col bg-[#1e1e1e] border-gray-800">
-        <CardContent className="h-[300px] flex items-center justify-center text-gray-500">
-          No service data available.
-        </CardContent>
-      </Card>
+      <div className="flex h-[300px] flex-col items-center justify-center text-muted-foreground">
+        <p>No service data</p>
+        <p className="text-xs">Orders will appear here once available.</p>
+      </div>
     );
   }
   return (
@@ -46,9 +47,19 @@ export function ServicePie({ data, thisMonth }: ServicechartProp) {
       <ChartContainer config={dynamicConfig} className="mx-auto h-auto">
         <PieChart>
           <ChartTooltip
-            content={<ChartTooltipContent nameKey="visitors" hideLabel />}
+            content={
+              <ChartTooltipContent nameKey="name" indicator="line" hideLabel />
+            }
           />
-          <Pie data={data} dataKey="value" />
+
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={65}
+            paddingAngle={3}
+            cornerRadius={6}
+          />
         </PieChart>
       </ChartContainer>
       <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 w-full">

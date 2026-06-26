@@ -34,9 +34,7 @@ export default function DashboardAnalytics({
 
   return (
     <div className="space-y-6">
-      {/* ROW 1: REVENUE & TOTAL ORDERS */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* REVENUE COMBO CARD */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 bg-white dark:bg-[#1e1e1e] p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-all hover:border-gray-300 dark:hover:border-gray-700">
           <div className="lg:col-span-1 flex items-center">
             <div className="w-full">
@@ -60,7 +58,6 @@ export default function DashboardAnalytics({
           </div>
         </div>
 
-        {/* TOTAL ORDERS COMBO CARD */}
         <div className="grid grid-cols-1 lg:grid-cols-3 bg-white dark:bg-[#1e1e1e] p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-all hover:border-gray-300 dark:hover:border-gray-700">
           <div className="lg:col-span-1 flex items-center">
             <div className="w-full">
@@ -80,14 +77,9 @@ export default function DashboardAnalytics({
             </div>
           </div>
           <div className="lg:col-span-2 mt-6 lg:mt-0">
-            <OrdersBar data={analytics.chartData} />
+            <OrdersBar data={analytics.chartData} thisMonth={month} />
           </div>
         </div>
-      </div>
-
-      {/* ROW 2: COMPLETED ORDERS & SERVICES */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* COMPLETED ORDERS & PIE CHART COMBO CARD */}
         <div className="grid grid-cols-1 lg:grid-cols-3 bg-white dark:bg-[#1e1e1e] p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-all hover:border-gray-300 dark:hover:border-gray-700 xl:col-span-1">
           <div className="lg:col-span-1 flex items-center">
             <div className="w-full">
@@ -107,15 +99,9 @@ export default function DashboardAnalytics({
             </div>
           </div>
           <div className="lg:col-span-2 mt-6 lg:mt-0">
-            <ServicePie
-              data={analytics.servicesDistribution}
-              thisMonth={month}
-            />
+            <ServicePie data={analytics.servicesDistribution} />
           </div>
         </div>
-
-        {/* Empty space on the right (or you can add a 4th metric here later!) */}
-        <div className="hidden xl:block"></div>
       </div>
     </div>
   );

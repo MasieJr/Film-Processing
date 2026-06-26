@@ -1,6 +1,6 @@
 "use client";
 
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 import {
   ChartContainer,
@@ -8,25 +8,43 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { useMemo } from "react";
 
-type RevenuechartProp = {
-  data: any[];
+type RevenueData = {
+  label: string;
+  currentRevenue: number;
+  previousRevenue: number;
+};
+
+type RevenueChartProps = {
+  data: RevenueData[];
   thisMonth: string;
   prevMonth: string;
 };
 
-const chartConfig = {
-  currentRevenue: {
-    label: "Current",
-    color: "#41B544",
-  },
-  previousRevenue: {
-    label: "Previous",
-    color: "#3b82f6",
-  },
-} satisfies ChartConfig;
+export function RevenueLine({ data, thisMonth, prevMonth }: RevenueChartProps) {
+  const chartConfig = useMemo(
+    () => ({
+      currentRevenue: {
+        label: thisMonth,
+        color: "#41B544",
+      },
+      previousRevenue: {
+        label: prevMonth,
+        color: "#3b82f6",
+      },
+    }),
+    [thisMonth, prevMonth],
+  ) satisfies ChartConfig;
 
-export function RevenueLine({ data, thisMonth, prevMonth }: RevenuechartProp) {
+  if (!data.length) {
+    return (
+      <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+        No revenue data available.
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex flex-row items-center gap-2 mb-4 text-sm font-semibold tracking-wide uppercase">
@@ -64,15 +82,18 @@ export function RevenueLine({ data, thisMonth, prevMonth }: RevenuechartProp) {
 
           <Line
             dataKey="currentRevenue"
-            type="monotone"
+            type="natural"
             stroke="var(--color-currentRevenue)"
-            strokeWidth={3}
+            strokeWidth={3.5}
             dot={false}
-            activeDot={{ r: 6, fill: "var(--color-currentRevenue)" }}
+            activeDot={{
+              r: 7,
+              fill: "var(--color-currentRevenue)",
+            }}
           />
           <Line
             dataKey="previousRevenue"
-            type="monotone"
+            type="natural"
             stroke="var(--color-previousRevenue)"
             strokeDasharray="5 5"
             strokeWidth={2}
