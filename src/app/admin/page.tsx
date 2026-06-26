@@ -7,7 +7,7 @@ import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/modals/ViewModal";
 import SuccessModal from "@/components/modals/SuccessModal";
 import { Calendar, Plus, Search, X } from "lucide-react";
-import AddOrder from "@/components/AddOrder";
+import AddOrder from "@/components/modals/AddOrder";
 import AutoRefresh from "@/components/AutoRefresh";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -174,11 +174,11 @@ export default function AdminDashboard() {
     }));
   };
 
-  const changeStatus = async () => {
+  const changeStatus = async (status: string) => {
     try {
       const updateRes = await fetch(`/api/orders/${selectedOrder.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ status: "Pending" }),
+        body: JSON.stringify({ status: status }),
       });
       if (updateRes.ok) fetchOrders();
     } catch (error) {
@@ -186,10 +186,11 @@ export default function AdminDashboard() {
     }
   };
 
+  // Print Docket
   const handlePrint = () => {
     console.log(selectedOrder);
     handlePrint1();
-    changeStatus();
+    changeStatus("Pending");
     setSelectedOrder(null);
   };
 
@@ -203,6 +204,7 @@ export default function AdminDashboard() {
     setSelectedOrder(null);
   };
 
+  // File Upload
   const handleAdminFileUpload = async () => {
     if (!selectedFile || !selectedOrder) return;
     setIsUploading(true);
@@ -265,24 +267,23 @@ export default function AdminDashboard() {
     orderId: string,
     updatedData: any,
   ) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, ...updatedData } : order,
-      ),
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, ...updatedData } : o)),
     );
 
     try {
-      const editRes = await fetch(`/api/orders/${orderId}/edit`, {
+      const res = await fetch(`/api/orders/${orderId}/edit`, {
         method: "PATCH",
-        body: JSON.stringify({
-          customerName: updatedData.customerName,
-          email: updatedData.email,
-          phone: updatedData.phone,
-        }),
+        body: JSON.stringify(updatedData),
       });
-      if (editRes.ok) fetchOrders();
-    } catch (error) {
-      console.error(error);
+
+      if (!res.ok) throw new Error("Update failed");
+
+      await fetchOrders();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save. Reverting changes...");
+      fetchOrders();
     }
   };
 
