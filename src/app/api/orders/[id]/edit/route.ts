@@ -9,11 +9,10 @@ const prisma = new PrismaClient({ adapter });
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const body = await request.json();
-  const resolvedParams = await params;
-  const orderId = resolvedParams.id;
+  const { id: orderId } = await params;
 
   try {
     const updated = await prisma.order.update({
@@ -26,17 +25,23 @@ export async function PATCH(
       },
     });
     return NextResponse.json(updated);
-  } catch (error) {
-    // If P2025 (Record not found), it means status was NOT Pending.
-    // Perform a 'Safe Update' that ignores status changes.
-    const safeUpdate = await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        customerName: body.customerName,
-        email: body.email,
-        phone: body.phone,
-      },
-    });
-    return NextResponse.json(safeUpdate);
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      const safeUpdate = await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          customerName: body.customerName,
+          email: body.email,
+          phone: body.phone,
+        },
+      });
+      return NextResponse.json(safeUpdate);
+    }
+
+    console.error("API Update Error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
