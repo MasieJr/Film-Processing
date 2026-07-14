@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useRef } from "react";
+import JSZip from "jszip";
 import {
   X,
   Printer,
@@ -8,6 +11,7 @@ import {
   Image as ImageIcon,
   AlertCircle,
   Send,
+  Loader2,
 } from "lucide-react";
 
 type ViewModalProps = {
@@ -53,12 +57,150 @@ export default function ViewModal({
   handleBlankFilmComplete,
 }: ViewModalProps) {
   const [isReplacing, setIsReplacing] = useState(false);
-
   const [actionType, setActionType] = useState<"upload" | "print" | "blank">(
     "upload",
   );
-
   const [blankCount, setBlankCount] = useState(1);
+
+  // States for browser-side zipping
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [zippingState, setZippingState] = useState<
+    "idle" | "reading" | "zipping"
+  >("idle");
+  const [zippingProgress, setZippingProgress] = useState(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper to recursively traverse dragged entries (supports nested folders)
+  const traverseDirectory = async (entry: any, zipInstance: JSZip) => {
+    if (entry.isFile) {
+      const file = await new Promise<File>((resolve, reject) =>
+        entry.file(resolve, reject),
+      );
+      // Ignore OS system files (like macOS DS_Store)
+      if (!file.name.startsWith("._") && file.name !== ".DS_Store") {
+        zipInstance.file(file.name, file);
+      }
+    } else if (entry.isDirectory) {
+      const dirReader = entry.createReader();
+      const entries = await new Promise<any[]>((resolve) => {
+        dirReader.readEntries(resolve);
+      });
+      const folderZip = zipInstance.folder(entry.name);
+      if (folderZip) {
+        for (const childEntry of entries) {
+          await traverseDirectory(childEntry, folderZip);
+        }
+      }
+    }
+  };
+
+  // Handle Drag & Drop of standard files or entire raw folders
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragActive(false);
+
+    if (isUploading || zippingState !== "idle") return;
+
+    const items = e.dataTransfer.items;
+    if (!items || items.length === 0) return;
+
+    setZippingState("reading");
+    const zip = new JSZip();
+    let hasFolders = false;
+
+    try {
+      // 1. Check if the user dropped any folders
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === "file") {
+          const entry = item.webkitGetAsEntry();
+          if (entry && entry.isDirectory) {
+            hasFolders = true;
+          }
+        }
+      }
+
+      // 2. Process Files & Folders
+      if (hasFolders) {
+        setZippingState("zipping");
+        for (let i = 0; i < items.length; i++) {
+          const entry = items[i].webkitGetAsEntry();
+          if (entry) {
+            await traverseDirectory(entry, zip);
+          }
+        }
+
+        // Compile the zip in-browser with progress indicators
+        const content = await zip.generateAsync(
+          { type: "blob" },
+          (metadata) => {
+            setZippingProgress(Math.round(metadata.percent));
+          },
+        );
+
+        // Convert the Blob to a virtual File object for S3 uploader compatibility
+        const zippedFile = new File(
+          [content],
+          `${order.customerName.replace(/\s+/g, "_")}.zip`,
+          { type: "application/zip" },
+        );
+
+        setSelectedFile(zippedFile);
+      } else {
+        // Fallback: If only standard files were dropped, select the first one directly
+        const file = e.dataTransfer.files?.[0] || null;
+        setSelectedFile(file);
+      }
+    } catch (err) {
+      console.error("Zipping error:", err);
+      alert("Failed to read folder contents. Please try compressing manually.");
+    } finally {
+      setZippingState("idle");
+      setZippingProgress(0);
+    }
+  };
+
+  // Handle traditional folder selection through browser input
+  const handleFolderSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setZippingState("zipping");
+    const zip = new JSZip();
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        // Filter out macOS hidden helper files
+        if (
+          !file.name.startsWith("._") &&
+          !file.webkitRelativePath.includes("/.")
+        ) {
+          zip.file(file.webkitRelativePath || file.name, file);
+        }
+      }
+
+      const content = await zip.generateAsync({ type: "blob" }, (metadata) => {
+        setZippingProgress(Math.round(metadata.percent));
+      });
+
+      const zippedFile = new File(
+        [content],
+        `${order.customerName.replace(/\s+/g, "_")}.zip`,
+        { type: "application/zip" },
+      );
+
+      setSelectedFile(zippedFile);
+    } catch (err) {
+      console.error("Zipping error:", err);
+      alert("Error packaging folder.");
+    } finally {
+      setZippingState("idle");
+      setZippingProgress(0);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -162,42 +304,109 @@ export default function ViewModal({
                 </div>
               ) : (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                  {/* Hidden Inputs */}
                   <input
+                    ref={fileInputRef}
                     type="file"
-                    id="file-upload"
                     className="hidden"
                     accept=".zip,.rar,.tar"
                     onChange={(e) =>
                       setSelectedFile(e.target.files?.[0] || null)
                     }
-                    disabled={isUploading}
+                    disabled={isUploading || zippingState !== "idle"}
                   />
-                  <label
-                    htmlFor="file-upload"
-                    className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${selectedFile ? "border-[#41B544] bg-[#41B544]/5" : "border-gray-300 bg-gray-50 dark:bg-[#1a1a1a] dark:border-gray-700"} ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+
+                  <input
+                    ref={folderInputRef}
+                    type="file"
+                    className="hidden"
+                    multiple
+                    onChange={handleFolderSelect}
+                    disabled={isUploading || zippingState !== "idle"}
+                    {...({
+                      webkitdirectory: "",
+                      directory: "",
+                    } as React.InputHTMLAttributes<HTMLInputElement> & {
+                      webkitdirectory: string;
+                      directory: string;
+                    })}
+                  />
+
+                  {/* Drag and Drop Zone */}
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragActive(true);
+                    }}
+                    onDragLeave={() => setIsDragActive(false)}
+                    onDrop={handleDrop}
+                    // Clicking the main area triggers the file picker by default
+                    onClick={() =>
+                      !isUploading &&
+                      zippingState === "idle" &&
+                      fileInputRef.current?.click()
+                    }
+                    className={`group flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl transition-all relative ${
+                      isDragActive
+                        ? "border-[#41B544] bg-[#41B544]/5 scale-[1.01]"
+                        : "border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-[#1a1a1a] hover:bg-gray-50 dark:hover:bg-[#222]"
+                    } ${isUploading || zippingState !== "idle" ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                   >
-                    {selectedFile ? (
+                    {zippingState !== "idle" ? (
                       <div className="text-center">
-                        <CircleCheck className="text-[#41B544] w-8 h-8 mx-auto mb-2" />
+                        <Loader2 className="animate-spin text-[#41B544] w-8 h-8 mx-auto mb-2" />
                         <p className="text-sm font-bold text-gray-900 dark:text-white">
+                          {zippingState === "reading"
+                            ? "Reading folders..."
+                            : `Packaging files (${zippingProgress}%)`}
+                        </p>
+                      </div>
+                    ) : selectedFile ? (
+                      <div className="text-center p-4">
+                        <CircleCheck className="text-[#41B544] w-8 h-8 mx-auto mb-2" />
+                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-xs mx-auto">
                           {selectedFile.name}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB •
+                          Ready to send
                         </p>
                       </div>
                     ) : (
-                      <div className="text-center">
-                        <CloudUpload className="text-gray-500 w-6 h-6 mx-auto mb-2" />
+                      <div className="text-center p-6 flex flex-col justify-center items-center">
+                        <CloudUpload className="text-gray-400 group-hover:text-[#41B544] w-8 h-8 mb-3 transition-colors" />
                         <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                          Browse for files
+                          Drag & drop here
                         </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          or click to browse Files
+                        </p>
+
+                        {/* Subtle, uncluttered fallback link */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevents triggering the folder input click
+
+                            folderInputRef.current?.click();
+                          }}
+                          className="mt-4 text-xs font-semibold text-gray-400 hover:text-blue-500 underline underline-offset-4 transition-colors"
+                        >
+                          Uploading a unzipped folder instead?
+                        </button>
                       </div>
                     )}
-                  </label>
+                  </div>
 
                   {isUploading && (
                     <div className="w-full mt-3 bg-gray-50 dark:bg-[#252525] p-3 rounded-xl border border-gray-100 dark:border-gray-800">
+                      <div className="flex justify-between text-xs font-bold text-gray-500 mb-1">
+                        <span>Uploading Order</span>
+                        <span>{uploadProgress}%</span>
+                      </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-[#41B544] h-2 rounded-full transition-all"
+                          className="bg-[#41B544] h-2 rounded-full transition-all duration-300"
                           style={{ width: `${uploadProgress}%` }}
                         ></div>
                       </div>
@@ -248,7 +457,6 @@ export default function ViewModal({
                 <span className="text-2xl font-black text-red-600 dark:text-red-400 w-8">
                   {blankCount}
                 </span>
-                {/* Prevent them from marking more blank rolls than the order actually has! */}
                 <button
                   type="button"
                   onClick={() =>
@@ -277,7 +485,7 @@ export default function ViewModal({
           {actionType === "upload" && (
             <button
               onClick={handleUpload}
-              disabled={!selectedFile || isUploading}
+              disabled={!selectedFile || isUploading || zippingState !== "idle"}
               className="flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold bg-[#41B544] text-white rounded-xl disabled:opacity-50 transition-all"
             >
               <Upload className="w-4 h-4" />
