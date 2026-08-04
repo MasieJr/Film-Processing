@@ -56,11 +56,11 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "allowScripts": {
-    "@prisma/engines@7.8.0": true,
     "esbuild@0.28.1": true,
     "msw@2.14.6": true,
-    "prisma@7.8.0": true,
     "sharp@0.34.5": true,
-    "unrs-resolver@1.11.1": true
+    "unrs-resolver@1.11.1": true,
+    "prisma@7.9.1": true,
+    "@prisma/engines@7.9.1": true
   }
 }

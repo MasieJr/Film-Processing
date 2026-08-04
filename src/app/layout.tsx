@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "Foto First Cresta",
     images: [
       {
-        url: "/og-image.jpg", // 1200x630px image in public folder
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Foto First Cresta Film Processing Lab",
