@@ -22,6 +22,7 @@ import EditCustomerModal from "@/components/modals/EditCustomerModal";
 import { fetchDashboardAnalytics } from "@/actions/analytics";
 import DashboardAnalytics from "@/components/DashboardAnalytics";
 
+//lazy me
 const initialOrders = [
   {
     id: "ORD-001",
