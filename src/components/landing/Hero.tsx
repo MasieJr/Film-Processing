@@ -17,7 +17,7 @@ import Link from "next/link";
       <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#41B544] to-emerald-300">
         Film Processing
       </span>{" "}
-      in Cresta
+      in Foto First Cresta
     </h1>
 
     <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
