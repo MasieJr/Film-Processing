@@ -189,13 +189,14 @@ export default function OrderFormPage() {
     <main className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white pt-6">
       {/* Form Container */}
       <div className="w-full max-w-2xl mx-auto px-4 flex flex-col space-y-6">
-        <div className="sticky top-0 bg-white dark:bg-[#1e1e1e] p-1 flex justify-center z-10">
+        <div className="sticky top-0 bg-white/80 dark:bg-[#1e1e1e]/80 p-1 flex justify-center z-10 backdrop-blur-md">
           <div className="relative w-full max-w-[300px] sm:max-w-[400px] h-24">
             <Image
               src="/logo.png"
               alt="Foto First Lab Logo"
               fill
               priority
+              sizes="(width: 100vw height:100vh)"
               className="object-contain"
             />
           </div>

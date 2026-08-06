@@ -2,10 +2,7 @@ import { Clock, MapPin } from "lucide-react";
 
 export default function Location() {
   return (
-    <section
-      id="location"
-      className="py-24 border-t border-gray-200 dark:border-gray-800 "
-    >
+    <section id="location" className="py-24 border-t border-[#41B544] ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -38,7 +35,7 @@ export default function Location() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-neutral-800 flex items-center justify-center text-[#41B544] shrink-0">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#41B544] shrink-0">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -52,10 +49,10 @@ export default function Location() {
             </div>
           </div>
 
-          <div className="w-full h-80 lg:h-96 rounded-3xl bg-neutral-900 border border-neutral-800 overflow-hidden relative">
+          <div className="w-full h-80 lg:h-96 rounded-3xl bg-neutral-900 border border-[#41B544] overflow-hidden relative">
             <iframe
               title="Foto First Cresta Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3581.652157123984!2d27.9712!3d-26.1265!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjYgw0DA3JzA1LjQiUyAyN8KwNTgnMTYuMyJF!5e0!3m2!1sen!2sza!4v1600000000000!5m2!1sen!2sza"
+              src="https://maps.google.com/maps?q=Foto%20First%20Cresta%2C%20Cresta%20Shopping%20Centre&t=&z=16&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="100%"
               style={{
