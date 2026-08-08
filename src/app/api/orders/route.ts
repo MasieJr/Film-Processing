@@ -74,7 +74,8 @@ export async function POST(request: Request) {
     await resend.emails.send({
       from: "Foto First Cresta <film@masieseremu.co.za>",
       to: body.email,
-      subject: "Thank you for submitting your film! 🎞️",
+      bcc: "fotocresta@gmail.com",
+      subject: `Hi ${body.customerName} Thank you for submitting your film! 🎞️`,
       html: `
     <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
       <tbody>

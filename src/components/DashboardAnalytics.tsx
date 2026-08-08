@@ -92,7 +92,7 @@ export default function DashboardAnalytics({
                   analytics.kpis.previous.completedOrders || 0
                 ).toLocaleString()}
                 stat2Label={prevLabel}
-                textColorClass="text-white"
+                textColorClass="text-blue"
                 isHigh={analytics.kpis.trends.completedIsUp}
                 percentage={analytics.kpis.trends.completedPercent}
               />

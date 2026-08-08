@@ -7,12 +7,11 @@ const nextConfig = {
     "192.168.1.82",
     "192.168.89.6",
     "192.168.1.84",
+    "192.168.1.93",
   ],
 };
 
 export default withSerwist({
-  
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
 })(nextConfig);
-
