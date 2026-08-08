@@ -118,7 +118,7 @@ export default function TermsOfServicePage() {
               Customers receive email or SMS links to download their
               high-resolution digital scans upon completion. It is the
               customer&apos;s responsibility to download and back up their
-              digital image files onto personal devices within the 30-day cloud
+              digital image files onto personal devices within the 7-day cloud
               hosting window.
             </p>
           </section>
