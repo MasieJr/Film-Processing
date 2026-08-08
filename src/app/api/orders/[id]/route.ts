@@ -35,7 +35,7 @@ export async function PATCH(
         from: "Foto First Cresta <film@masieseremu.co.za>",
         to: updatedOrder.email,
         bcc: "fotocresta@gmail.com",
-        subject: "Your photos are ready to download! 🎞️",
+        subject: `Hi ${updatedOrder.customerName} Your photos are ready to download! 🎞️`,
         html: `
    <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
   <tbody>
@@ -152,7 +152,8 @@ export async function POST(
       await resend.emails.send({
         from: "Foto First Cresta <film@masieseremu.co.za>",
         to: updatedOrder.email,
-        subject: "Your photos are ready to download! 🎞️",
+        bcc: "fotocresta@gmail.com",
+        subject: `Hi ${updatedOrder.customerName} Your photos are ready for Collection 🎞️`,
         html: `
 <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
   <tbody>
@@ -227,7 +228,7 @@ export async function POST(
       await resend.emails.send({
         from: "Foto First Cresta <film@masieseremu.co.za>",
         to: updatedOrder.email,
-        subject: "Your photos are ready to download! 🎞️",
+        subject: `Hi ${updatedOrder.customerName} Your film came out blank`,
         html: `
 <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center">
   <tbody>
