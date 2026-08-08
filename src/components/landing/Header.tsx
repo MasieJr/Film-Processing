@@ -32,18 +32,7 @@ export default function Header() {
           >
             Services & Pricing
           </a>
-          <a
-            href="#how-it-works"
-            className="dark:hover:text-white hover:text-black transition-colors"
-          >
-            How It Works
-          </a>
-          <a
-            href="#track"
-            className="dark:hover:text-white hover:text-black transition-colors"
-          >
-            Track Order
-          </a>
+
           <a
             href="#location"
             className="dark:hover:text-white hover:text-black transition-colors"

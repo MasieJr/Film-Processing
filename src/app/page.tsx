@@ -1,45 +1,33 @@
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import JsonLd from "@/components/JsonLd";
 import Services from "@/components/landing/Services";
 import Hero from "@/components/landing/Hero";
 import Location from "@/components/landing/Location";
 import Header from "@/components/landing/Header";
+import Footer from "@/components/landing/Footer";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] font-sans">
+    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] font-sans scroll-smooth relative">
+      <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-200 dark:bg-neutral-800 z-50 pointer-events-none">
+        <div className="h-full bg-blue-600 dark:bg-blue-400 animate-scroll-progress" />
+      </div>
       <JsonLd />
-
       <Header />
+      <main>
+        <section id="hero">
+          <Hero />
+        </section>
 
-      <Hero />
-      <Services />
-      <Location />
-      {/* Footer */}
-      <footer className="border-t border-[#41B544] py-12 ">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-neutral-500">
-          <p>
-            © {new Date().getFullYear()} Foto First Cresta. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <Link
-              href="/privacy"
-              className="dark:hover:text-white hover:text-black transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms"
-              className="dark:hover:text-white hover:text-black transition-colors"
-            >
-              Terms of Service
-            </Link>
-          </div>
-        </div>
-      </footer>
+        <section id="services" className="animate-section-reveal">
+          <Services />
+        </section>
+
+        <section id="location" className="animate-section-reveal">
+          <Location />
+        </section>
+      </main>
+      <Footer />
     </div>
   );
 }
