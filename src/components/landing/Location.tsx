@@ -1,6 +1,7 @@
 import { Clock, MapPin } from "lucide-react";
+import { Store } from "@/lib/stores";
 
-export default function Location() {
+export default function Location({ store }: { store: Store }) {
   return (
     <section id="location" className="py-24 border-t border-[#41B544] ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,12 +11,12 @@ export default function Location() {
               Drop-Off Location
             </span>
             <h2 className="text-3xl font-bold text-black dark:text-white mt-2 mb-6">
-              Visit Foto First Cresta
+              Visit {store.name}
             </h2>
             <p className="text-neutral-400 text-base leading-relaxed mb-8">
-              Drop off your rolls in person or post them directly to our lab
-              inside Cresta Shopping Centre. We notify you the moment your
-              digital scans are ready for cloud download.
+              Drop off your rolls in person or post them directly to our store
+              inside {store.location}. We notify you the moment your digital
+              scans are ready for cloud download.
             </p>
 
             <div className="space-y-4">
@@ -27,10 +28,7 @@ export default function Location() {
                   <p className="font-semibold text-gray-900 dark:text-gray-200">
                     Address
                   </p>
-                  <p>
-                    Shop Cresta Shopping Centre, Beyers Naudé Dr, Randburg,
-                    2194, South Africa
-                  </p>
+                  <p>{store.address}</p>
                 </div>
               </div>
 
@@ -51,8 +49,8 @@ export default function Location() {
 
           <div className="w-full h-80 lg:h-96 rounded-3xl bg-neutral-900 border border-[#41B544] overflow-hidden relative">
             <iframe
-              title="Foto First Cresta Location"
-              src="https://maps.google.com/maps?q=Foto%20First%20Cresta%2C%20Cresta%20Shopping%20Centre&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              title={`${store.name} Location`}
+              src={store.mapUrl}
               width="100%"
               height="100%"
               style={{

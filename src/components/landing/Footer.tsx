@@ -5,7 +5,11 @@ export default function Footer() {
     <footer className="border-t border-[#41B544] py-12 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-neutral-500">
         <p>
-          © {new Date().getFullYear()} Foto First Cresta. All rights reserved.
+          © {new Date().getFullYear()}{" "}
+          <a href="masieseremu.co.za" target="_blank">
+            Masie Seremu
+          </a>
+          . All rights reserved.
         </p>
         <div className="flex gap-6">
           <Link

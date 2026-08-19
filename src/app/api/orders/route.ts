@@ -33,6 +33,16 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    const store = await prisma.store.findUnique({
+      where: {
+        slug: body.store,
+      },
+    });
+
+    if (!store) {
+      return NextResponse.json({ error: "Invalid store" }, { status: 400 });
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\+?[0-9\s\-()]{10,15}$/;
     if (!body.email || !emailRegex.test(body.email)) {
@@ -58,6 +68,7 @@ export async function POST(request: Request) {
 
     const newOrder = await prisma.order.create({
       data: {
+        store_id: store.id,
         customerName: body.customerName,
         email: body.email.trim(),
         phone: body.phone.trim(),

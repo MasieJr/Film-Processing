@@ -1,4 +1,5 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Store } from "@/lib/stores";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 const highlights = [
@@ -20,7 +21,7 @@ const highlights = [
   },
 ];
 
-export default function Hero() {
+export default function Hero({ store }: { store: Store }) {
   return (
     <section className="relative pt-20 pb-28 overflow-hidden">
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-[#41B544]/15 rounded-full blur-[120px] pointer-events-none" />
@@ -31,7 +32,7 @@ export default function Hero() {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#41B544] to-emerald-300">
             Film Processing
           </span>{" "}
-          at Foto First Cresta
+          at {store.name}
         </h1>
 
         <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto font-normal leading-relaxed">
@@ -41,7 +42,7 @@ export default function Hero() {
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/order"
+            href={`${store.slug}/order`}
             className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#41B544] text-black font-bold text-base hover:bg-[#389e3b] transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
           >
             Start Order

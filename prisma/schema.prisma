@@ -13,8 +13,21 @@ datasource db {
   provider  = "postgresql"
 }
 
+model Store {
+  id           Int      @id @default(autoincrement())
+  name         String
+  slug         String   @unique
+  location     String
+  address      String
+  email        String?
+  salesPersons String[]
+  
+  orders       Order[]
+}
+
 model Order {
   id              String   @id @default(cuid()) // Generates a unique ID like "clm1x..."
+  store_id        int
   
   // Customer Info
   customerName    String
@@ -38,4 +51,6 @@ model Order {
   uploadedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  store           Store    @relation(fields: [storeId], references: [id])
 }

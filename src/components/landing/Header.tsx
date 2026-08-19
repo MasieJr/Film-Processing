@@ -1,8 +1,9 @@
+import { Store } from "@/lib/stores";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Header() {
+export default function Header({ store }: { store: Store }) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#41B544] bg-[#F3F4F6]/80 dark:bg-neutral-950/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -20,7 +21,7 @@ export default function Header() {
               Foto First
             </span>
             <span className="text-xs text-[#41B544] font-medium tracking-wide uppercase mt-1">
-              Cresta
+              {store.slug}
             </span>
           </div>
         </div>
@@ -49,7 +50,7 @@ export default function Header() {
             Admin
           </Link>
           <Link
-            href="/order"
+            href={`${store.slug}/order`}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#41B544] text-black font-semibold text-sm hover:bg-[#389e3b] transition-all hover:scale-[1.02]"
           >
             Start Order <ArrowRight className="w-4 h-4" />
