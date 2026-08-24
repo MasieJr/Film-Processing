@@ -27,7 +27,7 @@ model Store {
 
 model Order {
   id              String   @id @default(cuid()) // Generates a unique ID like "clm1x..."
-  store_id        int
+  store_id        Int?      
   
   // Customer Info
   customerName    String
@@ -52,5 +52,5 @@ model Order {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  store           Store    @relation(fields: [storeId], references: [id])
+  store           Store?    @relation(fields: [store_id], references: [id])
 }

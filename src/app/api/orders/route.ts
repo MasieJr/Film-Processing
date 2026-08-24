@@ -62,9 +62,6 @@ export async function POST(request: Request) {
     const chosenService = body.services || "";
 
     const isPrintingService = chosenService.toLowerCase().includes("print");
-    console.log(isPrintingService);
-    console.log(body.selectedService);
-    console.log(body.selectedSize);
 
     const newOrder = await prisma.order.create({
       data: {

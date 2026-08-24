@@ -127,7 +127,7 @@ export default function OrderStorePage() {
       const data = await response.json();
 
       if (data.success || response.ok) {
-        router.push("/thank-you");
+        router.push(`/${params.store}/thank-you`);
       } else {
         alert("Failed to submit order: " + data.error);
       }
