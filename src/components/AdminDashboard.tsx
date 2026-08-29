@@ -106,6 +106,8 @@ export default function AdminDashboard({ slug }: AdminProps) {
     pendingOrder: false,
     completedOrder: false,
     downloadedOrder: false,
+    awaitingOrder: false,
+    collectedOrder: false,
     blankOrder: false,
   });
 
@@ -145,9 +147,9 @@ export default function AdminDashboard({ slug }: AdminProps) {
     documentTitle: `WorkOrder_${selectedOrder?.id}`,
   });
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (shop: string) => {
     try {
-      const res = await fetch("/api/orders");
+      const res = await fetch(`/api/${shop}/orders`);
       const data = await res.json();
       setOrders(data);
     } catch (error) {
@@ -166,7 +168,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
   }, [timeframe]);
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(slug);
   }, []);
 
   if (isLoading || !analytics) {
@@ -195,7 +197,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
         method: "PATCH",
         body: JSON.stringify({ status: status }),
       });
-      if (updateRes.ok) fetchOrders();
+      if (updateRes.ok) fetchOrders(slug);
     } catch (error) {
       console.error(error);
     }
@@ -203,10 +205,27 @@ export default function AdminDashboard({ slug }: AdminProps) {
 
   // Print Docket
   const handlePrint = () => {
-    console.log(selectedOrder);
-    handlePrint1();
+    handlePrint1(); //change name to something better
     changeStatus("Pending");
     setSelectedOrder(null);
+  };
+
+  const handleDriverCollection = async () => {
+    const waitingOrders = orders.filter((order) => order.status === "Waiting");
+
+    if (waitingOrders.length === 0) {
+      alert("There are no orders waiting for collection.");
+      return;
+    }
+
+    try {
+      const updateRes = await fetch(`/api/${slug}/orders/collect`, {
+        method: "PATCH",
+      });
+      if (updateRes.ok) fetchOrders(slug);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const closeAddOrder = () => {
@@ -294,11 +313,11 @@ export default function AdminDashboard({ slug }: AdminProps) {
 
       if (!res.ok) throw new Error("Update failed");
 
-      await fetchOrders();
+      await fetchOrders(slug);
     } catch (err) {
       console.error(err);
       alert("Failed to save. Reverting changes...");
-      fetchOrders();
+      fetchOrders(slug);
     }
   };
 
@@ -363,7 +382,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
       setAddOrderFile(null);
       setIsAddOrderSendOpen(false);
       setUploadProgress(0);
-      fetchOrders();
+      fetchOrders(slug);
     } catch (error) {
       console.error(error);
       alert("Something went wrong with the file upload.");
@@ -560,6 +579,34 @@ export default function AdminDashboard({ slug }: AdminProps) {
             formatDate={formatDate}
             editOrder={setEditingOrder}
           />
+          {slug != "cresta" && (
+            <DropDownList
+              onClick={openDropdown}
+              open={dropDowns.awaitingOrder}
+              orders={displayedOrders.filter(
+                (order) => order.status === "Waiting",
+              )}
+              type="awaitingOrder"
+              name="Waiting Collection"
+              btnClick={setSelectedOrder}
+              formatDate={formatDate}
+              editOrder={setEditingOrder}
+            />
+          )}
+          {slug != "cresta" && (
+            <DropDownList
+              onClick={openDropdown}
+              open={dropDowns.collectedOrder}
+              orders={displayedOrders.filter(
+                (order) => order.status === "Collected",
+              )}
+              type="collectedOrder"
+              name="Collected Orders"
+              btnClick={setSelectedOrder}
+              formatDate={formatDate}
+              editOrder={setEditingOrder}
+            />
+          )}
           <DropDownList
             onClick={openDropdown}
             open={dropDowns.pendingOrder}
@@ -627,7 +674,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
 
       {showSuccessModal && (
         <SuccessModal
-          fetchOrders={fetchOrders}
+          fetchOrders={() => fetchOrders(slug)}
           setSelectedOrder={setSelectedOrder}
           setShowSuccessModal={setShowSuccessModal}
         />
