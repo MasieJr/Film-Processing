@@ -25,11 +25,13 @@ export async function PATCH(
     if (!store) {
       return NextResponse.json({ error: "Invalid store" }, { status: 400 });
     }
-    const orders = await prisma.order.findMany({
+    const orders = await prisma.order.updateMany({
       where: {
-        store_id: store.id,
+        status: "Waiting",
       },
-      orderBy: { createdAt: "desc" },
+      data: {
+        status: "Collected",
+      },
     });
     return NextResponse.json(orders);
   } catch (error) {

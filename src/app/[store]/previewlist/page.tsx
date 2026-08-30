@@ -1,0 +1,71 @@
+"use client";
+
+import CollectionList from "@/components/CollectionList";
+
+export default function CollectionPreviewPage() {
+  const mockOrders = [
+    {
+      id: "ORD-1042",
+      customerName: "Jane Doe",
+      email: "jane.doe@example.com",
+      phone: "082 123 4567",
+      quantity: 3,
+      services: "Print and Email",
+      totalPrice: 185,
+      status: "Waiting",
+      createdAt: new Date(),
+    },
+    {
+      id: "ORD-1043",
+      customerName: "Michael Smith",
+      email: "michael.smith@example.com",
+      phone: "083 456 7890",
+      quantity: 6,
+      services: "Print",
+      totalPrice: 320,
+      status: "Waiting",
+      createdAt: new Date(),
+    },
+    {
+      id: "ORD-1044",
+      customerName: "Sarah Williams",
+      email: "sarah.williams@example.com",
+      phone: "071 234 5678",
+      quantity: 2,
+      services: "Scan and Email",
+      totalPrice: 120,
+      status: "Waiting",
+      createdAt: new Date(),
+    },
+    {
+      id: "ORD-1045",
+      customerName: "David Moyo",
+      email: "david.moyo@example.com",
+      phone: "079 876 5432",
+      quantity: 10,
+      services: "Print and Scan",
+      totalPrice: 450,
+      status: "Waiting",
+      createdAt: new Date(),
+    },
+    {
+      id: "ORD-1046",
+      customerName: "Thandi Ndlovu",
+      email: "thandi.ndlovu@example.com",
+      phone: "072 345 6789",
+      quantity: 4,
+      services: "Print and Email",
+      totalPrice: 240,
+      status: "Waiting",
+      createdAt: new Date(),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-neutral-800 p-8 flex justify-center overflow-auto">
+      <div className="shadow-2xl w-full max-w-5xl">
+        <CollectionList orders={mockOrders} shop="clearwater" />
+      </div>
+    </div>
+  );
+}
