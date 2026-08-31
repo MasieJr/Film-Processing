@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/configs/prisma";
 
-export async function PATCH(
+// 1. GET: Admin fetches all orders
+export async function GET(
   request: Request,
-  { params }: { params: Promise<{ shop: string }> },
+  { params }: { params: Promise<{ store: string }> },
 ) {
   try {
-    const { shop } = await params;
+    const { store } = await params;
 
-    const store = await prisma.store.findUnique({
+    const shop = await prisma.store.findUnique({
       where: {
-        slug: shop,
+        slug: store,
       },
     });
 
-    if (!store) {
+    if (!shop) {
       return NextResponse.json({ error: "Invalid store" }, { status: 400 });
     }
-    const orders = await prisma.order.updateMany({
+    const orders = await prisma.order.findMany({
       where: {
-        status: "Waiting",
+        store_id: shop.id,
       },
-      data: {
-        status: "Collected",
-      },
+      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(orders);
   } catch (error) {

@@ -147,10 +147,10 @@ export default function AdminDashboard({ slug }: AdminProps) {
     documentTitle: `WorkOrder_${selectedOrder?.id}`,
   });
 
-  const printCollection = useReactToPrint({
-    contentRef: colRef,
-    documentTitle: `WorkOrder_${selectedOrder?.id}`,
-  });
+  // const printCollection = useReactToPrint({
+  //   contentRef: colRef,
+  //   documentTitle: `WorkOrder_${selectedOrder?.id}`,
+  // });
 
   const fetchOrders = async (shop: string) => {
     try {
@@ -211,7 +211,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
   // Print Docket
   const handlePrint = () => {
     handlePrint1(); //change name to something better
-    changeStatus("Pending");
+    changeStatus(slug === "cresta" ? "Pending" : "Waiting");
     setSelectedOrder(null);
   };
 
@@ -711,13 +711,6 @@ export default function AdminDashboard({ slug }: AdminProps) {
       {/* --- HIDDEN PDF TEMPLATE --- */}
       <div className="hidden">
         <OrderPdfTemplate ref={pdfRef} order={selectedOrder} />
-      </div>
-      <div className="hidden">
-        <CollectionList
-          ref={collectionListRef}
-          orders={waitingOrders}
-          shop={slug}
-        />
       </div>
     </div>
   );

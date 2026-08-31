@@ -17,26 +17,26 @@ function escapeHtml(value: unknown): string {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ shop: string }> },
+  { params }: { params: Promise<{ store: string }> },
 ) {
   let browser;
 
   try {
-    const { shop } = await params;
+    const { store } = await params;
 
-    // 1. Find store
-    const store = await prisma.store.findUnique({
-      where: { slug: shop },
+    // 1. Find shop
+    const shop = await prisma.store.findUnique({
+      where: { slug: store },
     });
 
-    if (!store) {
+    if (!shop) {
       return NextResponse.json({ error: "Invalid store" }, { status: 400 });
     }
 
     // 2. Fetch orders waiting for collection
     const orders = await prisma.order.findMany({
       where: {
-        storeId: store.id,
+        store_id: shop.id,
         status: "Waiting",
       },
       orderBy: {
@@ -65,8 +65,8 @@ export async function POST(
       minute: "2-digit",
     });
 
-    const storeName =
-      store.name || shop.charAt(0).toUpperCase() + shop.slice(1);
+    const shopName =
+      shop.name || store.charAt(0).toUpperCase() + store.slice(1);
 
     const rows = orders
       .map(
@@ -154,7 +154,7 @@ export async function POST(
             <div class="title">Driver Collection List</div>
           </div>
           <div class="details">
-            <div><strong>Branch:</strong> ${escapeHtml(storeName)}</div>
+            <div><strong>Branch:</strong> ${escapeHtml(shopName)}</div>
             <div><strong>Date:</strong> ${formattedDate}</div>
             <div><strong>Time:</strong> ${formattedTime}</div>
           </div>
@@ -235,8 +235,7 @@ export async function POST(
     browser = null;
 
     // 5. Upload PDF to Cloudflare R2
-    const timestamp = Date.now();
-    const fileKey = `collection-manifests/${shop}/${timestamp}.pdf`;
+    const fileKey = `${store}/${formattedDate}.pdf`;
 
     await S3.send(
       new PutObjectCommand({
@@ -245,7 +244,7 @@ export async function POST(
         Body: pdf,
         ContentType: "application/pdf",
         Metadata: {
-          store: shop,
+          shop: store,
           orderCount: String(orders.length),
         },
       }),
@@ -263,7 +262,7 @@ export async function POST(
 
     const newBatch = await prisma.collection.create({
       data: {
-        store_id: store.id,
+        store_id: shop.id,
         pdfUrl: downloadUrl,
       },
     });
