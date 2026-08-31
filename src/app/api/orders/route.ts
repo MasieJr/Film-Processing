@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { Resend } from "resend";
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL as string });
-
-const adapter = new PrismaPg(pool);
-
-const prisma = new PrismaClient({ adapter });
+import { prisma } from "@/configs/prisma";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
