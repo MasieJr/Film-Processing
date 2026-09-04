@@ -280,9 +280,6 @@ export async function POST(
     return NextResponse.json({
       success: true,
       pdfUrl: downloadUrl,
-      fileKey,
-      orderCount: orders.length,
-      orderIds,
     });
   } catch (error) {
     console.error("Collection PDF Error:", error);

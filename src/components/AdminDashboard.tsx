@@ -6,7 +6,7 @@ import OrderPdfTemplate from "@/components/OrderPdfTemplate";
 import DropDownList from "@/components/DropDownList";
 import ViewModal from "@/components/modals/ViewModal";
 import SuccessModal from "@/components/modals/SuccessModal";
-import { Calendar, Plus, Search, X } from "lucide-react";
+import { Calendar, Plus, Search, Truck, X } from "lucide-react";
 import AddOrder from "@/components/modals/AddOrder";
 import AutoRefresh from "@/components/AutoRefresh";
 import { format } from "date-fns";
@@ -22,6 +22,7 @@ import EditCustomerModal from "@/components/modals/EditCustomerModal";
 import { fetchDashboardAnalytics } from "@/actions/analytics";
 import DashboardAnalytics from "@/components/DashboardAnalytics";
 import { stores } from "@/lib/stores";
+import { useRouter } from "next/navigation";
 
 //lazy me
 const initialOrders = [
@@ -90,6 +91,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
   const [addOrderFile, setAddOrderFile] = useState<File | null>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [timeframe, setTimeframe] = useState<"week" | "month">("month");
+  const router = useRouter();
 
   const store = stores[slug as keyof typeof stores];
   if (!store) {
@@ -146,11 +148,6 @@ export default function AdminDashboard({ slug }: AdminProps) {
     contentRef: pdfRef,
     documentTitle: `WorkOrder_${selectedOrder?.id}`,
   });
-
-  // const printCollection = useReactToPrint({
-  //   contentRef: colRef,
-  //   documentTitle: `WorkOrder_${selectedOrder?.id}`,
-  // });
 
   const fetchOrders = async (shop: string) => {
     try {
@@ -224,10 +221,20 @@ export default function AdminDashboard({ slug }: AdminProps) {
     }
 
     try {
-      const updateRes = await fetch(`/api/${slug}/orders/collect`, {
-        method: "PATCH",
+      const updateRes = await fetch(`/api/${slug}/collection`, {
+        method: "POST",
       });
-      if (updateRes.ok) fetchOrders(slug);
+      if (updateRes.ok) {
+        const data = await updateRes.json(); // 1. Await JSON parsing
+        await fetchOrders(slug);
+
+        if (data.pdfUrl) {
+          // window.location.href = data.pdfUrl;
+          window.open(data.pdfUrl, "_blank", "noopener,noreferrer");
+        }
+      } else {
+        alert("Failed to create batch. Please try again or contact admin");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -467,7 +474,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#121212] pb-20">
-      <AutoRefresh interval={15000} />
+      {/* <AutoRefresh interval={15000} /> */}
 
       <div className="bg-white dark:bg-[#1e1e1e] border-b border-gray-200 dark:border-gray-800 px-6 py-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -516,7 +523,8 @@ export default function AdminDashboard({ slug }: AdminProps) {
 
       <div className="max-w-7xl mx-auto px-4 mt-8">
         <DashboardAnalytics analytics={analytics} timeframe={timeframe} />
-        <div className="mb-8 mt-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 mb-8 mt-8 justfy-between">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-gray-400" />
@@ -570,6 +578,16 @@ export default function AdminDashboard({ slug }: AdminProps) {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="mb-8 md:justify-self-end">
+            <Button
+              className="h-11 px-5 rounded-xl bg-[#41B544]
+                 hover:bg-[#369d39] text-white
+                 font-semibold shadow-sm"
+            >
+              <Truck className="w-4 h-4 mr-2" />
+              Driver Collection
+            </Button>
           </div>
         </div>
 
