@@ -229,7 +229,6 @@ export default function AdminDashboard({ slug }: AdminProps) {
         await fetchOrders(slug);
 
         if (data.pdfUrl) {
-          // window.location.href = data.pdfUrl;
           window.open(data.pdfUrl, "_blank", "noopener,noreferrer");
         }
       } else {
@@ -581,6 +580,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
           </div>
           <div className="mb-8 md:justify-self-end">
             <Button
+              onClick={() => handleDriverCollection()}
               className="h-11 px-5 rounded-xl bg-[#41B544]
                  hover:bg-[#369d39] text-white
                  font-semibold shadow-sm"
