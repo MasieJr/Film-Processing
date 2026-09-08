@@ -23,6 +23,7 @@ import { fetchDashboardAnalytics } from "@/actions/analytics";
 import DashboardAnalytics from "@/components/DashboardAnalytics";
 import { stores } from "@/lib/stores";
 import { useRouter } from "next/navigation";
+import PreviewOrders from "./modals/PreviewOrders";
 
 //lazy me
 const initialOrders = [
@@ -77,6 +78,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isaddOrderSendOpen, setIsAddOrderSendOpen] = useState(false);
 
   // Upload State
@@ -225,7 +227,7 @@ export default function AdminDashboard({ slug }: AdminProps) {
         method: "POST",
       });
       if (updateRes.ok) {
-        const data = await updateRes.json(); // 1. Await JSON parsing
+        const data = await updateRes.json();
         await fetchOrders(slug);
 
         if (data.pdfUrl) {
@@ -580,7 +582,8 @@ export default function AdminDashboard({ slug }: AdminProps) {
           </div>
           <div className="mb-8 md:justify-self-end">
             <Button
-              onClick={() => handleDriverCollection()}
+              onClick={() => setShowPreviewModal(true)}
+              // onClick={() => handleDriverCollection()}
               className="h-11 px-5 rounded-xl bg-[#41B544]
                  hover:bg-[#369d39] text-white
                  font-semibold shadow-sm"
@@ -723,6 +726,12 @@ export default function AdminDashboard({ slug }: AdminProps) {
           order={editingOrder}
           onClose={() => setEditingOrder(null)}
           onSave={handleSaveCustomerDetails}
+        />
+      )}
+      {showPreviewModal && (
+        <PreviewOrders
+          orders={orders}
+          onClose={() => setShowPreviewModal(false)}
         />
       )}
 
