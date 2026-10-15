@@ -22,12 +22,12 @@ export default function OrderFormPage() {
   ];
 
   const salesPersons = [
-    "Masie Seremu",
     "Nithian Chetty",
+    "Masie Seremu",
     "Prudence Ndlovu",
-    "Yanga Bululu",
-    "Hloni Smith",
+    "Thabang Mohlakoana",
     "Luisa Gravito",
+    "Hloni Smith",
   ];
 
   const printsSizes = ["9x13 cm", "10x15 cm", "13x18 cm", "15x20 cm"];
