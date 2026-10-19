@@ -31,7 +31,7 @@ export default async function StorePage({ params }: Props) {
       </div>
 
       <JsonLd />
-      <Header store={store} />
+      {/* <Header store={store} /> */}
 
       <main>
         <section id="hero">
