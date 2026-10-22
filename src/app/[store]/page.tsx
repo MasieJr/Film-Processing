@@ -26,13 +26,8 @@ export default async function StorePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#1e1e1e] font-sans scroll-smooth relative">
-      <div className="fixed top-0 left-0 right-0 h-1 bg-neutral-200 dark:bg-neutral-800 z-50 pointer-events-none">
-        <div className="h-full bg-blue-600 dark:bg-blue-400 animate-scroll-progress" />
-      </div>
-
       <JsonLd />
-      {/* <Header store={store} /> */}
-
+      <Header store={store} />
       <main>
         <section id="hero">
           <Hero store={store} />

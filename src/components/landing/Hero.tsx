@@ -8,10 +8,6 @@ export default function Hero({ store }: { store: Store }) {
   return (
     <section id="hero">
       <div className="p-5 space-y-4 max-w-lg mx-auto">
-        <h1 className="text-center text-3xl font-bold tracking-tight text-[#1e3772]">
-          {store.name.toUpperCase()}
-        </h1>
-
         <div className="space-y-2">
           <h2 className="text-4xl font-semibold text-gray-800 dark:text-gray-100">
             Get Your <br />
