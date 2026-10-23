@@ -196,7 +196,7 @@ export default function OrderStorePage() {
 
   return (
     <main className="bg-white dark:bg-[#1e1e1e] ">
-      <Sections selectedSection={2} />
+      <Sections selectedSection={openedSection} />
       <Details />
     </main>
   );
