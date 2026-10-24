@@ -4,6 +4,7 @@ type TextInputProps = {
   autoComplete: string;
   type: string;
   hasError: boolean;
+  placeholder: string;
   onChange: (key: string, value: string) => void;
   onBlur: (key: string) => void;
 };
@@ -14,9 +15,11 @@ export default function TextInput({
   autoComplete,
   type,
   hasError,
+  placeholder,
   onChange,
   onBlur,
 }: TextInputProps) {
+  placeholder = `eg. ` + placeholder;
   return (
     <div className="flex flex-col">
       <label className="text-lg mb-1 font-medium">{label}</label>
@@ -28,7 +31,7 @@ export default function TextInput({
       <input
         type={type}
         required
-        placeholder={label}
+        placeholder={placeholder}
         autoComplete={autoComplete}
         className={`border ${hasError ? "border-red-500" : "border-ffgreen"} rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg`}
         onChange={(e) => onChange(value, e.target.value)}

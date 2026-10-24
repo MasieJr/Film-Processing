@@ -29,11 +29,17 @@ export default function Details({
   salesPersons,
 }: DetailsProps) {
   return (
-    <div className="min-h-screen mt-2  max-w-lg mx-auto p-5 space-y-2">
+    <div className="min-h-screen mt-2 max-w-lg mx-auto p-5 space-y-2">
       <h1 className="text-4xl font-bold">1. Your Details</h1>
+      <p className="text-xs text-gray-400">
+        Please provide us with your details. These will only be used to send
+        your files or communicate with you about your order. Please make sure
+        they are correct
+      </p>
       <div className="space-y-3">
         <TextInput
           label="Name and Surname"
+          placeholder="Foto First"
           value="customerName"
           type="text"
           autoComplete="name"
@@ -43,6 +49,7 @@ export default function Details({
         />
         <TextInput
           label="Email Address"
+          placeholder="fotocresta@gmail.com"
           value="email"
           type="email"
           autoComplete="email"
@@ -52,6 +59,7 @@ export default function Details({
         />
         <TextInput
           label="Phone number"
+          placeholder="0114769580"
           value="phone"
           type="tel"
           autoComplete="tel"
@@ -64,7 +72,9 @@ export default function Details({
         <label className="text-xl mb-1 font-medium">Sales Person</label>
         <select
           className={`border ${
-            salesPersonError ? "border-red-500" : "border-[#41B544]"
+            salesPersonError
+              ? "border-red-500"
+              : "border-ffblue dark:border-ffgreen"
           } rounded-lg h-12 px-3 dark:bg-[#252525] bg-gray-50 text-lg appearance-none outline-none focus:ring-2 focus:ring-[#41B544]/50`}
           value={form.salesPerson}
           onChange={(e) => onChange("salesPerson", e.target.value)}
