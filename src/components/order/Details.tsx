@@ -1,3 +1,4 @@
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import TextInput from "../TextInput";
 
 export type FormData = {
@@ -16,6 +17,8 @@ type DetailsProps = {
   onChange: (field: keyof FormData, value: string) => void;
   onBlur: (field: keyof FormData) => void;
   salesPersons?: string[];
+  currentSection: number;
+  changeSection: (section: number) => void;
 };
 
 export default function Details({
@@ -27,9 +30,11 @@ export default function Details({
   onChange,
   onBlur,
   salesPersons,
+  currentSection,
+  changeSection,
 }: DetailsProps) {
   return (
-    <div className="min-h-screen mt-2 max-w-lg mx-auto p-5 space-y-2">
+    <div className="min-h-screen mt-2 max-w-lg mx-auto p-5 space-y-3">
       <h1 className="text-4xl font-bold">1. Your Details</h1>
       <p className="text-xs text-gray-400">
         Please provide us with your details. These will only be used to send
@@ -89,6 +94,37 @@ export default function Details({
             </option>
           ))}
         </select>
+      </div>
+      <div className="flex flex-row items-center justify-around">
+        {currentSection > 1 && (
+          <button
+            type="button"
+            className="flex flex-row gap-1 text-xl items-center"
+            onClick={() => changeSection(currentSection - 1)}
+          >
+            <ArrowLeft /> Back
+          </button>
+        )}
+
+        {currentSection < 4 ? (
+          <button
+            type="button"
+            className="flex flex-row gap-1 ml-auto bg-ffgreen dark:bg-ffblue p-4 text-xl text-bold rounded-xl items-center"
+            onClick={() => changeSection(currentSection + 1)}
+          >
+            Continue
+            <ArrowRight />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="flex flex-row gap-1 ml-auto bg-ffgreen dark:bg-ffblue p-4 text-xl text-bold rounded-xl items-center"
+            onClick={() => changeSection(currentSection + 1)}
+          >
+            Continue
+            <ArrowRight />
+          </button>
+        )}
       </div>
     </div>
   );

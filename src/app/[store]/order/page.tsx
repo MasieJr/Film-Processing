@@ -15,7 +15,7 @@ export default function OrderStorePage() {
   const [servicesIndex, setServicesIndex] = useState(0);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [selectedFinishIndex, setSelectedFinishIndex] = useState(0);
-  const [openedSection, setOpenedSection] = useState(1);
+  const [selectedSection, setSelectedSection] = useState(1);
   const router = useRouter();
 
   const params = useParams<{ store: string }>();
@@ -202,6 +202,10 @@ export default function OrderStorePage() {
         onBlur={handleBlur}
         onChange={handleInputChange}
         salesPersons={store.salesPersons}
+        currentSection={2}
+        changeSection={setSelectedSection}
+        customerNameError={formErrors.customerName}
+        emailError={from}
       />
     </main>
   );
