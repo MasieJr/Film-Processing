@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import { stores } from "@/lib/stores";
 import Details from "@/components/order/Details";
 import Sections from "@/components/order/Sections";
+import FilmOptions from "@/components/order/FilmOptions";
 
 export default function OrderStorePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -197,16 +198,27 @@ export default function OrderStorePage() {
   return (
     <main className="bg-white dark:bg-[#1e1e1e] ">
       <Sections selectedSection={2} />
-      <Details
-        form={form}
-        onBlur={handleBlur}
-        onChange={handleInputChange}
-        salesPersons={store.salesPersons}
-        currentSection={2}
-        changeSection={setSelectedSection}
-        customerNameError={formErrors.customerName}
-        emailError={from}
-      />
+      {selectedSection === 1 && (
+        <Details
+          form={form}
+          onBlur={handleBlur}
+          onChange={handleInputChange}
+          salesPersons={store.salesPersons}
+          currentSection={selectedSection}
+          changeSection={setSelectedSection}
+          customerNameError={formErrors.customerName}
+          emailError={formErrors.email}
+          phoneError={formErrors.phone}
+          salesPersonError={formErrors.salesPerson}
+        />
+      )}
+      {selectedSection === 2 && (
+        <FilmOptions
+          quantity={form.quantity}
+          increment={decrement}
+          decrement={decrement}
+        />
+      )}
     </main>
   );
 }
