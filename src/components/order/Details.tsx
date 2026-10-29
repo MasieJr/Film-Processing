@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import TextInput from "../TextInput";
+import SectionButton from "./SectionButtons";
 
 export type FormData = {
   customerName: string;
@@ -95,37 +96,10 @@ export default function Details({
           ))}
         </select>
       </div>
-      <div className="flex flex-row items-center justify-around">
-        {currentSection > 1 && (
-          <button
-            type="button"
-            className="flex flex-row gap-1 text-xl items-center"
-            onClick={() => changeSection(currentSection - 1)}
-          >
-            <ArrowLeft /> Back
-          </button>
-        )}
-
-        {currentSection < 4 ? (
-          <button
-            type="button"
-            className="flex flex-row gap-1 ml-auto bg-ffgreen dark:bg-ffblue p-4 text-xl text-bold rounded-xl items-center"
-            onClick={() => changeSection(currentSection + 1)}
-          >
-            Continue
-            <ArrowRight />
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="flex flex-row gap-1 ml-auto bg-ffgreen dark:bg-ffblue p-4 text-xl text-bold rounded-xl items-center"
-            onClick={() => changeSection(currentSection + 1)}
-          >
-            Continue
-            <ArrowRight />
-          </button>
-        )}
-      </div>
+      <SectionButton
+        changeSection={changeSection}
+        currentSection={currentSection}
+      />
     </div>
   );
 }

@@ -197,7 +197,7 @@ export default function OrderStorePage() {
 
   return (
     <main className="bg-white dark:bg-[#1e1e1e] ">
-      <Sections selectedSection={2} />
+      <Sections selectedSection={selectedSection} />
       {selectedSection === 1 && (
         <Details
           form={form}
@@ -217,6 +217,8 @@ export default function OrderStorePage() {
           quantity={form.quantity}
           increment={decrement}
           decrement={decrement}
+          changeSection={setSelectedSection}
+          currentSection={selectedSection}
         />
       )}
     </main>

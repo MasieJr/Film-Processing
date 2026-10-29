@@ -3,17 +3,22 @@ import Strepper from "./options/stepper";
 import RadioGroup from "../RadioGroup";
 import Radio from "./options/radio";
 import { useState } from "react";
+import SectionButton from "./SectionButtons";
 
 type FilmOptionsProps = {
   quantity: number;
   increment: () => void;
   decrement: () => void;
+  currentSection: number;
+  changeSection: (section: number) => void;
 };
 
 export default function FilmOptions({
   quantity,
   increment,
   decrement,
+  currentSection,
+  changeSection,
 }: FilmOptionsProps) {
   const [selected, setSelected] = useState(true);
   return (
@@ -59,18 +64,9 @@ export default function FilmOptions({
             select={() => setSelected(true)}
           />
         </div>
-        <p className="text-xs text-gray-400">
-          Please note its costs extra and takes slighty longer to develop half
-          frame films{" "}
-        </p>
       </div>
       <div className="space-y-2">
-        <p className="text-xl font-bold">Is Your film half frame?</p>
-        <p className="text-xs text-gray-400">
-          Please note if you select no and your film is indeed half frame it
-          will be processed or printed as a single frame i.e two prints on one
-          frame
-        </p>
+        <p className="text-xl font-bold">Do you want your negatives back?</p>
         <div className="grid grid-cols-2 gap-3">
           <Radio
             isSelected={!selected}
@@ -86,6 +82,10 @@ export default function FilmOptions({
           />
         </div>
       </div>
+      <SectionButton
+        changeSection={changeSection}
+        currentSection={currentSection}
+      />
     </div>
   );
 }

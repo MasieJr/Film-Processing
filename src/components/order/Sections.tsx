@@ -4,7 +4,7 @@ type sectionsProps = {
 
 export default function Sections({ selectedSection }: sectionsProps) {
   return (
-    <div className="flex flex-row items-center gap-2 justify-center text-xs text-black dark:text-white">
+    <div className="flex flex-row items-center gap-2 justify-center text-xs text-black dark:text-white sticky top-0 backdrop-blur-lg">
       <div
         className={`flex rounded-full h-8 w-8 items-center justify-center text-xs leading-none border border-ffgreen ${selectedSection > 1 ? "bg-ffblue dark:bg-ffgreen text-white" : "bg-ffblue"}`}
       >
