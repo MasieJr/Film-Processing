@@ -14,7 +14,7 @@ export default function Radio({
     <div
       role="button"
       onClick={select}
-      className="flex flex-row gap-3 p-2 border border-ffgreen items-center rounded-md active:bg-red-500 active:scale-95"
+      className={`flex flex-row gap-3 p-2 border border-ffgreen items-center rounded-md active:bg-red-500 active:scale-95 ${isSelected ? "text-white bg-ffblue/80  dark:bg-ffgreen/50" : ""}`}
     >
       <div className="flex w-6 h-6 rounded-full border border-ffgreen items-center justify-center">
         {isSelected && <div className="rounded-full w-3 h-3 bg-ffgreen" />}

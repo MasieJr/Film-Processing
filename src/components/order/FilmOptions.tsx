@@ -20,7 +20,8 @@ export default function FilmOptions({
   currentSection,
   changeSection,
 }: FilmOptionsProps) {
-  const [selected, setSelected] = useState(true);
+  const [isHalfFrame, setIsHalfFrame] = useState(false);
+  const [keepNegatives, setKeepNegatives] = useState(false);
   return (
     <div className="min-h-screen mt-2 max-w-lg mx-auto p-5 space-y-3">
       <h1 className="text-4xl font-bold">2. Film Options</h1>
@@ -52,16 +53,16 @@ export default function FilmOptions({
         </p>
         <div className="grid grid-cols-2 gap-3">
           <Radio
-            isSelected={!selected}
-            option="No"
-            description="Standard exposures(~36)"
-            select={() => setSelected(false)}
-          />
-          <Radio
-            isSelected={selected}
+            isSelected={isHalfFrame}
             option="Yes"
             description="Half-frame exposures(~72)"
-            select={() => setSelected(true)}
+            select={() => setIsHalfFrame(true)}
+          />
+          <Radio
+            isSelected={!isHalfFrame}
+            option="No"
+            description="Standard exposures(~36)"
+            select={() => setIsHalfFrame(false)}
           />
         </div>
       </div>
@@ -69,16 +70,16 @@ export default function FilmOptions({
         <p className="text-xl font-bold">Do you want your negatives back?</p>
         <div className="grid grid-cols-2 gap-3">
           <Radio
-            isSelected={!selected}
-            option="No"
-            description="Standard exposures(~36)"
-            select={() => setSelected(false)}
-          />
-          <Radio
-            isSelected={selected}
+            isSelected={keepNegatives}
             option="Yes"
             description="Half-frame exposures(~72)"
-            select={() => setSelected(true)}
+            select={() => setKeepNegatives(true)}
+          />
+          <Radio
+            isSelected={!keepNegatives}
+            option="No"
+            description="Standard exposures(~36)"
+            select={() => setKeepNegatives(false)}
           />
         </div>
       </div>

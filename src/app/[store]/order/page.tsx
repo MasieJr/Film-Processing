@@ -9,6 +9,7 @@ import { stores } from "@/lib/stores";
 import Details from "@/components/order/Details";
 import Sections from "@/components/order/Sections";
 import FilmOptions from "@/components/order/FilmOptions";
+import Services from "@/components/order/Services";
 
 export default function OrderStorePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -217,6 +218,15 @@ export default function OrderStorePage() {
           quantity={form.quantity}
           increment={decrement}
           decrement={decrement}
+          changeSection={setSelectedSection}
+          currentSection={selectedSection}
+        />
+      )}
+      {selectedSection === 3 && (
+        <Services
+          price={form.totalPrice}
+          handleSubmit={() => handleSubmit}
+          isSubmitting={isSubmitting}
           changeSection={setSelectedSection}
           currentSection={selectedSection}
         />
