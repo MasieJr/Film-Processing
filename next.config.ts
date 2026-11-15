@@ -3,15 +3,7 @@ import withSerwist from "@serwist/next";
 const nextConfig = {
   turbopack: {},
   reactCompiler: true,
-  allowedDevOrigins: [
-    "192.168.1.82",
-    "192.168.89.6",
-    "192.168.89.9",
-    "192.168.89.7",
-    "192.168.89.17",
-    "192.168.1.84",
-    "192.168.1.93",
-  ],
+  allowedDevOrigins: ["192.168.89.17", "192.168.1.71"],
 };
 
 export default withSerwist({

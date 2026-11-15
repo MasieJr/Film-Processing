@@ -220,6 +220,7 @@ export default function OrderFormPage() {
           label="Name and Surname"
           value="customerName"
           type="text"
+          placeholder="Masie"
           autoComplete="name"
           hasError={formErrors.customerName}
           onChange={handleInputChange}
@@ -229,6 +230,7 @@ export default function OrderFormPage() {
           label="Email Address"
           value="email"
           type="email"
+          placeholder="cresta@fotofirst.co.za"
           autoComplete="email"
           hasError={formErrors.email}
           onChange={handleInputChange}
@@ -238,6 +240,7 @@ export default function OrderFormPage() {
           label="Phone number"
           value="phone"
           type="tel"
+          placeholder="0114769580"
           autoComplete="tel"
           hasError={formErrors.phone}
           onChange={handleInputChange}

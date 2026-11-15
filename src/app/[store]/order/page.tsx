@@ -145,34 +145,6 @@ export default function OrderStorePage() {
   };
 
   // --- PRICING LOGIC ---
-  const selectService = (index: number) => {
-    setServicesIndex(index);
-    setSelectedSizeIndex(1);
-    setSelectedPrice(prices[index]);
-    setForm((prev) => ({
-      ...prev,
-      services: services[index],
-      totalPrice: prev.quantity * prices[index],
-    }));
-  };
-
-  const selectSize = (index: number) => {
-    setSelectedSizeIndex(index);
-    setSelectedPrice(printPrices[index]);
-    setForm((prev) => ({
-      ...prev,
-      selectedSize: printsSizes[index],
-      totalPrice: prev.quantity * printPrices[index],
-    }));
-  };
-
-  const selectFinish = (index: number) => {
-    setSelectedFinishIndex(index);
-    setForm((prev) => ({
-      ...prev,
-      selectedFinish: finishes[index],
-    }));
-  };
 
   const decrement = () => {
     setForm((prev) => {
@@ -224,7 +196,8 @@ export default function OrderStorePage() {
       )}
       {selectedSection === 3 && (
         <Services
-          price={form.totalPrice}
+          quantity={2}
+          halfFrameQuantity={1}
           handleSubmit={() => handleSubmit}
           isSubmitting={isSubmitting}
           changeSection={setSelectedSection}
