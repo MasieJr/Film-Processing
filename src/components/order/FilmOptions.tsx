@@ -3,7 +3,7 @@ import Strepper from "./options/stepper";
 import RadioGroup from "../RadioGroup";
 import Radio from "./options/radio";
 import { useState } from "react";
-import SectionButton from "./SectionButtons";
+import SectionButton from "./sections/SectionButtons";
 
 type FilmOptionsProps = {
   quantity: number;

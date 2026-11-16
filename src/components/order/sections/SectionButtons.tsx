@@ -34,9 +34,10 @@ export default function SectionButton({
         <button
           type="button"
           className="flex flex-row gap-1 ml-auto bg-ffgreen dark:bg-ffblue p-4 text-xl text-bold rounded-xl items-center"
-          onClick={() => changeSection(currentSection + 1)}
+          //submit
+          onClick={() => {}}
         >
-          Continue
+          Place order
           <ArrowRight />
         </button>
       )}

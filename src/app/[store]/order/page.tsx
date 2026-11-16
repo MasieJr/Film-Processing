@@ -10,6 +10,7 @@ import Details from "@/components/order/Details";
 import Sections from "@/components/order/Sections";
 import FilmOptions from "@/components/order/FilmOptions";
 import Services from "@/components/order/Services";
+import Review from "@/components/order/Review";
 
 export default function OrderStorePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -167,7 +168,19 @@ export default function OrderStorePage() {
       };
     });
   };
-
+  const order = {
+    name: "Masie Seremu",
+    email: "email@example.com",
+    phone: "0114769580",
+    quantity: 2,
+    halfFrame: false,
+    negatives: true,
+    service: "Print and Email",
+    printSize: "10x15cm",
+    printFinish: "Glossy",
+    filmType: "35mm Film",
+    price: 200,
+  };
   return (
     <main className="bg-white dark:bg-[#1e1e1e] ">
       <Sections selectedSection={selectedSection} />
@@ -196,10 +209,17 @@ export default function OrderStorePage() {
       )}
       {selectedSection === 3 && (
         <Services
-          quantity={2}
-          halfFrameQuantity={1}
+          quantity={1}
+          halfFrameQuantity={0}
           handleSubmit={() => handleSubmit}
           isSubmitting={isSubmitting}
+          changeSection={setSelectedSection}
+          currentSection={selectedSection}
+        />
+      )}
+      {selectedSection === 4 && (
+        <Review
+          order={order}
           changeSection={setSelectedSection}
           currentSection={selectedSection}
         />

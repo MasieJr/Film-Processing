@@ -1,6 +1,6 @@
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import TextInput from "../TextInput";
-import SectionButton from "./SectionButtons";
+import SectionButton from "./sections/SectionButtons";
 
 export type FormData = {
   customerName: string;
