@@ -11,3 +11,18 @@ export const printPrices = [445, 329, 895, 931];
 export const prices = [200, 180, 329, 329, 95];
 export const surcharges = [144, 144, 500, 600];
 export const devSurcharge = 90;
+
+export interface OrderFormData {
+  customerName: string;
+  email: string;
+  phone: string;
+  quantity: number;
+  salesPerson: string;
+  services: string;
+  selectedSize: string;
+  selectedFinish: string;
+  totalPrice: number;
+  keepNegatives: boolean;
+  isHalfFrame: boolean;
+  filmtype: "35mm" | "120mm" | "Slides" | "negatives";
+}
