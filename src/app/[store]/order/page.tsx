@@ -11,6 +11,7 @@ import Sections from "@/components/order/Sections";
 import FilmOptions from "@/components/order/FilmOptions";
 import Services from "@/components/order/Services";
 import Review from "@/components/order/Review";
+import { OrderFormData } from "@/lib/services";
 
 export default function OrderStorePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,95 +31,26 @@ export default function OrderStorePage() {
       </main>
     );
   }
-
-  const services = [
-    "Email in High Resolution",
-    "Email in Low Resolution",
-    "Print Only",
-    "Print and email",
-    "Develop only",
-  ];
-
-  const printsSizes = ["9x13 cm", "10x15 cm", "13x18 cm", "15x20 cm"];
-  const finishes = ["Glossy", "Matte"];
-  const printPrices = [445, 329, 895, 931];
-  const prices = [200, 180, 329, 329, 95];
-
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<OrderFormData>({
     customerName: "",
     email: "",
     phone: "",
     quantity: 1,
     salesPerson: "",
-    services: services[0],
-    selectedSize: printsSizes[1],
-    selectedFinish: finishes[0],
-    totalPrice: 200,
+    services: "",
+    selectedSize: "",
+    selectedFinish: "",
+    totalPrice: 0,
     keepNegatives: false,
+    filmtype: "35mm",
+    isHalfFrame: false,
   });
 
-  const [formErrors, setFormErrors] = useState({
-    customerName: false,
-    email: false,
-    phone: false,
-    salesPerson: false,
-    hasGlobalError: false,
-  });
-
-  const validateField = (key: string, value: string) => {
-    let hasError = false;
-
-    if (value.trim() === "") {
-      hasError = true;
-    } else if (key === "email") {
-      hasError = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-    } else if (key === "phone") {
-      hasError = !/^\+?[0-9\s\-()]{10,15}$/.test(value);
-    }
-
-    return hasError;
-  };
-
-  const handleInputChange = (key: string, value: string | boolean) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-
-    if (typeof value === "string") {
-      setFormErrors((prev) => ({
-        ...prev,
-        [key]: false,
-        hasGlobalError: false,
-      }));
-    }
-  };
-
-  const handleBlur = (key: string) => {
-    const value = form[key as keyof typeof form] as string;
-    const isError = validateField(key, value);
-
-    setFormErrors((prev) => ({ ...prev, [key]: isError }));
+  const updateFields = (fields: Partial<OrderFormData>) => {
+    setForm((prev) => ({ ...prev, ...fields }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const nameError = validateField("customerName", form.customerName);
-    const emailError = validateField("email", form.email);
-    const phoneError = validateField("phone", form.phone);
-    const salesError = validateField("salesPerson", form.salesPerson);
-
-    setFormErrors({
-      customerName: nameError,
-      email: emailError,
-      phone: phoneError,
-      salesPerson: salesError,
-      hasGlobalError: nameError || emailError || phoneError || salesError,
-    });
-
-    if (nameError || emailError || phoneError || salesError) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/orders", {
@@ -146,7 +78,6 @@ export default function OrderStorePage() {
   };
 
   // --- PRICING LOGIC ---
-
   const decrement = () => {
     setForm((prev) => {
       const newQuantity = Math.max(1, prev.quantity - 1);
@@ -186,16 +117,11 @@ export default function OrderStorePage() {
       <Sections selectedSection={selectedSection} />
       {selectedSection === 1 && (
         <Details
+          updateFields={updateFields}
           form={form}
-          onBlur={handleBlur}
-          onChange={handleInputChange}
           salesPersons={store.salesPersons}
           currentSection={selectedSection}
           changeSection={setSelectedSection}
-          customerNameError={formErrors.customerName}
-          emailError={formErrors.email}
-          phoneError={formErrors.phone}
-          salesPersonError={formErrors.salesPerson}
         />
       )}
       {selectedSection === 2 && (
